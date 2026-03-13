@@ -1,24 +1,61 @@
-# Compiled class file
+# =========================
+# Java
+# =========================
 *.class
 
-# Log file
+# Logs
 *.log
 
-# BlueJ files
-*.ctxt
+# =========================
+# Gradle
+# =========================
+.gradle/
+build/
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+# =========================
+# IntelliJ
+# =========================
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
 
-# Package Files #
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Package files (NO deberían subirse)
+# =========================
 *.jar
 *.war
-*.nar
 *.ear
+*.nar
 *.zip
 *.tar.gz
 *.rar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+# =========================
+# JVM crash logs
+# =========================
 hs_err_pid*
 replay_pid*
+
+# =========================
+# Environment files
+# =========================
+.env
+.env.*
+
+# =========================
+# Flyway temp
+# =========================
+flyway.conf
+
+# =========================
+# DevTools restart
+# =========================
+.restart/
