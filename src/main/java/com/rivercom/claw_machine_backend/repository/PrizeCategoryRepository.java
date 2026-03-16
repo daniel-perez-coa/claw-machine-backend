@@ -1,4 +1,4 @@
-package com.rivercom.claw_machine_backend.domain.repository;
+package com.rivercom.claw_machine_backend.repository;
 
 import com.rivercom.claw_machine_backend.domain.entity.PrizeCategory;
 import org.springframework.data.jpa.repository.JpaRepository;

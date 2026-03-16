@@ -16,16 +16,16 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "users", schema = "app")
-public class Users {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false, length = 150)
+    @Column(nullable = false, length = 150)
     private String name;
 
-    @Column(name = "phone", nullable = false, unique = true, length = 30)
+    @Column(nullable = false, unique = true, length = 30)
     private String phone;
 
     @Column(name = "current_points", nullable = false)
