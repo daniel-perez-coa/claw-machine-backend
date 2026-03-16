@@ -41,15 +41,12 @@ public class MachineChampaign {
     @Column(columnDefinition = "TEXT")
     private String notes;
 
-    @Column(name = "opened_at")
+    @CreationTimestamp
+    @Column(name = "opened_at", nullable = false, updatable = false)
     private LocalDateTime openedAt;
 
     @Column(name = "closed_at")
     private LocalDateTime closedAt;
-
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)

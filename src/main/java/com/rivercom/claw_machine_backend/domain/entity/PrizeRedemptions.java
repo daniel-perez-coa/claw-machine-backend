@@ -39,4 +39,8 @@ public class PrizeRedemptions {
     @Column(name = "redeemed_at", nullable = false)
     @CreationTimestamp
     private LocalDateTime redeemedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "campaign_id", nullable = false)
+    private MachineChampaign campaign;
 }
