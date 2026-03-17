@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "machine_campaigns", schema = "app")
-public class MachineChampaign {
+public class MachineCampaign {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -42,5 +42,5 @@ public class PrizeRedemptions {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "campaign_id", nullable = false)
-    private MachineChampaign campaign;
+    private MachineCampaign campaign;
 }

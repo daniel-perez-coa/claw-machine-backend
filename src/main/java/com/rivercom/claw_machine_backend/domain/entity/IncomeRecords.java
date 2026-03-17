@@ -24,7 +24,7 @@ public class IncomeRecords {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "campaign_id", nullable = false)
-    private MachineChampaign campaign;
+    private MachineCampaign campaign;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
