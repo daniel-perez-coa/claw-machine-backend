@@ -16,16 +16,17 @@ public class MachineCampaignMapper {
             return null;
         }
 
-       return MachineCampaignResponse.builder()
-               .name(entity.getName())
-               .prizeName(entity.getMajorPrize().getName())
-               .prizeDescription(entity.getMajorPrize().getDescription())
-               .status(String.valueOf(entity.getStatus()))
-               .baseTargetAmount(entity.getBaseTargetAmount())
-               .notes(entity.getNotes())
-               .openedAt(entity.getOpenedAt())
-               .closedAt(entity.getClosedAt() != null ? entity.getClosedAt() : null)
-               .build();
+        return new MachineCampaignResponse(
+                entity.getId(),
+                entity.getName(),
+                entity.getMajorPrize() != null ? entity.getMajorPrize().getName() : null,
+                entity.getMajorPrize() != null ? entity.getMajorPrize().getDescription() : null,
+                entity.getStatus(),
+                entity.getBaseTargetAmount(),
+                entity.getNotes(),
+                entity.getOpenedAt() != null ? entity.getClosedAt() : null,
+                entity.getClosedAt()
+        );
     }
 
     public List<MachineCampaignResponse> toResponseList

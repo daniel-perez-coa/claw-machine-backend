@@ -1,20 +1,17 @@
 package com.rivercom.claw_machine_backend.dto;
 
-import lombok.Builder;
-import lombok.Value;
+import com.rivercom.claw_machine_backend.domain.enums.MachineCampaignStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
-@Value
-@Builder
-public class MachineCampaignResponse {
-    String name;
-    String prizeName;
-    String prizeDescription;
-    String status;
-    BigDecimal baseTargetAmount;
-    String notes;
-    LocalDateTime openedAt;
-    LocalDateTime closedAt;
-}
+public record MachineCampaignResponse (
+        Long id,
+        String name,
+        String prizeName,
+        String prizeDescription,
+        MachineCampaignStatus status,
+        BigDecimal baseTargetAmount,
+        String notes,
+        LocalDateTime openedAt,
+        LocalDateTime closedAt
+){}
