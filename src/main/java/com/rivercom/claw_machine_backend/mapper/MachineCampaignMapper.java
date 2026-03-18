@@ -1,7 +1,7 @@
 package com.rivercom.claw_machine_backend.mapper;
 
 import com.rivercom.claw_machine_backend.domain.entity.MachineCampaign;
-import com.rivercom.claw_machine_backend.dto.MachineCampaignResponse;
+import com.rivercom.claw_machine_backend.dto.MachineCampaignResponseDTO;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -9,14 +9,14 @@ import java.util.List;
 @Component
 public class MachineCampaignMapper {
 
-    public MachineCampaignResponse toResponse
+    public MachineCampaignResponseDTO toResponse
             (MachineCampaign entity) {
 
         if (entity == null) {
             return null;
         }
 
-        return new MachineCampaignResponse(
+        return new MachineCampaignResponseDTO(
                 entity.getId(),
                 entity.getName(),
                 entity.getMajorPrize() != null ? entity.getMajorPrize().getName() : null,
@@ -29,7 +29,7 @@ public class MachineCampaignMapper {
         );
     }
 
-    public List<MachineCampaignResponse> toResponseList
+    public List<MachineCampaignResponseDTO> toResponseList
             (List<MachineCampaign> entityList) {
 
         if (entityList == null) {

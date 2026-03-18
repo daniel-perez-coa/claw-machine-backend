@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "prize_redemptions", schema = "app")
-public class PrizeRedemptions {
+public class PrizeRedemption {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -3,9 +3,9 @@ package com.rivercom.claw_machine_backend.service;
 import com.rivercom.claw_machine_backend.domain.entity.MachineCampaign;
 import com.rivercom.claw_machine_backend.domain.entity.Prize;
 import com.rivercom.claw_machine_backend.domain.enums.MachineCampaignStatus;
-import com.rivercom.claw_machine_backend.dto.MachineCampaignResponse;
-import com.rivercom.claw_machine_backend.dto.MachineCampaignNewRequest;
-import com.rivercom.claw_machine_backend.dto.MachineCampaignUpdateRequest;
+import com.rivercom.claw_machine_backend.dto.MachineCampaignResponseDTO;
+import com.rivercom.claw_machine_backend.dto.MachineCampaignNewCampaignDTO;
+import com.rivercom.claw_machine_backend.dto.MachineCampaignUpdateRequestDTO;
 import com.rivercom.claw_machine_backend.mapper.MachineCampaignMapper;
 import com.rivercom.claw_machine_backend.repository.MachineCampaignRepository;
 import com.rivercom.claw_machine_backend.repository.PrizeRepository;
@@ -21,21 +21,21 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class MachineCampaignService {
+public class CampaignDetailService {
 
     private final MachineCampaignRepository repository;
     private final PrizeRepository prizeRepository;
     private final MachineCampaignMapper mapper;
 
-    public List<MachineCampaignResponse> listAll() {
+    public List<MachineCampaignResponseDTO> listAll() {
 
         List<MachineCampaign> machineCampaigns = repository.findAll();
 
         return mapper.toResponseList(machineCampaigns);
     }
 
-    public MachineCampaignResponse createCampaign
-            (MachineCampaignNewRequest request) {
+    public MachineCampaignResponseDTO createCampaign
+            (MachineCampaignNewCampaignDTO request) {
         Optional<Prize> prize = prizeRepository.findById(request.majorPrizeId());
         Optional<MachineCampaign> existingOpenCampaign =
                 repository.findByStatus(MachineCampaignStatus.OPEN);
@@ -60,7 +60,7 @@ public class MachineCampaignService {
         return mapper.toResponse(savedCampaign);
     }
 
-    public MachineCampaignResponse updateCampaign (MachineCampaignUpdateRequest request, Long id) {
+    public MachineCampaignResponseDTO updateCampaign (MachineCampaignUpdateRequestDTO request, Long id) {
         Optional<MachineCampaign> existingCampaign =
                 repository.findById(id);
         if (existingCampaign.isEmpty()) {

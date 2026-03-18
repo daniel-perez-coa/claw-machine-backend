@@ -4,7 +4,7 @@ import com.rivercom.claw_machine_backend.domain.enums.MachineCampaignStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-public record MachineCampaignResponse (
+public record MachineCampaignResponseDTO(
         Long id,
         String name,
         String prizeName,

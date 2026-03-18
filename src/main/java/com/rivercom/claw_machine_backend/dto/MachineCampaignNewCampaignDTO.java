@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 
-public record MachineCampaignNewRequest(
+public record MachineCampaignNewCampaignDTO(
         @NotBlank String name,
         @NotNull Long majorPrizeId,
         @NotNull @DecimalMin("0.01") BigDecimal baseTargetAmount
