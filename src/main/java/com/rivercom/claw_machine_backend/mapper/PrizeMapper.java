@@ -15,7 +15,8 @@ public class PrizeMapper {
         }
         return new PrizeDTO(
                 prize.getId(),
-                prize.getCategory(),
+                prize.getCategory().getCode(),
+                prize.getCategory().getName(),
                 prize.getName(),
                 prize.getDescription(),
                 prize.getPointsCost(),

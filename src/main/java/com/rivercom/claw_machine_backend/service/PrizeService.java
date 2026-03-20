@@ -41,7 +41,7 @@ public class PrizeService {
         }
         Prize newPrize = new Prize();
         PrizeCategory prizeCategory = Optional.ofNullable(
-                prizeCategoryRepository.findByName(prize.prizeCategory())
+                prizeCategoryRepository.findByCode(prize.prizeCategory())
         ).orElseThrow(() -> new IllegalArgumentException("La categoría no existe"));
         newPrize.setCategory(prizeCategory);
         newPrize.setName(prize.name());
@@ -65,7 +65,10 @@ public class PrizeService {
         updatedPrize.setDescription(prize.description());
         updatedPrize.setPointsCost(prize.pointsCost());
         updatedPrize.setCost(prize.cost());
-        updatedPrize.setCategory(prize.prizeCategory());
+        PrizeCategory prizeCategory = Optional.ofNullable(
+                prizeCategoryRepository.findByCode(prize.prizeCategory())
+        ).orElseThrow(() -> new IllegalArgumentException("La categoría no existe"));
+        updatedPrize.setCategory(prizeCategory);
         Prize savedPrize = repository.save(updatedPrize);
         return mapper.toResponsePrize(savedPrize);
     }

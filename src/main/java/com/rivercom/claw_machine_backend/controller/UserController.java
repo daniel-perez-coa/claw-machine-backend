@@ -21,17 +21,17 @@ public class UserController {
         return ResponseEntity.ok(service.getAllUsers());
     }
 
-    @GetMapping("/api/users/by-phone/{phone}")
+    @GetMapping("/by-phone/{phone}")
     public ResponseEntity<UserDTO> getUser(@PathVariable String phone) {
         return ResponseEntity.ok(service.getUserByPhone(phone));
     }
 
-    @PostMapping("/api/users")
+    @PostMapping
     public ResponseEntity<UserDTO> createUser(@RequestBody NewUserDTO user) {
         return ResponseEntity.ok(service.newUser(user));
     }
 
-    @PutMapping("/api/users/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<UserDTO> updateUser(@RequestBody UserDTO user, @PathVariable Long id) {
         return ResponseEntity.ok(service.updateUser(user, id));
     }
