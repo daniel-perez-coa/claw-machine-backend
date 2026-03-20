@@ -14,6 +14,9 @@ public interface PrizeRepository extends JpaRepository<Prize, Long> {
 
     Optional<Prize> findByName(String name);
 
+    @EntityGraph(attributePaths = "category")
+    List<Prize> findByCategoryCode(String code);
+
     @Override
     @EntityGraph(attributePaths = "category")
     List<Prize> findAll();

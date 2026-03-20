@@ -1,6 +1,7 @@
 package com.rivercom.claw_machine_backend.controller;
 
 import com.rivercom.claw_machine_backend.dto.NewUserDTO;
+import com.rivercom.claw_machine_backend.dto.UserAddPointsDTO;
 import com.rivercom.claw_machine_backend.dto.UserDTO;
 import com.rivercom.claw_machine_backend.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -31,8 +32,13 @@ public class UserController {
         return ResponseEntity.ok(service.newUser(user));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<UserDTO> updateUser(@RequestBody UserDTO user, @PathVariable Long id) {
-        return ResponseEntity.ok(service.updateUser(user, id));
+    @PutMapping("/{phone}")
+    public ResponseEntity<UserDTO> updateUser(@RequestBody UserDTO user, @PathVariable String phone) {
+        return ResponseEntity.ok(service.updateUser(user, phone));
+    }
+
+    @PutMapping("/add-points")
+    public ResponseEntity<UserDTO> addPoints(@RequestBody UserAddPointsDTO user) {
+        return ResponseEntity.ok(service.addPoints(user));
     }
 }

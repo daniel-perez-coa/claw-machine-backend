@@ -14,6 +14,7 @@ import com.rivercom.claw_machine_backend.repository.PrizeRedemptionsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public class DashboardService {
     private final PrizeRedemptionsRepository prizeRedemptionsRepository;
     private final MachineExpenseRecordsRepository machineExpenseRecordsRepository;
 
+    @Transactional(readOnly = true)
     public DashboardInformationDTO getDashboardInformation() {
         log.debug("Buscando información sobre campañas con estado: OPEN");
 
@@ -98,7 +100,7 @@ public class DashboardService {
                     machineExpenseRecord.getQuantity(),
                     String.format(
                             "Los premios con categoría: %s necesitan rellenarse: %s",
-                            machineExpenseRecord.getPrize().getCategory(),
+                            machineExpenseRecord.getPrize().getCategory().getName(),
                             machineExpenseRecord.getQuantity()
                     )
             ));
