@@ -2,13 +2,15 @@ package com.rivercom.claw_machine_backend.service;
 
 import com.rivercom.claw_machine_backend.domain.entity.PrizeCategory;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import com.rivercom.claw_machine_backend.repository.PrizeCategoryRepository;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class PrizeCategoryService {
 
     private final PrizeCategoryRepository repository;

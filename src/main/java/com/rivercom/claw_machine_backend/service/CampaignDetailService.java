@@ -4,7 +4,7 @@ import com.rivercom.claw_machine_backend.domain.entity.MachineCampaign;
 import com.rivercom.claw_machine_backend.domain.entity.Prize;
 import com.rivercom.claw_machine_backend.domain.enums.MachineCampaignStatus;
 import com.rivercom.claw_machine_backend.dto.MachineCampaignResponseDTO;
-import com.rivercom.claw_machine_backend.dto.MachineCampaignNewCampaignDTO;
+import com.rivercom.claw_machine_backend.dto.NewMachineCampaignCampaignDTO;
 import com.rivercom.claw_machine_backend.dto.MachineCampaignUpdateRequestDTO;
 import com.rivercom.claw_machine_backend.mapper.MachineCampaignMapper;
 import com.rivercom.claw_machine_backend.repository.MachineCampaignRepository;
@@ -35,7 +35,7 @@ public class CampaignDetailService {
     }
 
     public MachineCampaignResponseDTO createCampaign
-            (MachineCampaignNewCampaignDTO request) {
+            (NewMachineCampaignCampaignDTO request) {
         Optional<Prize> prize = prizeRepository.findById(request.majorPrizeId());
         Optional<MachineCampaign> existingOpenCampaign =
                 repository.findByStatus(MachineCampaignStatus.OPEN);
