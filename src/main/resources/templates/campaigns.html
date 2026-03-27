@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: appHead('Campañas')}"><title>Campañas</title></head>
+<body>
+<div class="app">
+    <div th:replace="~{fragments/sidebar :: sidebar('campaigns')}"></div>
+
+    <main class="content">
+        <div th:replace="~{fragments/topbar :: topbar('Campañas', 'Inicio / Campañas')}"></div>
+
+        <section class="page">
+            <div class="page-shell campaigns-page">
+
+                <section class="campaigns-header">
+
+                    <!-- HERO FULL WIDTH -->
+                    <div class="campaigns-hero">
+                        <h3 class="campaigns-hero__title">Campañas</h3>
+                        <p class="campaigns-hero__text">
+                            Consulta, visualiza y actualiza las campañas registradas.
+                            Usa el botón de crear para registrar una nueva campaña.
+                        </p>
+                    </div>
+
+                    <!-- BOTÓN + CENTRADO -->
+                    <div class="campaigns-create-wrapper">
+                        <a th:href="@{/campaigns/new}"
+                           class="campaigns-create-card"
+                           aria-label="Crear campaña">
+                            +
+                        </a>
+                    </div>
+
+                </section>
+
+                <section class="app-card campaigns-list-shell">
+                    <div class="campaigns-list"
+                         th:if="${campaigns != null and !#lists.isEmpty(campaigns)}">
+
+                        <article class="app-card campaign-card"
+                                 th:each="campaign : ${campaigns}">
+
+                            <div class="campaign-card__content">
+                                <h3 class="campaign-card__title"
+                                    th:text="${campaign.name}">
+                                </h3>
+
+                                <p class="campaign-card__prize">
+                                    <strong>Premio mayor:</strong>
+                                    <span th:text="${campaign.prizeName}">
+                                    </span>
+                                    <span th:if="${campaign.prizeDescription != null and !#strings.isEmpty(campaign.prizeDescription)}"
+                                          th:text="${' - ' + campaign.prizeDescription}">
+                                    </span>
+                                </p>
+
+                                <div class="campaign-card__meta">
+
+                                    <div th:if="${campaign.status == 'OPEN'}"
+                                         class="campaign-card__status campaign-card__status--open">
+                                        <span class="campaign-card__status-dot"></span>
+                                        <span>Abierta</span>
+                                    </div>
+
+                                    <div th:if="${campaign.status == 'CLOSED'}"
+                                         class="campaign-card__status campaign-card__status--closed">
+                                        <span class="campaign-card__status-dot"></span>
+                                        <span>Cerrada</span>
+                                    </div>
+
+                                    <div class="campaign-card__target">
+                                        Meta base siguiente:
+                                        <strong style="margin-left: 6px;"
+                                                th:text="${'$' + #numbers.formatDecimal(campaign.baseTargetAmount, 1, 2)}">
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="campaign-card__actions">
+                                <a class="campaign-card__button"
+                                   th:href="@{'/campaigns/' + ${campaign.id}}">
+                                    Actualizar
+                                </a>
+                            </div>
+                        </article>
+                    </div>
+
+                    <div class="empty-state"
+                         th:if="${campaigns == null or #lists.isEmpty(campaigns)}">
+                        No hay campañas registradas por el momento.
+                    </div>
+                </section>
+
+            </div>
+        </section>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --bg: #050b18;
+    --bg-soft: #081225;
+    --panel: #08152d;
+    --panel-2: #0b1a35;
+    --border: rgba(113, 139, 196, 0.16);
+
+    --text: #f3f7ff;
+    --text-soft: #c6d1e6;
+    --muted: #7e8ba3;
+
+    --primary: #5964ff;
+    --primary-soft: rgba(89, 100, 255, 0.16);
+
+    --success: #68e0a0;
+    --warning: #f3c243;
+    --danger: #f39a9a;
+
+    --radius-lg: 22px;
+    --radius-md: 18px;
+    --radius-sm: 14px;
+
+    --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.25);
+    --shadow-panel: 0 20px 60px rgba(0, 0, 0, 0.28);
+}
+
+body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+    background:
+            radial-gradient(circle at top left, rgba(37, 76, 170, 0.12), transparent 28%),
+            radial-gradient(circle at bottom right, rgba(89, 100, 255, 0.10), transparent 30%),
+            linear-gradient(180deg, #040916 0%, #06101f 100%);
+    color: var(--text);
+}
+
+a {
+    color: inherit;
+    text-decoration: none!important;
+}
+
+.app {
+    display: flex;
+    min-height: 100vh;
+}
+
+.content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.page {
+    padding: 24px;
+}
+
+.page-shell {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.section-title {
+    margin: 0 0 14px;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.app-card {
+    background: linear-gradient(180deg, rgba(8, 21, 45, 0.96) 0%, rgba(5, 16, 34, 0.98) 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-panel);
+    padding: 20px;
+}
+
+.empty-state {
+    padding: 16px 18px;
+    border-radius: var(--radius-sm);
+    border: 1px dashed rgba(126, 139, 163, 0.25);
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--muted);
+}
+
+.money::before {
+    content: "$";
+    margin-right: 2px;
+}
+
+@media (max-width: 1100px) {
+    .page {
+        padding: 18px;
+    }
+}

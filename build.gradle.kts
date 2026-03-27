@@ -27,18 +27,19 @@ repositories {
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-flyway")
+	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-webmvc")
-	implementation("org.flywaydb:flyway-database-postgresql")
+	implementation("org.springframework.boot:spring-boot-h2console")
+
 	compileOnly("org.projectlombok:lombok")
-	developmentOnly("org.springframework.boot:spring-boot-devtools")
-	runtimeOnly("org.postgresql:postgresql")
 	annotationProcessor("org.projectlombok:lombok")
-	testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
-	testImplementation("org.springframework.boot:spring-boot-starter-flyway-test")
-	testImplementation("org.springframework.boot:spring-boot-starter-validation-test")
-	testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
-	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+	developmentOnly("org.springframework.boot:spring-boot-devtools")
+
+	runtimeOnly("com.h2database:h2")
+
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
 tasks.withType<Test> {

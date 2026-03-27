@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: appHead('Dashboard')}"><title>Dashboard</title></head>
+<body>
+<div class="app">
+    <div th:replace="~{fragments/sidebar :: sidebar('dashboard')}"></div>
+
+    <main class="content">
+        <div th:replace="~{fragments/topbar :: topbar('Dashboard', 'Inicio / Dashboard')}"></div>
+
+        <section class="page">
+            <div class="page-shell dashboard-page">
+
+                <section class="dashboard-hero">
+                    <h3 class="dashboard-hero__title">Resumen general de la máquina</h3>
+                    <p class="dashboard-hero__text">
+                        Consulta el dinero recaudado, lo que falta para alcanzar el jackpot,
+                        el excedente generado y la distribución entre socios y servicios.
+                    </p>
+                </section>
+
+                <!-- Cuando sí hay información -->
+                <th:block th:if="${dashboard != null}">
+
+                    <section class="dashboard-grid">
+                        <article class="app-card dashboard-kpi dashboard-kpi--primary">
+                            <div class="dashboard-kpi__label">Dinero recaudado</div>
+                            <div class="dashboard-kpi__value money"
+                                 th:text="${#numbers.formatDecimal(dashboard.totalMoneyRaised, 1, 2)}">0.00</div>
+                            <div class="dashboard-kpi__hint">Total acumulado registrado</div>
+                        </article>
+
+                        <article class="app-card dashboard-kpi dashboard-kpi--warning">
+                            <div class="dashboard-kpi__label">Restante para jackpot</div>
+                            <div class="dashboard-kpi__value money"
+                                 th:text="${#numbers.formatDecimal(dashboard.remainingToJackpot, 1, 2)}">2800.00</div>
+                            <div class="dashboard-kpi__hint">Meta pendiente actual</div>
+                        </article>
+
+                        <article class="app-card dashboard-kpi dashboard-kpi--success">
+                            <div class="dashboard-kpi__label">Excedente después del jackpot</div>
+                            <div class="dashboard-kpi__value money"
+                                 th:text="${#numbers.formatDecimal(dashboard.surplusAfterJackpot, 1, 2)}">0.00</div>
+                            <div class="dashboard-kpi__hint">Ganancia posterior a la meta</div>
+                        </article>
+
+                        <article class="app-card dashboard-kpi">
+                            <div class="dashboard-kpi__label">Participación socio 1</div>
+                            <div class="dashboard-kpi__value money"
+                                 th:text="${#numbers.formatDecimal(dashboard.firstPartnerShare, 1, 2)}">0.00</div>
+                            <div class="dashboard-kpi__hint">Distribución correspondiente</div>
+                        </article>
+
+                        <article class="app-card dashboard-kpi">
+                            <div class="dashboard-kpi__label">Participación socio 2</div>
+                            <div class="dashboard-kpi__value money"
+                                 th:text="${#numbers.formatDecimal(dashboard.secondPartnerShare, 1, 2)}">0.00</div>
+                            <div class="dashboard-kpi__hint">Distribución correspondiente</div>
+                        </article>
+
+                        <article class="app-card dashboard-kpi dashboard-kpi--danger">
+                            <div class="dashboard-kpi__label">Participación servicios</div>
+                            <div class="dashboard-kpi__value money"
+                                 th:text="${#numbers.formatDecimal(dashboard.servicesShare, 1, 2)}">0.00</div>
+                            <div class="dashboard-kpi__hint">Porcentaje destinado a servicios</div>
+                        </article>
+                    </section>
+
+                    <section class="dashboard-bottom">
+                        <article class="app-card dashboard-alerts">
+                            <h3 class="section-title">Alertas</h3>
+
+                            <div class="dashboard-alerts__list"
+                                 th:if="${dashboard.alerts != null and !#lists.isEmpty(dashboard.alerts)}">
+                                <div class="dashboard-alert"
+                                     th:each="alert : ${dashboard.alerts}"
+                                     th:text="${alert}">
+                                    Alerta
+                                </div>
+                            </div>
+
+                            <div class="empty-state"
+                                 th:if="${dashboard.alerts == null or #lists.isEmpty(dashboard.alerts)}">
+                                No hay alertas activas por el momento.
+                            </div>
+                        </article>
+
+                        <article class="app-card dashboard-shares">
+                            <h3 class="section-title">Distribución rápida</h3>
+
+                            <div class="dashboard-shares__list">
+                                <div class="dashboard-shares__row">
+                                    <span class="dashboard-shares__name">Socio 1</span>
+                                    <span class="dashboard-shares__value money"
+                                          th:text="${#numbers.formatDecimal(dashboard.firstPartnerShare, 1, 2)}">0.00</span>
+                                </div>
+
+                                <div class="dashboard-shares__row">
+                                    <span class="dashboard-shares__name">Socio 2</span>
+                                    <span class="dashboard-shares__value money"
+                                          th:text="${#numbers.formatDecimal(dashboard.secondPartnerShare, 1, 2)}">0.00</span>
+                                </div>
+
+                                <div class="dashboard-shares__row">
+                                    <span class="dashboard-shares__name">Servicios</span>
+                                    <span class="dashboard-shares__value money"
+                                          th:text="${#numbers.formatDecimal(dashboard.servicesShare, 1, 2)}">0.00</span>
+                                </div>
+                            </div>
+                        </article>
+                    </section>
+
+                </th:block>
+
+                <!-- Cuando NO hay información -->
+                <th:block th:if="${dashboard == null}">
+                    <section class="app-card">
+                        <div class="empty-state">
+                            No hay información que mostrar por el momento.
+                        </div>
+                    </section>
+                </th:block>
+
+            </div>
+        </section>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

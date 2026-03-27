@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<th:block th:fragment="sidebar(activeSection)">
+
+    <!-- Sidebar fijo desktop -->
+    <aside class="sidebar sidebar--desktop">
+        <div class="sidebar__brand">
+            <h1 class="sidebar__title">Claw Machine</h1>
+            <p class="sidebar__subtitle">Panel administrativo local</p>
+        </div>
+
+        <nav class="sidebar__nav">
+            <a th:href="@{/}"
+               class="sidebar__link"
+               th:classappend="${activeSection == 'dashboard'} ? ' sidebar__link--active' : ''">
+                Dashboard
+            </a>
+
+            <a th:href="@{/campaigns}"
+               class="sidebar__link"
+               th:classappend="${activeSection == 'campaigns'} ? ' sidebar__link--active' : ''">
+                Campañas
+            </a>
+
+            <a th:href="@{/prizes}"
+               class="sidebar__link"
+               th:classappend="${activeSection == 'prizes'} ? ' sidebar__link--active' : ''">
+                Premios
+            </a>
+
+            <a th:href="@{/redemptions}"
+               class="sidebar__link"
+               th:classappend="${activeSection == 'redemptions'} ? ' sidebar__link--active' : ''">
+                Canjes
+            </a>
+
+            <a th:href="@{/users}"
+               class="sidebar__link"
+               th:classappend="${activeSection == 'users'} ? ' sidebar__link--active' : ''">
+                Usuarios
+            </a>
+
+            <a th:href="@{/reports}"
+               class="sidebar__link"
+               th:classappend="${activeSection == 'reports'} ? ' sidebar__link--active' : ''">
+                Reportes
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Sidebar mobile con Bootstrap Offcanvas -->
+    <div class="offcanvas offcanvas-start sidebar-offcanvas"
+         tabindex="-1"
+         id="mobileSidebar"
+         aria-labelledby="mobileSidebarLabel">
+
+        <div class="offcanvas-header sidebar-offcanvas__header">
+            <div>
+                <h5 class="sidebar__title mb-0" id="mobileSidebarLabel">Claw Machine</h5>
+                <p class="sidebar__subtitle mb-0">Panel administrativo local</p>
+            </div>
+
+            <button type="button"
+                    class="btn-close btn-close-white"
+                    data-bs-dismiss="offcanvas"
+                    aria-label="Cerrar"></button>
+        </div>
+
+        <div class="offcanvas-body sidebar-offcanvas__body">
+            <nav class="sidebar__nav">
+                <a th:href="@{/}"
+                   class="sidebar__link"
+                   th:classappend="${activeSection == 'dashboard'} ? ' sidebar__link--active' : ''">
+                    Dashboard
+                </a>
+
+                <a th:href="@{/campaigns}"
+                   class="sidebar__link"
+                   th:classappend="${activeSection == 'campaigns'} ? ' sidebar__link--active' : ''">
+                    Campañas
+                </a>
+
+                <a th:href="@{/prizes}"
+                   class="sidebar__link"
+                   th:classappend="${activeSection == 'prizes'} ? ' sidebar__link--active' : ''">
+                    Premios
+                </a>
+
+                <a th:href="@{/redemptions}"
+                   class="sidebar__link"
+                   th:classappend="${activeSection == 'redemptions'} ? ' sidebar__link--active' : ''">
+                    Canjes
+                </a>
+
+                <a th:href="@{/users}"
+                   class="sidebar__link"
+                   th:classappend="${activeSection == 'users'} ? ' sidebar__link--active' : ''">
+                    Usuarios
+                </a>
+
+                <a th:href="@{/reports}"
+                   class="sidebar__link"
+                   th:classappend="${activeSection == 'reports'} ? ' sidebar__link--active' : ''">
+                    Reportes
+                </a>
+            </nav>
+        </div>
+    </div>
+
+</th:block>
+
+</body>
+</html>

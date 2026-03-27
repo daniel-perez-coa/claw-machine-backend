@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<header class="topbar" th:fragment="topbar(title, breadcrumb)">
+    <div class="topbar__left">
+        <button class="topbar__menu-btn d-lg-none"
+                type="button"
+                data-bs-toggle="offcanvas"
+                data-bs-target="#mobileSidebar"
+                aria-controls="mobileSidebar">
+            ☰
+        </button>
+
+        <div class="topbar__main">
+            <h2 class="topbar__title" th:text="${title}">Dashboard</h2>
+            <div class="topbar__breadcrumbs" th:text="${breadcrumb}">Inicio / Dashboard</div>
+        </div>
+    </div>
+
+    <div class="topbar__status">Sistema local activo</div>
+</header>
+</body>
+</html>

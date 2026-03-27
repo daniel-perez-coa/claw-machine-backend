@@ -1,4 +1,4 @@
-package com.rivercom.claw_machine_backend.controller;
+package com.rivercom.claw_machine_backend.controller.api;
 
 import com.rivercom.claw_machine_backend.dto.DashboardInformationDTO;
 import com.rivercom.claw_machine_backend.service.DashboardService;

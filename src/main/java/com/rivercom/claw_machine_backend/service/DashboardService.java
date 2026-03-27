@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -34,30 +35,36 @@ public class DashboardService {
     public DashboardInformationDTO getDashboardInformation() {
         log.debug("Buscando información sobre campañas con estado: OPEN");
 
-        MachineCampaign openCampaign = machineCampaignRepository.findByStatus(MachineCampaignStatus.OPEN)
-                .orElseThrow(() -> new IllegalStateException("No hay campaña activa"));
+        Optional<MachineCampaign> openCampaign =
+                machineCampaignRepository.findByStatus(MachineCampaignStatus.OPEN);
+
+        if (openCampaign.isEmpty()) {
+            return null;
+        }
+
+        MachineCampaign campaign = openCampaign.get();
 
         log.debug("Se ha encontrado una campaña activa");
 
-        BigDecimal targetAmount = openCampaign.getBaseTargetAmount();
+        BigDecimal targetAmount = campaign.getBaseTargetAmount();
         BigDecimal incomeTotalMoney = BigDecimal.ZERO;
         BigDecimal prizeRedemptionTotal = BigDecimal.ZERO;
         BigDecimal machineExpenseTotal = BigDecimal.ZERO;
 
         List<IncomeRecords> incomeRecordsList =
-                incomeRecordsRepository.findByCampaignId(openCampaign.getId());
+                incomeRecordsRepository.findByCampaignId(campaign.getId());
         for (IncomeRecords incomeRecord : incomeRecordsList) {
             incomeTotalMoney = incomeTotalMoney.add(incomeRecord.getAmount());
         }
 
         List<PrizeRedemption> prizeRedemptionList =
-                prizeRedemptionsRepository.findByCampaignId(openCampaign.getId());
+                prizeRedemptionsRepository.findByCampaignId(campaign.getId());
         for (PrizeRedemption prizeRedemption : prizeRedemptionList) {
             prizeRedemptionTotal = prizeRedemptionTotal.add(prizeRedemption.getPrize().getCost());
         }
 
         List<MachineExpenseRecords> machineExpenseRecordsList =
-                machineExpenseRecordsRepository.findByCampaignId(openCampaign.getId());
+                machineExpenseRecordsRepository.findByCampaignId(campaign.getId());
         for (MachineExpenseRecords machineExpenseRecord : machineExpenseRecordsList) {
             machineExpenseTotal = machineExpenseTotal.add(machineExpenseRecord.getTotalCost());
         }
