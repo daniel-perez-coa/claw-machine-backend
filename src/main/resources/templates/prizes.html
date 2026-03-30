@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: appHead('Premios')}">
+    <title>Premios</title>
+</head>
+<body>
+<div class="app">
+    <div th:replace="~{fragments/sidebar :: sidebar('prizes')}"></div>
+
+    <main class="content">
+        <div th:replace="~{fragments/topbar :: topbar('Premios', 'Inicio / Premios')}"></div>
+
+        <section class="page">
+            <div class="page-shell prizes-page">
+
+                <section class="prizes-header">
+
+                    <div class="prizes-hero">
+                        <h3 class="prizes-hero__title">Premios</h3>
+                        <p class="prizes-hero__text">
+                            Consulta, visualiza y actualiza los premios registrados.
+                            Usa el botón de crear para registrar un nuevo premio.
+                        </p>
+                    </div>
+
+                    <div class="prizes-create-wrapper">
+                        <a th:href="@{/prizes/new}"
+                           class="prizes-create-card"
+                           aria-label="Crear premio">
+                            +
+                        </a>
+                    </div>
+
+                </section>
+
+                <section class="app-card prizes-list-shell">
+                    <div class="prizes-list"
+                         th:if="${prizes != null and !#lists.isEmpty(prizes)}">
+
+                        <article class="app-card prize-card"
+                                 th:each="prize : ${prizes}">
+
+                            <div class="prize-card__content">
+                                <h3 class="prize-card__title"
+                                    th:text="${prize.name}">
+                                    Nombre del premio
+                                </h3>
+
+                                <p class="prize-card__detail">
+                                    <strong>Categoría:</strong>
+                                    <span th:text="${prize.prizeCategory}">
+                                        Premio mayor
+                                    </span>
+                                </p>
+
+                                <p class="prize-card__detail">
+                                    <strong>Código:</strong>
+                                    <span th:text="${prize.prizeCode}">
+                                        MAYOR
+                                    </span>
+                                </p>
+
+                                <p class="prize-card__detail"
+                                   th:if="${prize.description != null and !#strings.isEmpty(prize.description)}">
+                                    <strong>Descripción:</strong>
+                                    <span th:text="${prize.description}">
+                                        Descripción del premio
+                                    </span>
+                                </p>
+
+                                <div class="prize-card__meta">
+                                    <div class="prize-card__target">
+                                        Costo en puntos:
+                                        <strong th:text="${prize.pointsCost}">
+                                            300
+                                        </strong>
+                                    </div>
+
+                                    <div class="prize-card__target">
+                                        Costo real:
+                                        <strong th:text="${'$' + #numbers.formatDecimal(prize.cost, 1, 2)}">
+                                            $550.00
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="prize-card__actions">
+                                <a class="prize-card__button"
+                                   th:href="@{'/prizes/' + ${prize.id}}">
+                                    Actualizar
+                                </a>
+
+                                <form th:action="@{'/prizes/' + ${prize.id} + '/deactivate'}"
+                                      method="post"
+                                      class="prize-card__form">
+                                    <button type="submit"
+                                            class="prize-card__button prize-card__button--danger">
+                                        Eliminar
+                                    </button>
+                                </form>
+                            </div>
+
+                        </article>
+                    </div>
+
+                    <div class="empty-state"
+                         th:if="${prizes == null or #lists.isEmpty(prizes)}">
+                        No hay premios registrados por el momento.
+                    </div>
+                </section>
+
+            </div>
+        </section>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
