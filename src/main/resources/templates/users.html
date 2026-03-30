@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: appHead('Usuarios')}">
+  <title>Usuarios</title>
+</head>
+<body>
+<div class="app">
+  <div th:replace="~{fragments/sidebar :: sidebar('users')}"></div>
+
+  <main class="content">
+    <div th:replace="~{fragments/topbar :: topbar('Usuarios', 'Inicio / Usuarios')}"></div>
+
+    <section class="page">
+      <div class="page-shell users-page">
+
+        <section class="users-header">
+          <div class="users-hero">
+            <h3 class="users-hero__title">Usuarios</h3>
+            <p class="users-hero__text">
+              Consulta usuarios registrados, busca por teléfono y agrega puntos desde esta pantalla.
+            </p>
+          </div>
+          <div id="selectedUserContainer" class="user-card-result user-card-result--empty">
+            <div class="user-card-result__placeholder">
+              Aquí aparecerá la información del usuario encontrado.
+            </div>
+          </div>
+          <div>
+            <!-- BOTÓN NUEVO -->
+            <button type="button"
+                    id="clearUserBtn"
+                    class="users-danger-button"
+                    disabled>
+              Deseleccionar usuario
+            </button>
+          </div>
+        </section>
+
+        <section class="app-card users-shell">
+
+          <div id="usersAlertContainer"></div>
+
+          <div class="users-grid users-grid--main">
+
+            <article class="app-card users-panel">
+              <div class="users-panel__header">
+                <h3 class="users-panel__title">Buscar usuario</h3>
+                <p class="users-panel__text">
+                  Busca un usuario específico mediante su número telefónico.
+                </p>
+              </div>
+
+              <div class="users-search">
+                <div class="users-field">
+                  <label class="users-field__label" for="searchPhone">Teléfono</label>
+                  <input class="users-field__input"
+                         type="text"
+                         id="searchPhone"
+                         placeholder="Ej. 2211234567"
+                         maxlength="20">
+                </div>
+
+                <button type="button"
+                        class="users-action-button"
+                        id="searchUserBtn">
+                  Buscar
+                </button>
+              </div>
+
+
+            </article>
+
+            <article class="app-card users-panel">
+              <div class="users-panel__header">
+                <h3 class="users-panel__title">Agregar puntos</h3>
+                <p class="users-panel__text">
+                  Suma puntos al usuario seleccionado.
+                </p>
+              </div>
+
+              <form id="addPointsForm" class="users-form">
+                <div class="users-field">
+                  <label class="users-field__label" for="pointsToAdd">Puntos a agregar</label>
+                  <input class="users-field__input"
+                         type="number"
+                         id="pointsToAdd"
+                         min="1"
+                         placeholder="Ej. 50"
+                         disabled>
+                </div>
+
+                <button type="submit"
+                        id="addPointsBtn"
+                        class="users-submit-button"
+                        disabled>
+                  Agregar puntos
+                </button>
+              </form>
+            </article>
+          </div>
+
+          <section class="app-card users-list-shell">
+            <div class="users-list-header">
+              <h3 class="users-panel__title">----- Total de usuarios registrados -----</h3>
+              <button type="button"
+                      id="reloadUsersBtn"
+                      class="users-action-button users-action-button--small">
+                Recargar
+              </button>
+            </div>
+
+            <div id="usersList" class="users-list">
+              <div class="empty-state">Cargando usuarios...</div>
+            </div>
+          </section>
+
+        </section>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script th:src="@{/js/users.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

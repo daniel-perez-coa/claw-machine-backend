@@ -1,0 +1,260 @@
+.machine-expense-page {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.machine-expense-hero {
+    width: 100%;
+    padding: 24px 28px;
+    border-radius: 24px;
+    border: 1px solid rgba(59, 130, 246, 0.18);
+    background: linear-gradient(135deg, rgba(37, 46, 102, 0.95), rgba(6, 27, 68, 0.98));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.machine-expense-hero__title {
+    margin: 0 0 8px;
+    color: #ffffff;
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.machine-expense-hero__text {
+    margin: 0;
+    color: rgba(226, 232, 240, 0.96);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.machine-expense-feedback {
+    margin: 0;
+    border-radius: 16px;
+}
+
+.machine-expense-form-shell {
+    padding: 24px 26px;
+    border-radius: 24px;
+    border: 1px solid rgba(59, 130, 246, 0.16);
+    background: linear-gradient(180deg, rgba(7, 24, 54, 0.94), rgba(3, 18, 43, 0.94));
+    box-shadow: 0 18px 34px rgba(2, 6, 23, 0.24);
+}
+
+.machine-expense-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.machine-expense-form__header {
+    display: grid;
+    grid-template-columns: minmax(0, 1.8fr) minmax(140px, 0.7fr) 120px;
+    gap: 14px;
+    padding: 0 4px;
+    color: #cbd5e1;
+    font-size: 0.92rem;
+    font-weight: 700;
+}
+
+.machine-expense-form__rows {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.machine-expense-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.8fr) minmax(140px, 0.7fr) 120px;
+    gap: 14px;
+    align-items: center;
+}
+
+.machine-expense-form__field {
+    display: flex;
+    flex-direction: column;
+}
+
+.machine-expense-form__select,
+.machine-expense-form__input {
+    width: 100%;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 14px;
+    background: rgba(15, 23, 42, 0.82);
+    color: #f8fafc;
+    padding: 14px 16px;
+    font-size: 1rem;
+    line-height: 1.5;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.machine-expense-form__select {
+    appearance: none;
+}
+
+.machine-expense-form__select option {
+    color: #111827;
+}
+
+.machine-expense-form__input::placeholder {
+    color: #94a3b8;
+}
+
+.machine-expense-form__select:focus,
+.machine-expense-form__input:focus {
+    outline: none;
+    border-color: rgba(96, 165, 250, 0.52);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.14);
+    background: rgba(15, 23, 42, 0.94);
+    color: #ffffff;
+}
+
+.machine-expense-form__remove {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(239, 68, 68, 0.22);
+    background: rgba(127, 29, 29, 0.92);
+    color: #ffffff;
+    font-size: 0.92rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+}
+
+.machine-expense-form__remove:hover {
+    transform: translateY(-1px);
+    background: rgba(153, 27, 27, 0.96);
+    border-color: rgba(248, 113, 113, 0.34);
+}
+
+.machine-expense-form__remove.is-disabled,
+.machine-expense-form__remove:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.machine-expense-form__helper {
+    color: #94a3b8;
+    font-size: 0.92rem;
+    line-height: 1.5;
+}
+
+.machine-expense-form__actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.machine-expense-form__button {
+    min-width: 160px;
+    padding: 12px 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(59, 130, 246, 0.24);
+    background: rgba(30, 41, 59, 0.9);
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.machine-expense-form__button:hover {
+    transform: translateY(-1px);
+    background: rgba(51, 65, 85, 0.95);
+    border-color: rgba(96, 165, 250, 0.38);
+    color: #ffffff;
+}
+
+.machine-expense-form__button--primary {
+    background: linear-gradient(180deg, rgba(37, 99, 235, 0.95), rgba(29, 78, 216, 0.98));
+    border-color: rgba(96, 165, 250, 0.32);
+}
+
+.machine-expense-form__button--primary:hover {
+    background: linear-gradient(180deg, rgba(59, 130, 246, 0.98), rgba(37, 99, 235, 0.98));
+    border-color: rgba(147, 197, 253, 0.4);
+}
+
+.machine-expense-form__button--secondary {
+    background: rgba(15, 23, 42, 0.72);
+    border-color: rgba(148, 163, 184, 0.22);
+}
+
+.machine-expense-form__button--secondary:hover {
+    background: rgba(30, 41, 59, 0.9);
+    border-color: rgba(148, 163, 184, 0.34);
+}
+
+.machine-expense-form__select {
+    width: 100%;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 14px;
+    background: rgba(15, 23, 42, 0.82);
+    color: #f8fafc;
+    padding: 14px 16px;
+    font-size: 1rem;
+    line-height: 1.5;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.machine-expense-form__select option {
+    background-color: #0f172a;
+    color: #f8fafc;
+}
+
+.machine-expense-form__select option:checked {
+    background-color: #1d4ed8;
+    color: #ffffff;
+}
+
+.machine-expense-form__select option:hover {
+    background-color: #1e293b;
+    color: #ffffff;
+}
+
+@media (max-width: 992px) {
+    .machine-expense-form__header {
+        display: none;
+    }
+
+    .machine-expense-row {
+        grid-template-columns: 1fr;
+        padding: 16px;
+        border: 1px solid rgba(59, 130, 246, 0.16);
+        border-radius: 18px;
+        background: rgba(4, 20, 45, 0.54);
+    }
+
+    .machine-expense-form__field--actions {
+        margin-top: 4px;
+    }
+}
+
+@media (max-width: 768px) {
+    .machine-expense-form-shell {
+        padding: 20px 18px;
+    }
+
+    .machine-expense-hero {
+        padding: 22px 20px;
+    }
+
+    .machine-expense-hero__title {
+        font-size: 1.7rem;
+    }
+
+    .machine-expense-form__actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .machine-expense-form__button {
+        width: 100%;
+    }
+}

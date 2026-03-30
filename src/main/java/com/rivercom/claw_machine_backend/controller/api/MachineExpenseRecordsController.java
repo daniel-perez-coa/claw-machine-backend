@@ -1,6 +1,7 @@
 package com.rivercom.claw_machine_backend.controller.api;
 
 import com.rivercom.claw_machine_backend.dto.MachineExpenseDTO;
+import com.rivercom.claw_machine_backend.dto.MachineExpenseFormDTO;
 import com.rivercom.claw_machine_backend.dto.MachineExpenseRequestDTO;
 import com.rivercom.claw_machine_backend.service.MachineExpenseRecordsService;
 import jakarta.validation.Valid;
@@ -21,8 +22,8 @@ public class MachineExpenseRecordsController {
 
     @PostMapping
     public ResponseEntity<Map<String, String>> registerExpense(
-            @Valid @RequestBody MachineExpenseRequestDTO request) {
-        service.registerExpense(request);
+            @Valid @RequestBody MachineExpenseFormDTO request) {
+        service.registerExpenses(request.items());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Map.of("message", "Registrado con éxito"));
     }

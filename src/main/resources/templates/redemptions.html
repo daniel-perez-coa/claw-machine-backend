@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: appHead('Canje de premios')}">
+    <title>Canje de premios</title>
+</head>
+<body>
+<div class="app">
+    <div th:replace="~{fragments/sidebar :: sidebar('redemptions')}"></div>
+
+    <main class="content">
+        <div th:replace="~{fragments/topbar :: topbar('Canje de premios', 'Inicio / Canje de premios')}"></div>
+
+        <section class="page">
+            <div class="page-shell redemptions-page">
+
+                <section class="redemptions-header">
+                    <div class="redemptions-hero">
+                        <h3 class="redemptions-hero__title">Canje de premios</h3>
+                        <p class="redemptions-hero__text">
+                            Busca un usuario por teléfono, valida sus puntos y realiza el canje
+                            del premio seleccionado desde esta pantalla.
+                        </p>
+                    </div>
+                </section>
+
+                <section class="app-card redemptions-shell">
+
+                    <div th:if="${successMessage}" class="redemptions-alert redemptions-alert--success"
+                         th:text="${successMessage}">
+                        Canje realizado correctamente.
+                    </div>
+
+                    <div th:if="${errorMessage}" class="redemptions-alert redemptions-alert--error"
+                         th:text="${errorMessage}">
+                        Ocurrió un error.
+                    </div>
+
+                    <div class="redemptions-grid">
+
+                        <article class="app-card redemption-panel">
+                            <div class="redemption-panel__header">
+                                <h3 class="redemption-panel__title">Buscar usuario</h3>
+                                <p class="redemption-panel__text">
+                                    Ingresa el número telefónico del usuario que realizará el canje.
+                                </p>
+                            </div>
+
+                            <div class="redemption-search">
+                                <div class="redemption-field">
+                                    <label class="redemption-field__label" for="phoneSearch">Teléfono</label>
+                                    <input
+                                            class="redemption-field__input"
+                                            type="text"
+                                            id="phoneSearch"
+                                            placeholder="Ej. 2211234567"
+                                            maxlength="20">
+                                </div>
+
+                                <button type="button"
+                                        id="searchUserBtn"
+                                        class="redemption-action-button">
+                                    Buscar
+                                </button>
+                            </div>
+
+                            <div id="userResultContainer" class="user-result user-result--empty">
+                                <div class="user-result__placeholder">
+                                    Aquí aparecerá el usuario encontrado.
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="app-card redemption-panel">
+                            <div class="redemption-panel__header">
+                                <h3 class="redemption-panel__title">Realizar canje</h3>
+                                <p class="redemption-panel__text">
+                                    Cuando el usuario sea válido, selecciona el premio y confirma el canje.
+                                </p>
+                            </div>
+
+                            <form th:action="@{/redemptions}"
+                                  th:object="${redemptionForm}"
+                                  method="post"
+                                  id="redeemForm"
+                                  class="redeem-form">
+
+                                <input type="hidden" th:field="*{phone}" id="selectedUserPhone">
+
+                                <div class="redemption-field">
+                                    <label class="redemption-field__label" for="prizeId">Premio</label>
+                                    <select class="redemption-field__select"
+                                            th:field="*{prizeId}"
+                                            id="prizeId"
+                                            disabled>
+                                        <option value="">Selecciona un premio</option>
+                                        <option th:each="prize : ${prizes}"
+                                                th:value="${prize.id}"
+                                                th:text="${prize.name + ' - ' + prize.pointsCost + ' pts'}">
+                                            Premio
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <button type="submit"
+                                        id="redeemBtn"
+                                        class="redemption-submit-button"
+                                        disabled>
+                                    Canjear
+                                </button>
+                            </form>
+                        </article>
+                    </div>
+
+                    <section th:if="${redemptionResult != null}" class="redemption-result-section">
+                        <article class="app-card redemption-result-card">
+                            <div class="redemption-result-card__header">
+                                <h3 class="redemption-panel__title">Resultado del canje</h3>
+                                <p class="redemption-panel__text">
+                                    Resumen de la operación realizada correctamente.
+                                </p>
+                            </div>
+
+                            <div class="redemption-result-grid">
+                                <div class="redemption-result-item">
+                                    <span class="redemption-result-item__label">Usuario</span>
+                                    <span class="redemption-result-item__value"
+                                          th:text="${redemptionResult.userName}">Usuario</span>
+                                </div>
+
+                                <div class="redemption-result-item">
+                                    <span class="redemption-result-item__label">Teléfono</span>
+                                    <span class="redemption-result-item__value"
+                                          th:text="${redemptionResult.userPhone}">2210000000</span>
+                                </div>
+
+                                <div class="redemption-result-item">
+                                    <span class="redemption-result-item__label">Premio</span>
+                                    <span class="redemption-result-item__value"
+                                          th:text="${redemptionResult.prizeName}">Premio</span>
+                                </div>
+
+                                <div class="redemption-result-item">
+                                    <span class="redemption-result-item__label">Puntos gastados</span>
+                                    <span class="redemption-result-item__value"
+                                          th:text="${redemptionResult.pointsSpent}">0</span>
+                                </div>
+
+                                <div class="redemption-result-item">
+                                    <span class="redemption-result-item__label">Puntos restantes</span>
+                                    <span class="redemption-result-item__value"
+                                          th:text="${redemptionResult.remainingPoints}">0</span>
+                                </div>
+                            </div>
+                        </article>
+                    </section>
+
+                </section>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script th:src="@{/js/redemptions.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

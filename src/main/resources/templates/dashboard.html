@@ -29,6 +29,13 @@
                             <span class="dashboard-action-card__icon">+</span>
                             <span class="dashboard-action-card__label">Registrar ingreso</span>
                         </a>
+
+                        <a th:href="@{/machine-expense-records/new}"
+                           class="dashboard-action-card dashboard-action-card--secondary"
+                           aria-label="Registrar canje rápido">
+                            <span class="dashboard-action-card__icon">🎁</span>
+                            <span class="dashboard-action-card__label">Canje rápido</span>
+                        </a>
                     </section>
 
                     <section class="dashboard-grid">
@@ -81,10 +88,16 @@
 
                             <div class="dashboard-alerts__list"
                                  th:if="${dashboard.alerts != null and !#lists.isEmpty(dashboard.alerts)}">
+
                                 <div class="dashboard-alert"
-                                     th:each="alert : ${dashboard.alerts}"
-                                     th:text="${alert}">
-                                    Alerta
+                                     th:each="alert : ${dashboard.alerts}">
+
+                                    <div class="dashboard-alert__content">
+                    <span class="dashboard-alert__text"
+                          th:text="${alert.description}">
+                    </span>
+                                    </div>
+
                                 </div>
                             </div>
 

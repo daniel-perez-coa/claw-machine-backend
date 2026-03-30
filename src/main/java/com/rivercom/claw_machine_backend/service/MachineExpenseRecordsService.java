@@ -30,34 +30,31 @@ public class MachineExpenseRecordsService {
     private final MachineExpenseRecordsMapper mapper;
 
     @Transactional
-    public void registerExpense(MachineExpenseRequestDTO request) {
-        log.debug("Registrando gasto/canje rápido para prizeId={} quantity={}",
-                request.prizeId(), request.quantity());
-
+    public void registerExpenses(List<MachineExpenseRequestDTO> requests) {
         MachineCampaign openCampaign = machineCampaignRepository.findByStatus(MachineCampaignStatus.OPEN)
                 .orElseThrow(() -> new IllegalArgumentException("No hay campaña abierta"));
 
-        Prize prize = prizeRepository.findById(request.prizeId())
-                .orElseThrow(() -> new IllegalArgumentException("El premio no existe"));
+        for (MachineExpenseRequestDTO request : requests) {
+            Prize prize = prizeRepository.findById(request.prizeId())
+                    .orElseThrow(() -> new IllegalArgumentException("El premio no existe"));
 
-        if (!Boolean.TRUE.equals(prize.getIsActive())) {
-            throw new IllegalArgumentException("El premio no está activo");
+            if (!Boolean.TRUE.equals(prize.getIsActive())) {
+                throw new IllegalArgumentException("El premio no está activo");
+            }
+
+            BigDecimal unitCost = prize.getCost();
+            BigDecimal totalCost = unitCost.multiply(BigDecimal.valueOf(request.quantity()));
+
+            MachineExpenseRecords expenseRecord = new MachineExpenseRecords();
+            expenseRecord.setCampaign(openCampaign);
+            expenseRecord.setPrize(prize);
+            expenseRecord.setQuantity(request.quantity());
+            expenseRecord.setUnitCost(unitCost);
+            expenseRecord.setTotalCost(totalCost);
+            expenseRecord.setRestocked(false);
+
+            repository.save(expenseRecord);
         }
-
-        BigDecimal unitCost = prize.getCost();
-        BigDecimal totalCost = unitCost.multiply(BigDecimal.valueOf(request.quantity()));
-
-        MachineExpenseRecords expenseRecord = new MachineExpenseRecords();
-        expenseRecord.setCampaign(openCampaign);
-        expenseRecord.setPrize(prize);
-        expenseRecord.setQuantity(request.quantity());
-        expenseRecord.setUnitCost(unitCost);
-        expenseRecord.setTotalCost(totalCost);
-        expenseRecord.setRestocked(false);
-
-        repository.save(expenseRecord);
-
-        log.debug("Gasto/canje rápido registrado correctamente");
     }
 
     @Transactional

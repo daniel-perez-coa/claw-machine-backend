@@ -1,9 +1,10 @@
 package com.rivercom.claw_machine_backend.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record UserRedemptionRequestDTO(
         @NotBlank String phone,
-        @NotBlank Long prizeId
+        @NotNull Long prizeId
 ) {
 }

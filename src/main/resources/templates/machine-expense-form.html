@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: appHead('Canje rápido')}">
+    <title>Canje rápido</title>
+</head>
+<body>
+<div class="app">
+    <div th:replace="~{fragments/sidebar :: sidebar('redemptions')}"></div>
+
+    <main class="content">
+        <div th:replace="~{fragments/topbar :: topbar('Canje rápido', 'Inicio / Dashboard / Canje rápido')}"></div>
+
+        <section class="page">
+            <div class="page-shell machine-expense-page">
+
+                <section class="machine-expense-hero">
+                    <h3 class="machine-expense-hero__title">Canje rápido</h3>
+                    <p class="machine-expense-hero__text">
+                        Registra la salida rápida de premios de la campaña activa.
+                        Agrega uno o varios renglones con premio y cantidad.
+                    </p>
+                </section>
+
+                <div class="alert alert-success machine-expense-feedback"
+                     th:if="${successMessage != null}"
+                     th:text="${successMessage}">
+                    Registro realizado correctamente.
+                </div>
+
+                <div class="alert alert-danger machine-expense-feedback"
+                     th:if="${errorMessage != null}"
+                     th:text="${errorMessage}">
+                    Ocurrió un error al registrar el canje.
+                </div>
+
+                <section class="app-card machine-expense-form-shell">
+                    <form th:action="@{/machine-expense-records}"
+                          method="post"
+                          class="machine-expense-form"
+                          id="machineExpenseForm">
+
+                        <div class="machine-expense-form__header">
+                            <div class="machine-expense-form__col machine-expense-form__col--prize">
+                                Premio
+                            </div>
+                            <div class="machine-expense-form__col machine-expense-form__col--quantity">
+                                Cantidad
+                            </div>
+                            <div class="machine-expense-form__col machine-expense-form__col--actions">
+                                Acción
+                            </div>
+                        </div>
+
+                        <div id="expenseRows" class="machine-expense-form__rows">
+                            <div class="machine-expense-row" data-index="0">
+                                <div class="machine-expense-form__field machine-expense-form__field--prize">
+                                    <select name="request[0].prizeId"
+                                            class="machine-expense-form__select js-prize-select">
+                                        <option value="">Selecciona un premio</option>
+                                        <option th:each="prize : ${prizes}"
+                                                th:value="${prize.id}"
+                                                th:text="${prize.prizeCategory + ' - ' + prize.name}">
+                                            Premio
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <div class="machine-expense-form__field machine-expense-form__field--quantity">
+                                    <input type="number"
+                                           name="request[0].quantity"
+                                           min="1"
+                                           step="1"
+                                           class="machine-expense-form__input js-quantity-input"
+                                           placeholder="Cantidad">
+                                </div>
+
+                                <div class="machine-expense-form__field machine-expense-form__field--actions">
+                                    <button type="button"
+                                            class="machine-expense-form__remove"
+                                            disabled>
+                                        Quitar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="machine-expense-form__helper">
+                            Cuando completes el último renglón, se agregará otro automáticamente.
+                        </div>
+
+                        <div class="machine-expense-form__actions">
+                            <button type="submit"
+                                    class="machine-expense-form__button machine-expense-form__button--primary">
+                                Guardar canje
+                            </button>
+
+                            <a th:href="@{/}"
+                               class="machine-expense-form__button machine-expense-form__button--secondary">
+                                Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </section>
+
+            </div>
+        </section>
+    </main>
+</div>
+
+<template id="expenseRowTemplate">
+    <div class="machine-expense-row" data-index="__INDEX__">
+        <div class="machine-expense-form__field machine-expense-form__field--prize">
+            <select name="request[__INDEX__].prizeId"
+                    class="machine-expense-form__select js-prize-select">
+                <option value="">Selecciona un premio</option>
+                <option th:each="prize : ${prizes}"
+                        th:value="${prize.id}"
+                        th:text="${prize.prizeCategory + ' - ' + prize.name}">
+                    Premio
+                </option>
+            </select>
+        </div>
+
+        <div class="machine-expense-form__field machine-expense-form__field--quantity">
+            <input type="number"
+                   name="request[__INDEX__].quantity"
+                   min="1"
+                   step="1"
+                   class="machine-expense-form__input js-quantity-input"
+                   placeholder="Cantidad">
+        </div>
+
+        <div class="machine-expense-form__field machine-expense-form__field--actions">
+            <button type="button"
+                    class="machine-expense-form__remove">
+                Quitar
+            </button>
+        </div>
+    </div>
+</template>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/machine-expense-form.js}"></script>
+</body>
+</html>
