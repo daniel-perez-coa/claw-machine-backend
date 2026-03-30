@@ -22,6 +22,15 @@
                 <!-- Cuando sí hay información -->
                 <th:block th:if="${dashboard != null}">
 
+                    <section class="dashboard-actions">
+                        <a th:href="@{/income-records/new}"
+                           class="dashboard-action-card"
+                           aria-label="Registrar ingreso">
+                            <span class="dashboard-action-card__icon">+</span>
+                            <span class="dashboard-action-card__label">Registrar ingreso</span>
+                        </a>
+                    </section>
+
                     <section class="dashboard-grid">
                         <article class="app-card dashboard-kpi dashboard-kpi--primary">
                             <div class="dashboard-kpi__label">Dinero recaudado</div>
