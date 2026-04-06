@@ -59,3 +59,11 @@ flyway.conf
 # DevTools restart
 # =========================
 .restart/
+
+# =========================
+# Local database files
+# =========================
+data/
+*.mv.db
+*.lock.db
+*.trace.db

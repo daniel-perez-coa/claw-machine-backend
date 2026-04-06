@@ -98,6 +98,28 @@ a {
     color: var(--muted);
 }
 
+.page-title-banner {
+    padding: 18px 22px;
+    border-radius: 22px;
+    border: 1px solid rgba(75, 94, 188, 0.42);
+    background: linear-gradient(90deg, rgba(28, 37, 84, 0.96) 0%, rgba(10, 21, 47, 0.98) 100%);
+    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.24);
+}
+
+.page-title-banner__title {
+    margin: 0 0 4px;
+    font-size: 20px;
+    font-weight: 900;
+    line-height: 1.2;
+    color: #ffffff;
+}
+
+.page-title-banner__text {
+    margin: 0;
+    font-size: 13px;
+    color: rgba(235, 242, 255, 0.92);
+}
+
 .money::before {
     content: "$";
     margin-right: 2px;

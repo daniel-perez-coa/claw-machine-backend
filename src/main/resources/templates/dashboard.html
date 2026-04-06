@@ -11,30 +11,27 @@
         <section class="page">
             <div class="page-shell dashboard-page">
 
-                <section class="dashboard-hero">
-                    <h3 class="dashboard-hero__title">Resumen general de la máquina</h3>
-                    <p class="dashboard-hero__text">
+                <section class="page-title-banner">
+                    <h3 class="page-title-banner__title">Resumen general de la maquina</h3>
+                    <p class="page-title-banner__text">
                         Consulta el dinero recaudado, lo que falta para alcanzar el jackpot,
-                        el excedente generado y la distribución entre socios y servicios.
+                        el excedente generado y la distribucion entre socios y servicios.
                     </p>
                 </section>
 
-                <!-- Cuando sí hay información -->
                 <th:block th:if="${dashboard != null}">
 
                     <section class="dashboard-actions">
                         <a th:href="@{/income-records/new}"
                            class="dashboard-action-card"
                            aria-label="Registrar ingreso">
-                            <span class="dashboard-action-card__icon">+</span>
                             <span class="dashboard-action-card__label">Registrar ingreso</span>
                         </a>
 
                         <a th:href="@{/machine-expense-records/new}"
                            class="dashboard-action-card dashboard-action-card--secondary"
-                           aria-label="Registrar canje rápido">
-                            <span class="dashboard-action-card__icon">🎁</span>
-                            <span class="dashboard-action-card__label">Canje rápido</span>
+                           aria-label="Registrar canje rapido">
+                            <span class="dashboard-action-card__label">Canje rapido</span>
                         </a>
                     </section>
 
@@ -54,28 +51,28 @@
                         </article>
 
                         <article class="app-card dashboard-kpi dashboard-kpi--success">
-                            <div class="dashboard-kpi__label">Excedente después del jackpot</div>
+                            <div class="dashboard-kpi__label">Excedente despues del jackpot</div>
                             <div class="dashboard-kpi__value money"
                                  th:text="${#numbers.formatDecimal(dashboard.surplusAfterJackpot, 1, 2)}">0.00</div>
                             <div class="dashboard-kpi__hint">Ganancia posterior a la meta</div>
                         </article>
 
                         <article class="app-card dashboard-kpi">
-                            <div class="dashboard-kpi__label">Participación socio 1</div>
+                            <div class="dashboard-kpi__label">Participacion socio 1</div>
                             <div class="dashboard-kpi__value money"
                                  th:text="${#numbers.formatDecimal(dashboard.firstPartnerShare, 1, 2)}">0.00</div>
-                            <div class="dashboard-kpi__hint">Distribución correspondiente</div>
+                            <div class="dashboard-kpi__hint">Distribucion correspondiente</div>
                         </article>
 
                         <article class="app-card dashboard-kpi">
-                            <div class="dashboard-kpi__label">Participación socio 2</div>
+                            <div class="dashboard-kpi__label">Participacion socio 2</div>
                             <div class="dashboard-kpi__value money"
                                  th:text="${#numbers.formatDecimal(dashboard.secondPartnerShare, 1, 2)}">0.00</div>
-                            <div class="dashboard-kpi__hint">Distribución correspondiente</div>
+                            <div class="dashboard-kpi__hint">Distribucion correspondiente</div>
                         </article>
 
                         <article class="app-card dashboard-kpi dashboard-kpi--danger">
-                            <div class="dashboard-kpi__label">Participación servicios</div>
+                            <div class="dashboard-kpi__label">Participacion servicios</div>
                             <div class="dashboard-kpi__value money"
                                  th:text="${#numbers.formatDecimal(dashboard.servicesShare, 1, 2)}">0.00</div>
                             <div class="dashboard-kpi__hint">Porcentaje destinado a servicios</div>
@@ -93,9 +90,9 @@
                                      th:each="alert : ${dashboard.alerts}">
 
                                     <div class="dashboard-alert__content">
-                    <span class="dashboard-alert__text"
-                          th:text="${alert.description}">
-                    </span>
+                                        <span class="dashboard-alert__text"
+                                              th:text="${alert.description}">
+                                        </span>
                                     </div>
 
                                 </div>
@@ -108,7 +105,7 @@
                         </article>
 
                         <article class="app-card dashboard-shares">
-                            <h3 class="section-title">Distribución rápida</h3>
+                            <h3 class="section-title">Distribucion rapida</h3>
 
                             <div class="dashboard-shares__list">
                                 <div class="dashboard-shares__row">
@@ -134,11 +131,10 @@
 
                 </th:block>
 
-                <!-- Cuando NO hay información -->
                 <th:block th:if="${dashboard == null}">
                     <section class="app-card">
                         <div class="empty-state">
-                            No hay información que mostrar por el momento.
+                            No hay informacion que mostrar por el momento.
                         </div>
                     </section>
                 </th:block>

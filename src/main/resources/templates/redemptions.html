@@ -14,10 +14,10 @@
             <div class="page-shell redemptions-page">
 
                 <section class="redemptions-header">
-                    <div class="redemptions-hero">
-                        <h3 class="redemptions-hero__title">Canje de premios</h3>
-                        <p class="redemptions-hero__text">
-                            Busca un usuario por teléfono, valida sus puntos y realiza el canje
+                    <div class="page-title-banner">
+                        <h3 class="page-title-banner__title">Canje de premios</h3>
+                        <p class="page-title-banner__text">
+                            Busca un usuario por telefono, valida sus puntos y realiza el canje
                             del premio seleccionado desde esta pantalla.
                         </p>
                     </div>
@@ -32,7 +32,7 @@
 
                     <div th:if="${errorMessage}" class="redemptions-alert redemptions-alert--error"
                          th:text="${errorMessage}">
-                        Ocurrió un error.
+                        Ocurrio un error.
                     </div>
 
                     <div class="redemptions-grid">
@@ -41,13 +41,13 @@
                             <div class="redemption-panel__header">
                                 <h3 class="redemption-panel__title">Buscar usuario</h3>
                                 <p class="redemption-panel__text">
-                                    Ingresa el número telefónico del usuario que realizará el canje.
+                                    Ingresa el numero telefonico del usuario que realizara el canje.
                                 </p>
                             </div>
 
                             <div class="redemption-search">
                                 <div class="redemption-field">
-                                    <label class="redemption-field__label" for="phoneSearch">Teléfono</label>
+                                    <label class="redemption-field__label" for="phoneSearch">Telefono</label>
                                     <input
                                             class="redemption-field__input"
                                             type="text"
@@ -65,7 +65,7 @@
 
                             <div id="userResultContainer" class="user-result user-result--empty">
                                 <div class="user-result__placeholder">
-                                    Aquí aparecerá el usuario encontrado.
+                                    Aqui aparecera el usuario encontrado.
                                 </div>
                             </div>
                         </article>
@@ -74,7 +74,7 @@
                             <div class="redemption-panel__header">
                                 <h3 class="redemption-panel__title">Realizar canje</h3>
                                 <p class="redemption-panel__text">
-                                    Cuando el usuario sea válido, selecciona el premio y confirma el canje.
+                                    Cuando el usuario sea valido, selecciona el premio y confirma el canje.
                                 </p>
                             </div>
 
@@ -116,7 +116,7 @@
                             <div class="redemption-result-card__header">
                                 <h3 class="redemption-panel__title">Resultado del canje</h3>
                                 <p class="redemption-panel__text">
-                                    Resumen de la operación realizada correctamente.
+                                    Resumen de la operacion realizada correctamente.
                                 </p>
                             </div>
 
@@ -128,7 +128,7 @@
                                 </div>
 
                                 <div class="redemption-result-item">
-                                    <span class="redemption-result-item__label">Teléfono</span>
+                                    <span class="redemption-result-item__label">Telefono</span>
                                     <span class="redemption-result-item__value"
                                           th:text="${redemptionResult.userPhone}">2210000000</span>
                                 </div>

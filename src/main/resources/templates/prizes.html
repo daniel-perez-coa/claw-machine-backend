@@ -15,11 +15,11 @@
 
                 <section class="prizes-header">
 
-                    <div class="prizes-hero">
-                        <h3 class="prizes-hero__title">Premios</h3>
-                        <p class="prizes-hero__text">
+                    <div class="page-title-banner">
+                        <h3 class="page-title-banner__title">Premios</h3>
+                        <p class="page-title-banner__text">
                             Consulta, visualiza y actualiza los premios registrados.
-                            Usa el botón de crear para registrar un nuevo premio.
+                            Usa el boton de crear para registrar un nuevo premio.
                         </p>
                     </div>
 
@@ -47,14 +47,14 @@
                                 </h3>
 
                                 <p class="prize-card__detail">
-                                    <strong>Categoría:</strong>
+                                    <strong>Categoria:</strong>
                                     <span th:text="${prize.prizeCategory}">
                                         Premio mayor
                                     </span>
                                 </p>
 
                                 <p class="prize-card__detail">
-                                    <strong>Código:</strong>
+                                    <strong>Codigo:</strong>
                                     <span th:text="${prize.prizeCode}">
                                         MAYOR
                                     </span>
@@ -62,9 +62,9 @@
 
                                 <p class="prize-card__detail"
                                    th:if="${prize.description != null and !#strings.isEmpty(prize.description)}">
-                                    <strong>Descripción:</strong>
+                                    <strong>Descripcion:</strong>
                                     <span th:text="${prize.description}">
-                                        Descripción del premio
+                                        Descripcion del premio
                                     </span>
                                 </p>
 
