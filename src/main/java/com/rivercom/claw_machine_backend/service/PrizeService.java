@@ -10,6 +10,7 @@ import com.rivercom.claw_machine_backend.repository.PrizeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,25 +25,26 @@ public class PrizeService {
     private final PrizeCategoryRepository prizeCategoryRepository;
 
     public List<PrizeDTO> getActivePrizes() {
-         return mapper.toResponsePrizeList(
-                 repository.findByIsActive(true));
+        return mapper.toResponsePrizeList(repository.findByIsActive(true));
     }
 
     public List<PrizeDTO> getAllPrizes() {
-        return mapper.toResponsePrizeList(
-                repository.findAll());
+        return mapper.toResponsePrizeList(repository.findAll());
     }
 
+    @Transactional
     public PrizeDTO createPrize(NewPrizeDTO prize) {
         Optional<Prize> existingPrize = repository.findByName(prize.name());
         if (existingPrize.isPresent()) {
             log.error("Prize already exists");
             return null;
         }
-        Prize newPrize = new Prize();
+
         PrizeCategory prizeCategory = Optional.ofNullable(
                 prizeCategoryRepository.findByCode(prize.prizeCategory())
-        ).orElseThrow(() -> new IllegalArgumentException("La categoría no existe"));
+        ).orElseThrow(() -> new IllegalArgumentException("La categoria no existe"));
+
+        Prize newPrize = new Prize();
         newPrize.setCategory(prizeCategory);
         newPrize.setName(prize.name());
         newPrize.setDescription(prize.description());
@@ -54,31 +56,40 @@ public class PrizeService {
         return mapper.toResponsePrize(savedPrize);
     }
 
+    @Transactional
     public PrizeDTO updatePrize(PrizeDTO prize, Long id) {
         Optional<Prize> existingPrize = repository.findById(id);
         if (existingPrize.isEmpty()) {
             log.error("Prize not found");
             return null;
         }
+
+        String prizeCategoryCode = Optional.ofNullable(prize.prizeCode())
+                .filter(code -> !code.isBlank())
+                .orElse(prize.prizeCategory());
+
+        PrizeCategory prizeCategory = Optional.ofNullable(
+                prizeCategoryRepository.findByCode(prizeCategoryCode)
+        ).orElseThrow(() -> new IllegalArgumentException("La categoria no existe"));
+
         Prize updatedPrize = existingPrize.get();
         updatedPrize.setName(prize.name());
         updatedPrize.setDescription(prize.description());
         updatedPrize.setPointsCost(prize.pointsCost());
         updatedPrize.setCost(prize.cost());
-        PrizeCategory prizeCategory = Optional.ofNullable(
-                prizeCategoryRepository.findByCode(prize.prizeCategory())
-        ).orElseThrow(() -> new IllegalArgumentException("La categoría no existe"));
         updatedPrize.setCategory(prizeCategory);
+
         Prize savedPrize = repository.save(updatedPrize);
         return mapper.toResponsePrize(savedPrize);
     }
 
+    @Transactional
     public PrizeDTO deactivatePrize(Long id) {
         Prize prize = repository.findById(id)
                 .orElseThrow(() -> new IllegalStateException("El premio no existe"));
 
         if (!prize.getIsActive()) {
-            throw new IllegalStateException("El premio ya está desactivado");
+            throw new IllegalStateException("El premio ya esta desactivado");
         }
 
         prize.setIsActive(false);

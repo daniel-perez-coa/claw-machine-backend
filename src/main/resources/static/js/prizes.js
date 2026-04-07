@@ -24,13 +24,30 @@ document.addEventListener('DOMContentLoaded', () => {
     function showAlert(message, type = 'success') {
         alertContainer.innerHTML = `
             <div class="alert alert-${type === 'error' ? 'danger' : 'success'}">
-                ${message}
+                ${escapeHtml(message)}
             </div>
         `;
 
-        setTimeout(() => {
+        window.setTimeout(() => {
             alertContainer.innerHTML = '';
         }, 4000);
+    }
+
+    async function loadPrizes() {
+        prizesList.innerHTML = '<div class="empty-state">Cargando premios...</div>';
+
+        try {
+            const response = await fetch('/api/prizes/active');
+
+            if (!response.ok) {
+                throw new Error('No se pudieron cargar los premios.');
+            }
+
+            const prizes = await response.json();
+            renderPrizes(prizes);
+        } catch (error) {
+            prizesList.innerHTML = '<div class="empty-state">No fue posible cargar los premios.</div>';
+        }
     }
 
     function attachDeactivateActions() {
@@ -39,6 +56,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const prizeId = button.getAttribute('data-id');
 
                 if (!prizeId) {
+                    return;
+                }
+
+                if (!window.confirm('¿Deseas desactivar este premio?')) {
                     return;
                 }
 
@@ -54,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     showAlert('Premio desactivado correctamente.');
                     await loadPrizes();
                 } catch (error) {
-                    showAlert('Ocurrio un error al desactivar el premio.', 'error');
+                    showAlert('Ocurrió un error al desactivar el premio.', 'error');
                 }
             });
         });
@@ -116,23 +137,6 @@ document.addEventListener('DOMContentLoaded', () => {
         `).join('');
 
         attachDeactivateActions();
-    }
-
-    async function loadPrizes() {
-        prizesList.innerHTML = '<div class="empty-state">Cargando premios...</div>';
-
-        try {
-            const response = await fetch('/api/prizes');
-
-            if (!response.ok) {
-                throw new Error('No se pudieron cargar los premios.');
-            }
-
-            const prizes = await response.json();
-            renderPrizes(prizes);
-        } catch (error) {
-            prizesList.innerHTML = '<div class="empty-state">No fue posible cargar los premios.</div>';
-        }
     }
 
     loadPrizes();

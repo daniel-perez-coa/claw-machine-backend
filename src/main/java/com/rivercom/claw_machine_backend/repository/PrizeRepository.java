@@ -9,6 +9,10 @@ import java.util.Optional;
 
 public interface PrizeRepository extends JpaRepository<Prize, Long> {
 
+    @Override
+    @EntityGraph(attributePaths = "category")
+    Optional<Prize> findById(Long id);
+
     @EntityGraph(attributePaths = "category")
     List<Prize> findByIsActive(Boolean isActive);
 
