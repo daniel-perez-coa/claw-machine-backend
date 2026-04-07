@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: appHead('Actualizar campana')}">
+    <title>Actualizar campana</title>
+</head>
+<body>
+<div class="app">
+    <div th:replace="~{fragments/sidebar :: sidebar('campaigns')}"></div>
+
+    <main class="content">
+        <div th:replace="~{fragments/topbar :: topbar('Actualizar campana', 'Inicio / Campanas / Actualizar campana')}"></div>
+
+        <section class="page">
+            <div class="page-shell campaign-update-page">
+
+                <section class="campaign-form-hero">
+                    <h3 class="campaign-form-hero__title">Actualizar campana</h3>
+                    <p class="campaign-form-hero__text">
+                        Cierra una campana al completar la meta o cancelala indicando el motivo.
+                    </p>
+                </section>
+
+                <div id="campaignUpdateAlertContainer"></div>
+
+                <section class="app-card campaign-update-summary">
+                    <h3 class="section-title">Resumen de la campana</h3>
+                    <div id="campaignUpdateSummaryContent" class="empty-state">Cargando campana...</div>
+                </section>
+
+                <section class="app-card campaign-form-shell">
+                    <form id="campaignUpdateForm" class="campaign-form">
+                        <div class="campaign-form__group">
+                            <label for="campaignStatus" class="campaign-form__label">Nuevo estado</label>
+                            <select id="campaignStatus"
+                                    name="status"
+                                    class="campaign-form__select"
+                                    required>
+                                <option value="">Selecciona una accion</option>
+                                <option value="CLOSED">Cerrar campana</option>
+                                <option value="CANCELLED">Cancelar campana</option>
+                            </select>
+                        </div>
+
+                        <div id="campaignNotesGroup" class="campaign-form__group" style="display: none;">
+                            <label for="campaignNotes" class="campaign-form__label">Motivo de cancelacion</label>
+                            <textarea id="campaignNotes"
+                                      name="notes"
+                                      class="campaign-form__textarea"
+                                      placeholder="Explica por que se cancela la campana"></textarea>
+                        </div>
+
+                        <div class="campaign-form__actions">
+                            <button type="submit"
+                                    id="submitCampaignUpdateBtn"
+                                    class="campaign-form__button campaign-form__button--primary">
+                                Guardar cambios
+                            </button>
+
+                            <a th:href="@{/campaigns}"
+                               class="campaign-form__button campaign-form__button--secondary">
+                                Volver
+                            </a>
+                        </div>
+                    </form>
+                </section>
+
+            </div>
+        </section>
+    </main>
+</div>
+
+<script th:src="@{/js/campaign-update-form.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

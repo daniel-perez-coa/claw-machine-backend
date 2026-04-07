@@ -41,13 +41,29 @@
 }
 
 .campaign-card__prize {
-    margin: 0 0 16px;
+    margin: 0 0 10px;
     font-size: 14px;
     color: var(--text-soft);
 }
 
 .campaign-card__prize strong {
     color: var(--text);
+}
+
+.campaign-card__notes {
+    margin: 0 0 16px;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(243, 194, 67, 0.18);
+    background: rgba(243, 194, 67, 0.08);
+    color: #f2ddb0;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.campaign-card__notes strong {
+    color: #ffe7a8;
+    margin-right: 6px;
 }
 
 .campaign-card__meta {
@@ -97,6 +113,15 @@
     box-shadow: 0 0 0 4px rgba(243, 154, 154, 0.10);
 }
 
+.campaign-card__status--cancelled {
+    color: var(--warning);
+}
+
+.campaign-card__status--cancelled .campaign-card__status-dot {
+    background: var(--warning);
+    box-shadow: 0 0 0 4px rgba(243, 194, 67, 0.10);
+}
+
 .campaign-card__target {
     display: flex;
     align-items: center;
@@ -112,6 +137,9 @@
 
 .campaign-card__button {
     min-width: 148px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .campaigns-list-shell::-webkit-scrollbar {

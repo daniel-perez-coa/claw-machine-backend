@@ -13,6 +13,10 @@ public interface MachineCampaignRepository extends JpaRepository<MachineCampaign
     @EntityGraph(attributePaths = "majorPrize")
     List<MachineCampaign> findAll();
 
+    @Override
+    @EntityGraph(attributePaths = "majorPrize")
+    Optional<MachineCampaign> findById(Long id);
+
     @EntityGraph(attributePaths = "majorPrize")
     Optional<MachineCampaign> findByStatus(MachineCampaignStatus status);
 }

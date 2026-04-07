@@ -3,7 +3,7 @@ package com.rivercom.claw_machine_backend.dto;
 import com.rivercom.claw_machine_backend.domain.enums.MachineCampaignStatus;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+
 public record MachineCampaignResponseDTO(
         Long id,
         String name,
@@ -12,6 +12,7 @@ public record MachineCampaignResponseDTO(
         MachineCampaignStatus status,
         BigDecimal baseTargetAmount,
         String notes,
-        LocalDateTime openedAt,
-        LocalDateTime closedAt
+        String createdAt,
+        String openedAt,
+        String closedAt
 ){}

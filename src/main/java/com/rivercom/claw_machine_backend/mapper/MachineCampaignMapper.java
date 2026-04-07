@@ -4,10 +4,15 @@ import com.rivercom.claw_machine_backend.domain.entity.MachineCampaign;
 import com.rivercom.claw_machine_backend.dto.MachineCampaignResponseDTO;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Component
 public class MachineCampaignMapper {
+
+    private static final DateTimeFormatter CAMPAIGN_DATE_FORMATTER =
+            DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     public MachineCampaignResponseDTO toResponse
             (MachineCampaign entity) {
@@ -24,8 +29,9 @@ public class MachineCampaignMapper {
                 entity.getStatus(),
                 entity.getBaseTargetAmount(),
                 entity.getNotes(),
-                entity.getOpenedAt() != null ? entity.getClosedAt() : null,
-                entity.getClosedAt()
+                formatDate(entity.getOpenedAt()),
+                formatDate(entity.getOpenedAt()),
+                formatDate(entity.getClosedAt())
         );
     }
 
@@ -38,5 +44,13 @@ public class MachineCampaignMapper {
         return entityList.stream()
                 .map(this::toResponse)
                 .toList();
+    }
+
+    private String formatDate(LocalDateTime value) {
+        if (value == null) {
+            return null;
+        }
+
+        return value.format(CAMPAIGN_DATE_FORMATTER);
     }
 }

@@ -47,6 +47,41 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 
+    function getCampaignDateMarkup(campaign) {
+        if (campaign.status === 'CLOSED' || campaign.status === 'CANCELLED') {
+            return `
+                <p class="campaign-card__prize">
+                    <strong>Fecha de apertura:</strong>
+                    <span>${escapeHtml(campaign.createdAt ?? 'Sin fecha')}</span>
+                </p>
+                <p class="campaign-card__prize">
+                    <strong>Fecha de cierre:</strong>
+                    <span>${escapeHtml(campaign.closedAt ?? 'Sin fecha')}</span>
+                </p>
+            `;
+        }
+
+        return `
+            <p class="campaign-card__prize">
+                <strong>Fecha de creación:</strong>
+                <span>${escapeHtml(campaign.createdAt ?? 'Sin fecha')}</span>
+            </p>
+        `;
+    }
+
+    function getCampaignNotesMarkup(campaign) {
+        if (campaign.status !== 'CANCELLED' || !campaign.notes) {
+            return '';
+        }
+
+        return `
+            <p class="campaign-card__notes">
+                <strong>Motivo de cancelaci&oacute;n:</strong>
+                <span>${escapeHtml(campaign.notes)}</span>
+            </p>
+        `;
+    }
+
     function renderCampaigns(campaigns) {
         if (!campaigns || campaigns.length === 0) {
             campaignsList.innerHTML = '<div class="empty-state">No hay campanas registradas por el momento.</div>';
@@ -64,6 +99,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${campaign.prizeDescription ? `<span> - ${escapeHtml(campaign.prizeDescription)}</span>` : ''}
                     </p>
 
+                    ${getCampaignDateMarkup(campaign)}
+                    ${getCampaignNotesMarkup(campaign)}
+
                     <div class="campaign-card__meta">
                         ${getStatusMarkup(campaign.status)}
 
@@ -74,11 +112,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
 
-                <div class="campaign-card__actions">
-                    <a class="campaign-card__button" href="/campaigns/${campaign.id}">
-                        Actualizar
-                    </a>
-                </div>
+                ${campaign.status === 'OPEN' ? `
+                    <div class="campaign-card__actions">
+                        <a class="campaign-card__button" href="/campaigns/${campaign.id}">
+                            Actualizar
+                        </a>
+                    </div>
+                ` : ''}
             </article>
         `).join('');
     }

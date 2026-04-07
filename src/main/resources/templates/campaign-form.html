@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: appHead('Nueva campana')}">
+    <title>Nueva campana</title>
+</head>
+<body>
+<div class="app">
+    <div th:replace="~{fragments/sidebar :: sidebar('campaigns')}"></div>
+
+    <main class="content">
+        <div th:replace="~{fragments/topbar :: topbar('Nueva campana', 'Inicio / Campanas / Nueva campana')}"></div>
+
+        <section class="page">
+            <div class="page-shell campaign-form-page">
+
+                <section class="campaign-form-hero">
+                    <h3 class="campaign-form-hero__title">Crear campana</h3>
+                    <p class="campaign-form-hero__text">
+                        Registra una nueva campana activa indicando nombre, premio mayor y meta base.
+                    </p>
+                </section>
+
+                <div id="campaignFormAlertContainer"></div>
+
+                <section class="app-card campaign-form-shell">
+                    <form id="campaignForm" class="campaign-form">
+                        <div class="campaign-form__group">
+                            <label for="campaignName" class="campaign-form__label">Nombre de la campana</label>
+                            <input id="campaignName"
+                                   name="name"
+                                   type="text"
+                                   maxlength="120"
+                                   class="campaign-form__input"
+                                   placeholder="Ej. Campana verano 2026"
+                                   required>
+                        </div>
+
+                        <div class="campaign-form__group">
+                            <label for="majorPrizeId" class="campaign-form__label">Premio mayor</label>
+                            <select id="majorPrizeId"
+                                    name="majorPrizeId"
+                                    class="campaign-form__select"
+                                    required>
+                                <option value="">Selecciona un premio</option>
+                            </select>
+                        </div>
+
+                        <div class="campaign-form__group">
+                            <label for="baseTargetAmount" class="campaign-form__label">Meta base</label>
+                            <input id="baseTargetAmount"
+                                   name="baseTargetAmount"
+                                   type="number"
+                                   step="0.01"
+                                   min="0.01"
+                                   class="campaign-form__input"
+                                   placeholder="Ej. 10000.00"
+                                   required>
+                        </div>
+
+                        <div class="campaign-form__actions">
+                            <button type="submit"
+                                    id="submitCampaignBtn"
+                                    class="campaign-form__button campaign-form__button--primary">
+                                Crear campana
+                            </button>
+
+                            <a th:href="@{/campaigns}"
+                               class="campaign-form__button campaign-form__button--secondary">
+                                Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </section>
+
+            </div>
+        </section>
+    </main>
+</div>
+
+<script th:src="@{/js/campaign-form.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
