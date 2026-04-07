@@ -25,15 +25,7 @@
 
                 <section class="app-card redemptions-shell">
 
-                    <div th:if="${successMessage}" class="redemptions-alert redemptions-alert--success"
-                         th:text="${successMessage}">
-                        Canje realizado correctamente.
-                    </div>
-
-                    <div th:if="${errorMessage}" class="redemptions-alert redemptions-alert--error"
-                         th:text="${errorMessage}">
-                        Ocurrio un error.
-                    </div>
+                    <div id="redemptionsAlertContainer"></div>
 
                     <div class="redemptions-grid">
 
@@ -78,26 +70,16 @@
                                 </p>
                             </div>
 
-                            <form th:action="@{/redemptions}"
-                                  th:object="${redemptionForm}"
-                                  method="post"
-                                  id="redeemForm"
-                                  class="redeem-form">
+                            <form id="redeemForm" class="redeem-form">
 
-                                <input type="hidden" th:field="*{phone}" id="selectedUserPhone">
+                                <input type="hidden" id="selectedUserPhone">
 
                                 <div class="redemption-field">
                                     <label class="redemption-field__label" for="prizeId">Premio</label>
                                     <select class="redemption-field__select"
-                                            th:field="*{prizeId}"
                                             id="prizeId"
                                             disabled>
                                         <option value="">Selecciona un premio</option>
-                                        <option th:each="prize : ${prizes}"
-                                                th:value="${prize.id}"
-                                                th:text="${prize.name + ' - ' + prize.pointsCost + ' pts'}">
-                                            Premio
-                                        </option>
                                     </select>
                                 </div>
 
@@ -111,7 +93,7 @@
                         </article>
                     </div>
 
-                    <section th:if="${redemptionResult != null}" class="redemption-result-section">
+                    <section id="redemptionResultSection" class="redemption-result-section" style="display: none;">
                         <article class="app-card redemption-result-card">
                             <div class="redemption-result-card__header">
                                 <h3 class="redemption-panel__title">Resultado del canje</h3>
@@ -120,37 +102,7 @@
                                 </p>
                             </div>
 
-                            <div class="redemption-result-grid">
-                                <div class="redemption-result-item">
-                                    <span class="redemption-result-item__label">Usuario</span>
-                                    <span class="redemption-result-item__value"
-                                          th:text="${redemptionResult.userName}">Usuario</span>
-                                </div>
-
-                                <div class="redemption-result-item">
-                                    <span class="redemption-result-item__label">Telefono</span>
-                                    <span class="redemption-result-item__value"
-                                          th:text="${redemptionResult.userPhone}">2210000000</span>
-                                </div>
-
-                                <div class="redemption-result-item">
-                                    <span class="redemption-result-item__label">Premio</span>
-                                    <span class="redemption-result-item__value"
-                                          th:text="${redemptionResult.prizeName}">Premio</span>
-                                </div>
-
-                                <div class="redemption-result-item">
-                                    <span class="redemption-result-item__label">Puntos gastados</span>
-                                    <span class="redemption-result-item__value"
-                                          th:text="${redemptionResult.pointsSpent}">0</span>
-                                </div>
-
-                                <div class="redemption-result-item">
-                                    <span class="redemption-result-item__label">Puntos restantes</span>
-                                    <span class="redemption-result-item__value"
-                                          th:text="${redemptionResult.remainingPoints}">0</span>
-                                </div>
-                            </div>
+                            <div id="redemptionResultGrid" class="redemption-result-grid"></div>
                         </article>
                     </section>
 
