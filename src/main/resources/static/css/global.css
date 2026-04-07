@@ -34,6 +34,18 @@ body {
 
     --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.25);
     --shadow-panel: 0 20px 60px rgba(0, 0, 0, 0.28);
+
+    --hero-border: rgba(75, 94, 188, 0.42);
+    --hero-bg: linear-gradient(90deg, rgba(28, 37, 84, 0.96) 0%, rgba(10, 21, 47, 0.98) 100%);
+
+    --button-border: rgba(93, 110, 255, 0.34);
+    --button-bg: linear-gradient(180deg, rgba(71, 86, 222, 0.16) 0%, rgba(17, 28, 58, 0.56) 100%);
+    --button-bg-hover: linear-gradient(180deg, rgba(71, 86, 222, 0.22) 0%, rgba(17, 28, 58, 0.70) 100%);
+
+    --field-border: rgba(126, 139, 163, 0.18);
+    --field-bg: rgba(255, 255, 255, 0.03);
+    --field-bg-focus: rgba(255, 255, 255, 0.04);
+    --field-ring: 0 0 0 4px rgba(87, 92, 222, 0.12);
 }
 
 body {
@@ -50,7 +62,14 @@ body {
 
 a {
     color: inherit;
-    text-decoration: none!important;
+    text-decoration: none !important;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
 }
 
 .app {
@@ -98,15 +117,19 @@ a {
     color: var(--muted);
 }
 
-.page-title-banner {
+.page-title-banner,
+.income-record-hero,
+.machine-expense-hero {
     padding: 18px 22px;
     border-radius: 22px;
-    border: 1px solid rgba(75, 94, 188, 0.42);
-    background: linear-gradient(90deg, rgba(28, 37, 84, 0.96) 0%, rgba(10, 21, 47, 0.98) 100%);
+    border: 1px solid var(--hero-border);
+    background: var(--hero-bg);
     box-shadow: 0 18px 42px rgba(0, 0, 0, 0.24);
 }
 
-.page-title-banner__title {
+.page-title-banner__title,
+.income-record-hero__title,
+.machine-expense-hero__title {
     margin: 0 0 4px;
     font-size: 20px;
     font-weight: 900;
@@ -114,10 +137,410 @@ a {
     color: #ffffff;
 }
 
-.page-title-banner__text {
+.page-title-banner__text,
+.income-record-hero__text,
+.machine-expense-hero__text {
     margin: 0;
     font-size: 13px;
     color: rgba(235, 242, 255, 0.92);
+}
+
+.campaigns-create-wrapper,
+.prizes-create-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.campaigns-create-card,
+.prizes-create-card {
+    width: 80px;
+    height: 80px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 42px;
+    font-weight: 300;
+    color: var(--text);
+    border: 1px solid rgba(59, 130, 246, 0.28);
+    background: linear-gradient(180deg, rgba(23, 37, 84, 0.95), rgba(15, 23, 42, 0.98));
+    box-shadow: 0 14px 30px rgba(2, 6, 23, 0.28);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.campaigns-create-card:hover,
+.prizes-create-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(96, 165, 250, 0.45);
+    box-shadow: 0 18px 34px rgba(2, 6, 23, 0.34);
+    color: #ffffff;
+}
+
+.dashboard-action-card,
+.campaign-card__button,
+.prize-card__button,
+.users-action-button,
+.users-submit-button,
+.user-list-card__button,
+.redemption-action-button,
+.redemption-submit-button,
+.income-record-form__button,
+.machine-expense-form__button {
+    min-height: 52px;
+    border-radius: 14px;
+    border: 1px solid var(--button-border);
+    background: var(--button-bg);
+    color: #dfe6ff;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.dashboard-action-card:hover,
+.campaign-card__button:hover,
+.prize-card__button:hover,
+.users-action-button:hover,
+.users-submit-button:hover,
+.user-list-card__button:hover,
+.redemption-action-button:hover,
+.redemption-submit-button:hover,
+.income-record-form__button:hover,
+.machine-expense-form__button:hover {
+    transform: translateY(-1px);
+    border-color: rgba(113, 126, 255, 0.50);
+    background: var(--button-bg-hover);
+    color: #ffffff;
+}
+
+.dashboard-action-card,
+.income-record-form__button,
+.machine-expense-form__button,
+.prize-card__button {
+    text-align: center;
+}
+
+.prize-card__button--danger,
+.users-danger-button,
+.machine-expense-form__remove {
+    border-radius: 14px;
+    border: 1px solid rgba(243, 154, 154, 0.32);
+    background: linear-gradient(180deg, rgba(243, 154, 154, 0.12) 0%, rgba(58, 17, 17, 0.58) 100%);
+    color: #fca5a5;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, opacity 0.18s ease;
+}
+
+.prize-card__button--danger:hover,
+.users-danger-button:hover,
+.machine-expense-form__remove:hover {
+    transform: translateY(-1px);
+    border-color: rgba(243, 154, 154, 0.52);
+    background: linear-gradient(180deg, rgba(243, 154, 154, 0.18) 0%, rgba(58, 17, 17, 0.72) 100%);
+    color: #ffffff;
+}
+
+.users-danger-button:disabled,
+.machine-expense-form__remove:disabled,
+.machine-expense-form__remove.is-disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.income-record-form__button--primary,
+.machine-expense-form__button--primary {
+    background: linear-gradient(180deg, rgba(71, 86, 222, 0.34) 0%, rgba(17, 28, 58, 0.82) 100%);
+    border-color: rgba(113, 126, 255, 0.50);
+    color: #ffffff;
+}
+
+.income-record-form__button--primary:hover,
+.machine-expense-form__button--primary:hover {
+    background: linear-gradient(180deg, rgba(71, 86, 222, 0.48) 0%, rgba(17, 28, 58, 0.92) 100%);
+}
+
+.income-record-form__button--secondary,
+.machine-expense-form__button--secondary {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(126, 139, 163, 0.18);
+}
+
+.users-panel,
+.redemption-panel,
+.redemption-result-card {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 20px;
+}
+
+.users-panel__header,
+.redemption-panel__header,
+.redemption-result-card__header {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.users-panel__title,
+.redemption-panel__title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text);
+}
+
+.users-panel__text,
+.redemption-panel__text {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-soft);
+}
+
+.users-search,
+.users-form,
+.redemption-search,
+.redeem-form,
+.income-record-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.users-field,
+.redemption-field,
+.income-record-form__group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.users-field__label,
+.redemption-field__label,
+.income-record-form__label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.users-field__input,
+.redemption-field__input,
+.redemption-field__select,
+.income-record-form__input,
+.income-record-form__textarea,
+.machine-expense-form__input,
+.machine-expense-form__select {
+    width: 100%;
+    border: 1px solid var(--field-border);
+    border-radius: 14px;
+    background: var(--field-bg);
+    color: var(--text);
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.5;
+    outline: none;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.redemption-field__input,
+.redemption-field__select {
+    min-height: 52px;
+}
+
+.redemption-field__select,
+.machine-expense-form__select {
+    padding-right: 44px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background:
+            linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.02)),
+            url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23dfe6ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 14px center;
+}
+
+.users-field__input::placeholder,
+.redemption-field__input::placeholder,
+.income-record-form__input::placeholder,
+.income-record-form__textarea::placeholder,
+.machine-expense-form__input::placeholder {
+    color: var(--text-soft);
+}
+
+.users-field__input:focus,
+.redemption-field__input:focus,
+.redemption-field__select:focus,
+.income-record-form__input:focus,
+.income-record-form__textarea:focus,
+.machine-expense-form__input:focus,
+.machine-expense-form__select:focus {
+    border-color: rgba(113, 126, 255, 0.46);
+    box-shadow: var(--field-ring);
+    background: var(--field-bg-focus);
+}
+
+.users-field__input:disabled,
+.redemption-field__select:disabled,
+.users-submit-button:disabled,
+.redemption-submit-button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.redemption-field__select option,
+.machine-expense-form__select option {
+    background: #0f172a;
+    color: #e5e7eb;
+}
+
+.redemption-field__select option[value=""] {
+    color: #94a3b8;
+}
+
+.income-record-form__textarea {
+    min-height: 140px;
+    resize: vertical;
+}
+
+.user-card-result,
+.user-result {
+    min-height: 148px;
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(126, 139, 163, 0.14);
+    background: rgba(255, 255, 255, 0.02);
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    box-shadow: var(--shadow-panel);
+}
+
+.user-card-result--empty,
+.user-result--empty,
+.user-result--loading {
+    justify-content: center;
+    color: var(--text-soft);
+    font-size: 14px;
+}
+
+.user-card-result--found,
+.user-result--found {
+    border-color: rgba(104, 224, 160, 0.28);
+    background: linear-gradient(180deg, rgba(104, 224, 160, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+}
+
+.user-card-result--error,
+.user-result--not-found {
+    border-color: rgba(243, 154, 154, 0.25);
+    background: linear-gradient(180deg, rgba(243, 154, 154, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+}
+
+.user-card-result__placeholder,
+.user-result__placeholder {
+    text-align: center;
+}
+
+.user-card-result__content,
+.user-result__content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.user-card-result__title,
+.user-result__title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text);
+}
+
+.user-card-result__message,
+.user-result__message {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--danger);
+}
+
+.user-card-result__grid,
+.user-result__grid,
+.redemption-result-grid {
+    display: grid;
+    gap: 12px;
+}
+
+.user-card-result__grid,
+.user-result__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.redemption-result-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.user-card-result__item,
+.user-result__item,
+.redemption-result-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(126, 139, 163, 0.14);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.user-card-result__label,
+.user-result__label,
+.redemption-result-item__label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-soft);
+}
+
+.user-card-result__value,
+.user-result__value,
+.redemption-result-item__value {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text);
+    word-break: break-word;
+}
+
+.users-alert,
+.redemptions-alert,
+#incomeRecordAlertContainer .alert,
+#prizesAlertContainer .alert,
+#machineExpenseAlertContainer .alert {
+    margin: 0 0 16px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 700;
+    box-shadow: var(--shadow-panel);
+}
+
+.users-alert--success,
+.redemptions-alert--success,
+#incomeRecordAlertContainer .alert-success,
+#prizesAlertContainer .alert-success,
+#machineExpenseAlertContainer .alert-success {
+    color: var(--success);
+    border: 1px solid rgba(104, 224, 160, 0.20);
+    background: rgba(104, 224, 160, 0.08);
+}
+
+.users-alert--error,
+.redemptions-alert--error,
+#incomeRecordAlertContainer .alert-danger,
+#prizesAlertContainer .alert-danger,
+#machineExpenseAlertContainer .alert-danger {
+    color: var(--danger);
+    border: 1px solid rgba(243, 154, 154, 0.18);
+    background: rgba(243, 154, 154, 0.08);
 }
 
 .money::before {
@@ -128,5 +551,28 @@ a {
 @media (max-width: 1100px) {
     .page {
         padding: 18px;
+    }
+}
+
+@media (max-width: 720px) {
+    .campaigns-create-card,
+    .prizes-create-card {
+        min-height: 80px;
+        font-size: 42px;
+    }
+
+    .user-card-result__grid,
+    .user-result__grid,
+    .redemption-result-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .income-record-form__button,
+    .machine-expense-form__button,
+    .users-action-button,
+    .users-submit-button,
+    .redemption-action-button,
+    .redemption-submit-button {
+        width: 100%;
     }
 }

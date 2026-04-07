@@ -17,6 +17,12 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 
+    function redirectToDashboardWithDelay() {
+        window.setTimeout(() => {
+            window.location.href = '/dashboard';
+        }, 1800);
+    }
+
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
 
@@ -48,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             showAlert('Ingreso registrado correctamente.');
             form.reset();
-            window.location.href = '/dashboard';
+            redirectToDashboardWithDelay();
         } catch (error) {
             showAlert('Ocurrio un error al registrar el ingreso.', 'error');
         } finally {

@@ -20,6 +20,12 @@
         `;
     }
 
+    function redirectToDashboardWithDelay() {
+        window.setTimeout(() => {
+            window.location.href = '/dashboard';
+        }, 1800);
+    }
+
     function getRows() {
         return Array.from(rowsContainer.querySelectorAll('.machine-expense-row'));
     }
@@ -248,7 +254,7 @@
 
             showAlert('Canje registrado correctamente.', 'success');
             resetFormRows();
-            window.location.href = '/dashboard';
+            redirectToDashboardWithDelay();
         } catch (error) {
             showAlert('Ocurrio un error al registrar el canje.', 'error');
         } finally {
