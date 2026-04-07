@@ -16,12 +16,14 @@
                 <section class="income-record-hero">
                     <h3 class="income-record-hero__title">Registrar ingreso</h3>
                     <p class="income-record-hero__text">
-                        Captura el monto de efectivo ingresado a la campaña activa.
+                        Captura el monto de efectivo ingresado a la campana activa.
                     </p>
                 </section>
 
+                <div id="incomeRecordAlertContainer"></div>
+
                 <section class="app-card income-record-form-shell">
-                    <form th:action="@{/income-records}" method="post" class="income-record-form">
+                    <form id="incomeRecordForm" class="income-record-form">
 
                         <div class="income-record-form__group">
                             <label for="amount" class="income-record-form__label">Monto</label>
@@ -45,11 +47,12 @@
 
                         <div class="income-record-form__actions">
                             <button type="submit"
+                                    id="submitIncomeRecordBtn"
                                     class="income-record-form__button income-record-form__button--primary">
                                 Guardar ingreso
                             </button>
 
-                            <a th:href="@{/}"
+                            <a th:href="@{/dashboard}"
                                class="income-record-form__button income-record-form__button--secondary">
                                 Cancelar
                             </a>
@@ -62,6 +65,7 @@
     </main>
 </div>
 
+<script th:src="@{/js/income-record-form.js}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

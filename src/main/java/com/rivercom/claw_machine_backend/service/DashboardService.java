@@ -18,7 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -100,15 +102,21 @@ public class DashboardService {
     }
 
     private List<AlertDTO> getAlertDTOs(List<MachineExpenseRecords> machineExpenseRecordsNeedsToRestock) {
-        List<AlertDTO> alertDTOList = new ArrayList<>();
+        Map<String, Integer> quantityByCategory = new LinkedHashMap<>();
 
         for (MachineExpenseRecords machineExpenseRecord : machineExpenseRecordsNeedsToRestock) {
+            String categoryName = machineExpenseRecord.getPrize().getCategory().getName();
+            quantityByCategory.merge(categoryName, machineExpenseRecord.getQuantity(), Integer::sum);
+        }
+
+        List<AlertDTO> alertDTOList = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : quantityByCategory.entrySet()) {
             alertDTOList.add(new AlertDTO(
-                    machineExpenseRecord.getQuantity(),
+                    entry.getValue(),
                     String.format(
                             "Los premios con categoría: %s necesitan rellenarse: %s",
-                            machineExpenseRecord.getPrize().getCategory().getName(),
-                            machineExpenseRecord.getQuantity()
+                            entry.getKey(),
+                            entry.getValue()
                     )
             ));
         }

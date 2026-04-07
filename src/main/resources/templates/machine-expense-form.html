@@ -1,42 +1,30 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/head :: appHead('Canje rápido')}">
-    <title>Canje rápido</title>
+<head th:replace="~{fragments/head :: appHead('Canje rapido')}">
+    <title>Canje rapido</title>
 </head>
 <body>
 <div class="app">
     <div th:replace="~{fragments/sidebar :: sidebar('redemptions')}"></div>
 
     <main class="content">
-        <div th:replace="~{fragments/topbar :: topbar('Canje rápido', 'Inicio / Dashboard / Canje rápido')}"></div>
+        <div th:replace="~{fragments/topbar :: topbar('Canje rapido', 'Inicio / Dashboard / Canje rapido')}"></div>
 
         <section class="page">
             <div class="page-shell machine-expense-page">
 
                 <section class="machine-expense-hero">
-                    <h3 class="machine-expense-hero__title">Canje rápido</h3>
+                    <h3 class="machine-expense-hero__title">Canje rapido</h3>
                     <p class="machine-expense-hero__text">
-                        Registra la salida rápida de premios de la campaña activa.
+                        Registra la salida rapida de premios de la campana activa.
                         Agrega uno o varios renglones con premio y cantidad.
                     </p>
                 </section>
 
-                <div class="alert alert-success machine-expense-feedback"
-                     th:if="${successMessage != null}"
-                     th:text="${successMessage}">
-                    Registro realizado correctamente.
-                </div>
-
-                <div class="alert alert-danger machine-expense-feedback"
-                     th:if="${errorMessage != null}"
-                     th:text="${errorMessage}">
-                    Ocurrió un error al registrar el canje.
-                </div>
+                <div id="machineExpenseAlertContainer"></div>
 
                 <section class="app-card machine-expense-form-shell">
-                    <form th:action="@{/machine-expense-records}"
-                          method="post"
-                          class="machine-expense-form"
+                    <form class="machine-expense-form"
                           id="machineExpenseForm">
 
                         <div class="machine-expense-form__header">
@@ -47,27 +35,20 @@
                                 Cantidad
                             </div>
                             <div class="machine-expense-form__col machine-expense-form__col--actions">
-                                Acción
+                                Accion
                             </div>
                         </div>
 
                         <div id="expenseRows" class="machine-expense-form__rows">
                             <div class="machine-expense-row" data-index="0">
                                 <div class="machine-expense-form__field machine-expense-form__field--prize">
-                                    <select name="request[0].prizeId"
-                                            class="machine-expense-form__select js-prize-select">
+                                    <select class="machine-expense-form__select js-prize-select">
                                         <option value="">Selecciona un premio</option>
-                                        <option th:each="prize : ${prizes}"
-                                                th:value="${prize.id}"
-                                                th:text="${prize.prizeCategory + ' - ' + prize.name}">
-                                            Premio
-                                        </option>
                                     </select>
                                 </div>
 
                                 <div class="machine-expense-form__field machine-expense-form__field--quantity">
                                     <input type="number"
-                                           name="request[0].quantity"
                                            min="1"
                                            step="1"
                                            class="machine-expense-form__input js-quantity-input"
@@ -85,16 +66,17 @@
                         </div>
 
                         <div class="machine-expense-form__helper">
-                            Cuando completes el último renglón, se agregará otro automáticamente.
+                            Cuando completes el ultimo renglon, se agregara otro automaticamente.
                         </div>
 
                         <div class="machine-expense-form__actions">
                             <button type="submit"
+                                    id="submitMachineExpenseBtn"
                                     class="machine-expense-form__button machine-expense-form__button--primary">
                                 Guardar canje
                             </button>
 
-                            <a th:href="@{/}"
+                            <a th:href="@{/dashboard}"
                                class="machine-expense-form__button machine-expense-form__button--secondary">
                                 Cancelar
                             </a>
@@ -110,20 +92,13 @@
 <template id="expenseRowTemplate">
     <div class="machine-expense-row" data-index="__INDEX__">
         <div class="machine-expense-form__field machine-expense-form__field--prize">
-            <select name="request[__INDEX__].prizeId"
-                    class="machine-expense-form__select js-prize-select">
+            <select class="machine-expense-form__select js-prize-select">
                 <option value="">Selecciona un premio</option>
-                <option th:each="prize : ${prizes}"
-                        th:value="${prize.id}"
-                        th:text="${prize.prizeCategory + ' - ' + prize.name}">
-                    Premio
-                </option>
             </select>
         </div>
 
         <div class="machine-expense-form__field machine-expense-form__field--quantity">
             <input type="number"
-                   name="request[__INDEX__].quantity"
                    min="1"
                    step="1"
                    class="machine-expense-form__input js-quantity-input"

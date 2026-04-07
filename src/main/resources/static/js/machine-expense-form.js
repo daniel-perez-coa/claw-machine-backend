@@ -2,15 +2,46 @@
     const rowsContainer = document.getElementById('expenseRows');
     const templateElement = document.getElementById('expenseRowTemplate');
     const formElement = document.getElementById('machineExpenseForm');
+    const alertContainer = document.getElementById('machineExpenseAlertContainer');
+    const submitButton = document.getElementById('submitMachineExpenseBtn');
 
-    if (!rowsContainer || !templateElement || !formElement) {
+    if (!rowsContainer || !templateElement || !formElement || !alertContainer || !submitButton) {
         return;
     }
 
     const rowTemplate = templateElement.innerHTML;
+    let prizes = [];
+
+    function showAlert(message, type) {
+        alertContainer.innerHTML = `
+            <div class="alert alert-${type === 'error' ? 'danger' : 'success'} machine-expense-feedback">
+                ${message}
+            </div>
+        `;
+    }
 
     function getRows() {
         return Array.from(rowsContainer.querySelectorAll('.machine-expense-row'));
+    }
+
+    function getPrizeOptionsMarkup() {
+        return `
+            <option value="">Selecciona un premio</option>
+            ${prizes.map((prize) => `
+                <option value="${prize.id}">${prize.prizeCategory ?? ''} - ${prize.name ?? ''}</option>
+            `).join('')}
+        `;
+    }
+
+    function hydratePrizeSelects() {
+        rowsContainer.querySelectorAll('.js-prize-select').forEach((select) => {
+            const currentValue = select.value;
+            select.innerHTML = getPrizeOptionsMarkup();
+
+            if (currentValue) {
+                select.value = currentValue;
+            }
+        });
     }
 
     function isRowFilled(row) {
@@ -37,6 +68,7 @@
         const index = getRows().length;
         const html = rowTemplate.replaceAll('__INDEX__', index);
         rowsContainer.insertAdjacentHTML('beforeend', html);
+        hydratePrizeSelects();
         refreshRemoveButtons();
     }
 
@@ -45,42 +77,23 @@
 
         rows.forEach((row, idx) => {
             const removeBtn = row.querySelector('.machine-expense-form__remove');
-            if (!removeBtn) return;
+            if (!removeBtn) {
+                return;
+            }
 
             removeBtn.disabled = rows.length === 1;
             removeBtn.classList.toggle('is-disabled', rows.length === 1);
-
-            const select = row.querySelector('.js-prize-select');
-            const input = row.querySelector('.js-quantity-input');
-
-            if (select) select.dataset.index = idx;
-            if (input) input.dataset.index = idx;
-
             row.dataset.index = idx;
         });
     }
 
-    function applyNamesOnlyToValidRows() {
-        const rows = getRows();
-        let validIndex = 0;
-
-        rows.forEach((row) => {
-            const select = row.querySelector('.js-prize-select');
-            const input = row.querySelector('.js-quantity-input');
-
-            if (!select || !input) return;
-
-            if (isRowFilled(row)) {
-                select.name = `items[${validIndex}].prizeId`;
-                input.name = `items[${validIndex}].quantity`;
-                validIndex++;
-            } else {
-                select.removeAttribute('name');
-                input.removeAttribute('name');
-            }
-        });
-
-        return validIndex;
+    function getPayloadItems() {
+        return getRows()
+            .filter(isRowFilled)
+            .map((row) => ({
+                prizeId: Number(row.querySelector('.js-prize-select')?.value),
+                quantity: Number(row.querySelector('.js-quantity-input')?.value)
+            }));
     }
 
     function ensureTrailingEmptyRow() {
@@ -92,24 +105,80 @@
         }
     }
 
+    function resetFormRows() {
+        rowsContainer.innerHTML = `
+            <div class="machine-expense-row" data-index="0">
+                <div class="machine-expense-form__field machine-expense-form__field--prize">
+                    <select class="machine-expense-form__select js-prize-select">
+                        <option value="">Selecciona un premio</option>
+                    </select>
+                </div>
+
+                <div class="machine-expense-form__field machine-expense-form__field--quantity">
+                    <input type="number"
+                           min="1"
+                           step="1"
+                           class="machine-expense-form__input js-quantity-input"
+                           placeholder="Cantidad">
+                </div>
+
+                <div class="machine-expense-form__field machine-expense-form__field--actions">
+                    <button type="button"
+                            class="machine-expense-form__remove"
+                            disabled>
+                        Quitar
+                    </button>
+                </div>
+            </div>
+        `;
+
+        hydratePrizeSelects();
+        refreshRemoveButtons();
+    }
+
+    async function loadPrizes() {
+        try {
+            const response = await fetch('/api/prizes/active');
+
+            if (!response.ok) {
+                throw new Error('No se pudieron cargar los premios.');
+            }
+
+            prizes = await response.json();
+            hydratePrizeSelects();
+        } catch (error) {
+            showAlert('No fue posible cargar los premios activos.', 'error');
+        }
+    }
+
     rowsContainer.addEventListener('input', function (event) {
         const row = event.target.closest('.machine-expense-row');
-        if (!row) return;
+        if (!row) {
+            return;
+        }
+
         ensureTrailingEmptyRow();
     });
 
     rowsContainer.addEventListener('change', function (event) {
         const row = event.target.closest('.machine-expense-row');
-        if (!row) return;
+        if (!row) {
+            return;
+        }
+
         ensureTrailingEmptyRow();
     });
 
     rowsContainer.addEventListener('click', function (event) {
         const removeBtn = event.target.closest('.machine-expense-form__remove');
-        if (!removeBtn || removeBtn.disabled) return;
+        if (!removeBtn || removeBtn.disabled) {
+            return;
+        }
 
         const row = removeBtn.closest('.machine-expense-row');
-        if (!row) return;
+        if (!row) {
+            return;
+        }
 
         row.remove();
         refreshRemoveButtons();
@@ -122,15 +191,18 @@
         }
     });
 
-    formElement.addEventListener('submit', function (event) {
-        const rows = getRows();
+    formElement.addEventListener('submit', async function (event) {
+        event.preventDefault();
+
         let hasPartialRow = false;
 
-        rows.forEach((row) => {
+        getRows().forEach((row) => {
             const select = row.querySelector('.js-prize-select');
             const input = row.querySelector('.js-quantity-input');
 
-            if (!select || !input) return;
+            if (!select || !input) {
+                return;
+            }
 
             select.required = false;
             input.required = false;
@@ -149,18 +221,41 @@
         });
 
         if (hasPartialRow) {
-            event.preventDefault();
             return;
         }
 
-        const validRows = applyNamesOnlyToValidRows();
+        const items = getPayloadItems();
 
-        if (validRows === 0) {
-            event.preventDefault();
-            alert('Debes registrar al menos un premio con cantidad válida.');
+        if (items.length === 0) {
+            showAlert('Debes registrar al menos un premio con cantidad valida.', 'error');
             return;
+        }
+
+        submitButton.disabled = true;
+
+        try {
+            const response = await fetch('/api/machine-expense-records', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ items })
+            });
+
+            if (!response.ok) {
+                throw new Error('No se pudo registrar el canje.');
+            }
+
+            showAlert('Canje registrado correctamente.', 'success');
+            resetFormRows();
+            window.location.href = '/dashboard';
+        } catch (error) {
+            showAlert('Ocurrio un error al registrar el canje.', 'error');
+        } finally {
+            submitButton.disabled = false;
         }
     });
 
     refreshRemoveButtons();
+    loadPrizes();
 })();
