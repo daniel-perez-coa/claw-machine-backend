@@ -16,6 +16,8 @@ build/
 # IntelliJ
 # =========================
 .idea/
+.project
+.settings/
 *.iml
 *.iws
 *.ipr

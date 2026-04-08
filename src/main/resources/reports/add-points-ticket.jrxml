@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 6.20.6-5c96b6aa8a39ac1dc6b6bea4b81168e16dd39231  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="add_points_ticket" pageWidth="156" pageHeight="900" columnWidth="140" leftMargin="8" rightMargin="8" topMargin="10" bottomMargin="10" uuid="0ca14b71-c842-45d5-8d5f-6831e1a85d6a">
+	<subDataset name="redeemablePrizesDataset" uuid="6bd77880-cc28-4386-82eb-b5dad4905ef2">
+		<field name="prizeName" class="java.lang.String"/>
+		<field name="prizeCost" class="java.lang.Integer"/>
+	</subDataset>
+	<parameter name="USER_NAME" class="java.lang.String"/>
+	<parameter name="USER_PHONE" class="java.lang.String"/>
+	<parameter name="USER_POINTS_BEFORE" class="java.lang.Integer"/>
+	<parameter name="POINTS_ADDED" class="java.lang.Integer"/>
+	<parameter name="USER_POINTS_AFTER" class="java.lang.Integer"/>
+	<parameter name="REPORT_TIMESTAMP" class="java.util.Date"/>
+	<parameter name="REDEEMABLE_PRIZES_DATA" class="net.sf.jasperreports.engine.JRDataSource"/>
+	<title>
+		<band height="206">
+			<staticText>
+				<reportElement x="0" y="0" width="140" height="18" uuid="64940251-a8ba-4974-9859-cd17a5ec2641"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[COMPROBANTE DE PUNTOS]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="22" width="140" height="1" uuid="c4b8496d-8448-4886-b540-f58ba3329b67"/>
+			</line>
+			<staticText>
+				<reportElement x="0" y="28" width="140" height="12" uuid="3bb82a20-8b00-41d2-bb67-ad054d645ab4"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Informacion del usuario]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="44" width="140" height="11" uuid="2f3b9ba8-6bbd-496f-a92d-2e303983d586"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Nombre: " + ($P{USER_NAME} == null ? "" : $P{USER_NAME})]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="57" width="140" height="11" uuid="bd769499-c60d-41eb-bf87-83f25339d625"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Telefono: " + ($P{USER_PHONE} == null ? "" : $P{USER_PHONE})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="74" width="140" height="12" uuid="6fb666a1-e8c8-4ec6-acd3-f33e56d16d5b"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Operacion: agregar puntos]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="90" width="140" height="11" uuid="81773c6d-f0f4-48f2-bb3e-648be8ad4d7b"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Puntos previos: " + String.valueOf($P{USER_POINTS_BEFORE} == null ? 0 : $P{USER_POINTS_BEFORE})]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="103" width="140" height="11" uuid="1b61cc4d-420a-49d7-bd44-22f5489a89e7"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Puntos agregados: " + String.valueOf($P{POINTS_ADDED} == null ? 0 : $P{POINTS_ADDED})]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="116" width="140" height="11" uuid="6c7745f6-af58-4fa0-a27d-4b10a70ea184"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Puntos actuales: " + String.valueOf($P{USER_POINTS_AFTER} == null ? 0 : $P{USER_POINTS_AFTER})]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="0" y="135" width="68" height="11" uuid="52fcac8c-02d5-4d98-a9a6-a38d3c5b9b66"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{REPORT_TIMESTAMP}]]></textFieldExpression>
+			</textField>
+			<textField pattern="HH:mm:ss">
+				<reportElement x="72" y="135" width="68" height="11" uuid="a3925bc8-cbe1-4987-a643-2f73b6e6d682"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{REPORT_TIMESTAMP}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="152" width="140" height="1" uuid="c4cdabaf-a057-4a62-a4f4-1c71aa07e408"/>
+			</line>
+			<staticText>
+				<reportElement x="0" y="160" width="140" height="30" uuid="45a1b0d9-f9b9-4796-aeb3-8ce212d62bd5"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Usted puede canjear los siguientes premios actualmente]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="180">
+			<componentElement>
+				<reportElement x="0" y="0" width="140" height="180" uuid="65d74e78-8505-4ed7-a061-59ff7d2bc130"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="redeemablePrizesDataset" uuid="f5f7fef5-2b44-4ef3-b42d-0f1f0c0f6e22">
+						<dataSourceExpression><![CDATA[$P{REDEEMABLE_PRIZES_DATA}]]></dataSourceExpression>
+					</datasetRun>
+					<jr:listContents height="22" width="140">
+						<frame>
+							<reportElement x="0" y="0" width="140" height="20" uuid="92b16cee-a0fc-4998-a365-335cf4e5d357"/>
+							<box>
+								<topPen lineWidth="0.2"/>
+								<leftPen lineWidth="0.2"/>
+								<bottomPen lineWidth="0.2"/>
+								<rightPen lineWidth="0.2"/>
+							</box>
+							<textField isBlankWhenNull="true">
+								<reportElement x="4" y="4" width="88" height="12" uuid="12ee9b3d-f0b9-45d4-82fb-3e5dc0f91a1c"/>
+								<textElement>
+									<font size="8"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{prizeName}]]></textFieldExpression>
+							</textField>
+							<textField isBlankWhenNull="true">
+								<reportElement x="94" y="4" width="42" height="12" uuid="5167cf1f-b80d-4a76-9d24-7f2f4de63958"/>
+								<textElement textAlignment="Right">
+									<font size="8" isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[String.valueOf($F{prizeCost}) + " pts"]]></textFieldExpression>
+							</textField>
+						</frame>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="40">
+			<line>
+				<reportElement x="0" y="2" width="140" height="1" uuid="7720b1a1-a8b7-449a-84ff-12ec7e48d0db"/>
+			</line>
+			<staticText>
+				<reportElement x="0" y="8" width="140" height="22" uuid="9476f7e0-465f-44ae-aacd-2c44be8af4c5"/>
+				<textElement textAlignment="Center">
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[Tus puntos quedan registrados en sistema.
+Este comprobante es únicamente informativo.]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+</jasperReport>

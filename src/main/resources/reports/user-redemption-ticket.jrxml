@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 6.20.6-5c96b6aa8a39ac1dc6b6bea4b81168e16dd39231  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="user_redemption_ticket" pageWidth="156" pageHeight="520" columnWidth="140" leftMargin="8" rightMargin="8" topMargin="10" bottomMargin="10" uuid="edcd5624-46d6-4707-a09c-a9ecb9e963cb">
+	<parameter name="USER_NAME" class="java.lang.String"/>
+	<parameter name="USER_PHONE" class="java.lang.String"/>
+	<parameter name="PRIZE_NAME" class="java.lang.String"/>
+	<parameter name="PRIZE_CATEGORY" class="java.lang.String"/>
+	<parameter name="POINTS_BEFORE" class="java.lang.Integer"/>
+	<parameter name="POINTS_SPENT" class="java.lang.Integer"/>
+	<parameter name="POINTS_AFTER" class="java.lang.Integer"/>
+	<parameter name="REPORT_TIMESTAMP" class="java.util.Date"/>
+	<title>
+		<band height="230">
+			<staticText>
+				<reportElement x="0" y="0" width="140" height="18" uuid="37233be6-6d36-4a96-8f59-18e28d83904a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[COMPROBANTE DE CANJE]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="22" width="140" height="1" uuid="ceee2f98-ee80-4e7c-a833-4ef485da2e80"/>
+			</line>
+			<staticText>
+				<reportElement x="0" y="28" width="140" height="12" uuid="c4e71412-a776-4150-a3e2-301ff1139918"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Informacion del usuario]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="44" width="140" height="11" uuid="40969c6f-db99-4875-a430-9bc443c9c98e"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Nombre: " + ($P{USER_NAME} == null ? "" : $P{USER_NAME})]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="57" width="140" height="11" uuid="8bcc9cfc-77ff-41dd-b674-c040d1bf707d"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Telefono: " + ($P{USER_PHONE} == null ? "" : $P{USER_PHONE})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="74" width="140" height="12" uuid="104d8441-f8d2-44aa-8a3b-bc67df605945"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Informacion del canje]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="90" width="140" height="11" uuid="6ca5b928-a577-4f22-b8c2-bf9fda1d24ae"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Premio: " + ($P{PRIZE_NAME} == null ? "" : $P{PRIZE_NAME})]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="116" width="140" height="11" uuid="d01402c4-f8c7-47fc-8677-862667266e66"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Puntos antes: " + String.valueOf($P{POINTS_BEFORE} == null ? 0 : $P{POINTS_BEFORE})]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="129" width="140" height="11" uuid="a641f22e-e44c-4688-bb8a-1de77fcd779a"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Puntos canjeados: " + String.valueOf($P{POINTS_SPENT} == null ? 0 : $P{POINTS_SPENT})]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="142" width="140" height="11" uuid="bb0b4164-6bce-476b-80d8-8ddeea46a0bb"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Puntos restantes: " + String.valueOf($P{POINTS_AFTER} == null ? 0 : $P{POINTS_AFTER})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="161" width="140" height="24" uuid="fefc27f6-8c0b-4525-b7a3-c2d7d6eaf610"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[El premio fue canjeado correctamente y los puntos del usuario fueron actualizados.]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="0" y="194" width="68" height="11" uuid="84894a14-39a6-4627-96ef-8ac20d3900a9"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{REPORT_TIMESTAMP}]]></textFieldExpression>
+			</textField>
+			<textField pattern="HH:mm:ss">
+				<reportElement x="72" y="194" width="68" height="11" uuid="31c63d86-9fe7-4d14-a791-84317fbc0e18"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{REPORT_TIMESTAMP}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="212" width="140" height="1" uuid="c8020f04-c712-4eb8-8ce4-d336f9f3627a"/>
+			</line>
+		</band>
+	</title>
+	<detail>
+		<band height="104">
+			<staticText>
+				<reportElement x="0" y="8" width="140" height="14" uuid="b0dcd0da-ec6b-47c2-a2f8-466915b5db74"/>
+				<textElement textAlignment="Center">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Mensaje importante]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="28" width="140" height="54" uuid="2fdb5808-9557-4df1-8f33-5577db583d54"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Siga acumulando puntos para obtener premios mas grandes en sus proximos canjes.]]></text>
+			</staticText>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="34">
+			<line>
+				<reportElement x="0" y="2" width="140" height="1" uuid="0e6be3aa-dc5f-48e7-ab06-dda54009b27a"/>
+			</line>
+			<staticText>
+				<reportElement x="0" y="9" width="140" height="18" uuid="bc99c3ce-4983-4ff2-ad2a-ebd803a2cb61"/>
+				<textElement textAlignment="Center">
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[Gracias por su visita.]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+</jasperReport>
