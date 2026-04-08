@@ -583,6 +583,14 @@ textarea {
     text-align: center;
 }
 
+.app-confirm-modal__text-accent--danger {
+    color: #ff7b7b;
+}
+
+.app-confirm-modal__text-accent--warning {
+    color: #fde68a;
+}
+
 .app-confirm-modal__actions {
     display: flex;
     gap: 20px;

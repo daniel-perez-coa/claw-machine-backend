@@ -72,8 +72,9 @@ window.showAppConfirmModal = (() => {
         ensureModal();
 
         const {
-            title = 'Confirmar acción',
+            title = 'Confirmar accion',
             body = '',
+            bodyHtml = '',
             confirmText = 'Confirmar',
             cancelText = 'Cancelar',
             cancelVariant = 'cancel',
@@ -83,7 +84,11 @@ window.showAppConfirmModal = (() => {
         const { titleElement, textElement, cancelButton, confirmButton } = modalElement._appConfirm;
 
         titleElement.textContent = title;
-        textElement.textContent = body;
+        if (bodyHtml) {
+            textElement.innerHTML = bodyHtml;
+        } else {
+            textElement.textContent = body;
+        }
         cancelButton.textContent = cancelText;
         cancelButton.className = `app-confirm-modal__button app-confirm-modal__button--${cancelVariant}`;
         confirmButton.textContent = confirmText;

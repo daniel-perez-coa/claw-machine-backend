@@ -18,11 +18,50 @@
                     <p class="page-title-banner__text">Exporta o imprime reportes</p>
                 </section>
 
+                <section class="reports-grid">
+                    <article class="app-card reports-action-card">
+                        <div class="reports-action-card__content">
+                            <div>
+                                <h3 class="reports-action-card__title">Configuración de la base de datos</h3>
+                                <p class="reports-action-card__text">
+                                    Realice estas operaciones solamente con ayuda de un administrador.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="reports-action-card__actions">
+                            <button type="button"
+                                    id="downloadDatabaseBackupBtn"
+                                    class="reports-action-card__button reports-action-card__button--warning">
+                                Guardar base de datos
+                            </button>
+
+                            <label for="importDatabaseBackupFile"
+                                   class="reports-action-card__button reports-action-card__button--secondary">
+                                Importar base de datos
+                            </label>
+                            <input type="file"
+                                   id="importDatabaseBackupFile"
+                                   class="reports-action-card__file-input"
+                                   accept=".sql,text/plain">
+
+                            <button type="button"
+                                    id="deleteDatabaseBtn"
+                                    class="reports-action-card__button reports-action-card__button--danger">
+                                Eliminar base de datos
+                            </button>
+                        </div>
+
+                        <div id="reportsStatus" class="reports-status" aria-live="polite"></div>
+                    </article>
+                </section>
+
             </div>
         </section>
     </main>
 </div>
 
+<script th:src="@{/js/app-confirm-modal.js}"></script>
 <script th:src="@{/js/reports.js}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -4,6 +4,114 @@
     gap: 18px;
 }
 
+.reports-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.reports-action-card {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.reports-action-card__content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.reports-action-card__title {
+    margin: 0 0 8px;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #eef4ff;
+}
+
+.reports-action-card__text {
+    margin: 0;
+    max-width: 720px;
+    color: var(--text-soft);
+}
+
+.reports-action-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.reports-action-card__button {
+    min-width: 220px;
+    min-height: 48px;
+    padding: 12px 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(243, 194, 67, 0.34);
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgba(243, 194, 67, 0.18) 0%, rgba(92, 63, 8, 0.72) 100%);
+    color: #fde68a;
+    font-size: 0.98rem;
+    font-weight: 800;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.reports-action-card__button:hover:not(:disabled) {
+    transform: translateY(-1px);
+    border-color: rgba(243, 194, 67, 0.54);
+    background: linear-gradient(180deg, rgba(243, 194, 67, 0.26) 0%, rgba(92, 63, 8, 0.82) 100%);
+    color: #ffffff;
+}
+
+.reports-action-card__button--secondary {
+    border-color: rgba(126, 139, 163, 0.28);
+    background: linear-gradient(180deg, rgba(126, 139, 163, 0.16) 0%, rgba(29, 39, 58, 0.86) 100%);
+    color: #dde7f6;
+}
+
+.reports-action-card__button--secondary:hover:not(:disabled) {
+    border-color: rgba(156, 171, 196, 0.44);
+    background: linear-gradient(180deg, rgba(126, 139, 163, 0.24) 0%, rgba(35, 46, 67, 0.94) 100%);
+}
+
+.reports-action-card__button--danger {
+    border-color: rgba(240, 92, 100, 0.34);
+    background: linear-gradient(180deg, rgba(240, 92, 100, 0.2) 0%, rgba(86, 18, 28, 0.82) 100%);
+    color: #ffb4b4;
+}
+
+.reports-action-card__button--danger:hover:not(:disabled) {
+    border-color: rgba(240, 92, 100, 0.5);
+    background: linear-gradient(180deg, rgba(240, 92, 100, 0.28) 0%, rgba(110, 24, 36, 0.92) 100%);
+}
+
+.reports-action-card__button:disabled {
+    opacity: 0.72;
+    cursor: wait;
+}
+
+.reports-action-card__file-input {
+    display: none;
+}
+
+.reports-status {
+    min-height: 24px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-soft);
+}
+
+.reports-status--success {
+    color: #9ff0c3;
+}
+
+.reports-status--error {
+    color: #ffb4b4;
+}
+
 .reports-hero {
     position: relative;
     overflow: hidden;
@@ -68,5 +176,15 @@
     .reports-hero {
         min-height: 180px;
         padding: 18px;
+    }
+
+    .reports-action-card__content {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .reports-action-card__button {
+        width: 100%;
+        min-width: 0;
     }
 }
