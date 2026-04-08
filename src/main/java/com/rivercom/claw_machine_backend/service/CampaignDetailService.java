@@ -1,5 +1,6 @@
 package com.rivercom.claw_machine_backend.service;
 
+import com.rivercom.claw_machine_backend.domain.entity.IncomeRecords;
 import com.rivercom.claw_machine_backend.domain.entity.MachineCampaign;
 import com.rivercom.claw_machine_backend.domain.entity.Prize;
 import com.rivercom.claw_machine_backend.domain.enums.MachineCampaignStatus;
@@ -7,16 +8,21 @@ import com.rivercom.claw_machine_backend.dto.MachineCampaignResponseDTO;
 import com.rivercom.claw_machine_backend.dto.MachineCampaignUpdateRequestDTO;
 import com.rivercom.claw_machine_backend.dto.NewMachineCampaignCampaignDTO;
 import com.rivercom.claw_machine_backend.mapper.MachineCampaignMapper;
+import com.rivercom.claw_machine_backend.repository.IncomeRecordsRepository;
 import com.rivercom.claw_machine_backend.repository.MachineCampaignRepository;
+import com.rivercom.claw_machine_backend.repository.MachineExpenseRecordsRepository;
 import com.rivercom.claw_machine_backend.repository.PrizeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -26,6 +32,8 @@ public class CampaignDetailService {
 
     private final MachineCampaignRepository repository;
     private final PrizeRepository prizeRepository;
+    private final MachineExpenseRecordsRepository machineExpenseRecordsRepository;
+    private final IncomeRecordsRepository incomeRecordsRepository;
     private final MachineCampaignMapper mapper;
 
     public List<MachineCampaignResponseDTO> listAll() {
@@ -36,7 +44,7 @@ public class CampaignDetailService {
                 ))
                 .toList();
 
-        return mapper.toResponseList(machineCampaigns);
+        return mapper.toResponseList(machineCampaigns, getTotalMoneyRaisedByCampaign(machineCampaigns));
     }
 
     @Transactional
@@ -67,7 +75,7 @@ public class CampaignDetailService {
         newCampaign.setBaseTargetAmount(request.baseTargetAmount());
 
         MachineCampaign savedCampaign = repository.save(newCampaign);
-        return mapper.toResponse(savedCampaign);
+        return mapper.toResponse(savedCampaign, BigDecimal.ZERO);
     }
 
     @Transactional
@@ -85,15 +93,43 @@ public class CampaignDetailService {
             campaign.setStatus(MachineCampaignStatus.CLOSED);
             campaign.setClosedAt(LocalDateTime.now());
             campaign.setNotes("Campaña cerrada exitosamente porque se logró la meta.");
+            resolvePendingRestockForCampaign(campaign.getId());
         }
 
         if (request.status() == MachineCampaignStatus.CANCELLED) {
             campaign.setStatus(MachineCampaignStatus.CANCELLED);
             campaign.setNotes(request.notes());
             campaign.setClosedAt(LocalDateTime.now());
+            resolvePendingRestockForCampaign(campaign.getId());
         }
 
         MachineCampaign updatedCampaign = repository.save(campaign);
-        return mapper.toResponse(updatedCampaign);
+        return mapper.toResponse(updatedCampaign, getTotalMoneyRaised(updatedCampaign.getId()));
+    }
+
+    private void resolvePendingRestockForCampaign(Long campaignId) {
+        machineExpenseRecordsRepository.findByCampaignIdAndRestocked(campaignId, false)
+                .forEach((record) -> record.setRestocked(true));
+    }
+
+    private Map<Long, BigDecimal> getTotalMoneyRaisedByCampaign(List<MachineCampaign> campaigns) {
+        Map<Long, BigDecimal> totals = new LinkedHashMap<>();
+
+        for (MachineCampaign campaign : campaigns) {
+            totals.put(campaign.getId(), getTotalMoneyRaised(campaign.getId()));
+        }
+
+        return totals;
+    }
+
+    private BigDecimal getTotalMoneyRaised(Long campaignId) {
+        List<IncomeRecords> incomeRecords = incomeRecordsRepository.findByCampaignId(campaignId);
+        BigDecimal total = BigDecimal.ZERO;
+
+        for (IncomeRecords incomeRecord : incomeRecords) {
+            total = total.add(incomeRecord.getAmount());
+        }
+
+        return total;
     }
 }

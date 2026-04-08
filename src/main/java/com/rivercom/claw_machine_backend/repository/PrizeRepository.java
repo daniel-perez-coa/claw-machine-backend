@@ -18,6 +18,10 @@ public interface PrizeRepository extends JpaRepository<Prize, Long> {
 
     Optional<Prize> findByName(String name);
 
+    Optional<Prize> findByNameIgnoreCase(String name);
+
+    boolean existsByNameIgnoreCaseAndIdNot(String name, Long id);
+
     @EntityGraph(attributePaths = "category")
     List<Prize> findByCategoryCode(String code);
 

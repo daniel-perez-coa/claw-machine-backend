@@ -33,6 +33,18 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 
+    function getUpdatePrizeErrorMessage(response) {
+        if (response.status === 409) {
+            return 'Ya existe otro premio con ese nombre.';
+        }
+
+        if (response.status === 400) {
+            return 'La informacion del premio no es valida.';
+        }
+
+        return 'No fue posible actualizar el premio.';
+    }
+
     function renderCategoryOptions(categories) {
         categorySelect.innerHTML = `
             <option value="">Selecciona una categoria</option>
@@ -108,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (!response.ok) {
-                throw new Error('No fue posible actualizar el premio.');
+                throw new Error(getUpdatePrizeErrorMessage(response));
             }
 
             const responseText = await response.text();
@@ -124,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = '/prizes';
             }, 1800);
         } catch (error) {
-            showAlert('Ocurrio un error al actualizar el premio.', 'error');
+            showAlert(error.message || 'Ocurrio un error al actualizar el premio.', 'error');
         } finally {
             submitButton.disabled = false;
         }

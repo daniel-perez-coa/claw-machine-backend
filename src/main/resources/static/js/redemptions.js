@@ -9,9 +9,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const alertContainer = document.getElementById('redemptionsAlertContainer');
     const redemptionResultSection = document.getElementById('redemptionResultSection');
     const redemptionResultGrid = document.getElementById('redemptionResultGrid');
+    const redemptionsContent = document.getElementById('redemptionsContent');
+    const redemptionsUnavailableState = document.getElementById('redemptionsUnavailableState');
 
     if (!phoneSearchInput || !searchUserBtn || !userResultContainer || !selectedUserPhone || !prizeSelect ||
-        !redeemBtn || !redeemForm || !alertContainer || !redemptionResultSection || !redemptionResultGrid) {
+        !redeemBtn || !redeemForm || !alertContainer || !redemptionResultSection || !redemptionResultGrid ||
+        !redemptionsContent || !redemptionsUnavailableState) {
         return;
     }
 
@@ -24,6 +27,10 @@ document.addEventListener('DOMContentLoaded', () => {
             .replaceAll("'", '&#39;');
     }
 
+    function sanitizePhone(value) {
+        return String(value ?? '').replaceAll(/\D/g, '').slice(0, 10);
+    }
+
     function showAlert(message, type = 'success') {
         alertContainer.innerHTML = `
             <div class="redemptions-alert redemptions-alert--${type === 'error' ? 'error' : 'success'}">
@@ -34,6 +41,18 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             alertContainer.innerHTML = '';
         }, 4000);
+    }
+
+    function showUnavailableState() {
+        redemptionsContent.style.display = 'none';
+        redemptionResultSection.style.display = 'none';
+        redemptionsUnavailableState.style.display = '';
+        resetSelection();
+    }
+
+    function showContent() {
+        redemptionsContent.style.display = '';
+        redemptionsUnavailableState.style.display = 'none';
     }
 
     function resetSelection() {
@@ -159,23 +178,50 @@ document.addEventListener('DOMContentLoaded', () => {
         redemptionResultSection.style.display = '';
     }
 
+    async function hasOpenCampaign() {
+        const response = await fetch('/api/campaigns');
+
+        if (!response.ok) {
+            throw new Error('No se pudieron cargar las campanas.');
+        }
+
+        const campaigns = await response.json();
+        return Array.isArray(campaigns) && campaigns.some((campaign) => campaign.status === 'OPEN');
+    }
+
     async function loadPrizes() {
         try {
-            const response = await fetch('/api/prizes');
+            const openCampaignExists = await hasOpenCampaign();
+
+            if (!openCampaignExists) {
+                showUnavailableState();
+                return;
+            }
+
+            const response = await fetch('/api/prizes/active');
 
             if (!response.ok) {
                 throw new Error('No se pudieron cargar los premios.');
             }
 
             const prizes = await response.json();
+
+            if (!prizes || prizes.length === 0) {
+                showContent();
+                renderPrizeOptions([]);
+                return;
+            }
+
+            showContent();
             renderPrizeOptions(prizes);
         } catch (error) {
-            showAlert('No fue posible cargar los premios.', 'error');
+            showUnavailableState();
         }
     }
 
     async function searchUserByPhone() {
-        const phone = phoneSearchInput.value.trim();
+        const phone = sanitizePhone(phoneSearchInput.value).trim();
+        phoneSearchInput.value = phone;
 
         if (!phone) {
             renderEmpty('Debes ingresar un telefono para realizar la busqueda.');
@@ -248,6 +294,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     searchUserBtn.addEventListener('click', searchUserByPhone);
     redeemForm.addEventListener('submit', redeemPrize);
+
+    phoneSearchInput.addEventListener('input', () => {
+        const sanitizedValue = sanitizePhone(phoneSearchInput.value);
+        if (sanitizedValue !== phoneSearchInput.value) {
+            phoneSearchInput.value = sanitizedValue;
+        }
+    });
 
     phoneSearchInput.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {

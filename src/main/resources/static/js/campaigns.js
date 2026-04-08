@@ -106,8 +106,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${getStatusMarkup(campaign.status)}
 
                         <div class="campaign-card__target">
-                            Meta base siguiente:
+                            Meta de dinero a recaudar:
                             <strong style="margin-left: 6px;">$${formatMoney(campaign.baseTargetAmount)}</strong>
+                            <span class="campaign-card__target-separator"></span>
+                            Dinero recaudado:
+                            <strong style="margin-left: 6px;">$${formatMoney(campaign.totalMoneyRaised)}</strong>
                         </div>
                     </div>
                 </div>

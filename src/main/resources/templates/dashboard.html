@@ -21,7 +21,7 @@
 
                 <div id="dashboardStatusContainer"></div>
 
-                <section class="dashboard-actions">
+                <section id="dashboardActions" class="dashboard-actions">
                     <a th:href="@{/income-records/new}"
                        class="dashboard-action-card"
                        aria-label="Registrar ingreso">
@@ -31,7 +31,7 @@
                     <a th:href="@{/machine-expense-records/new}"
                        class="dashboard-action-card dashboard-action-card--secondary"
                        aria-label="Registrar canje rapido">
-                        <span class="dashboard-action-card__label">Canje rapido</span>
+                        <span class="dashboard-action-card__label">Canjear un premio</span>
                     </a>
                 </section>
 
@@ -40,67 +40,48 @@
                         <article class="app-card dashboard-kpi dashboard-kpi--primary">
                             <div class="dashboard-kpi__label">Dinero recaudado</div>
                             <div id="totalMoneyRaised" class="dashboard-kpi__value money">0.00</div>
-                            <div class="dashboard-kpi__hint">Total acumulado registrado</div>
                         </article>
 
                         <article class="app-card dashboard-kpi dashboard-kpi--warning">
-                            <div class="dashboard-kpi__label">Restante para jackpot</div>
+                            <div class="dashboard-kpi__label">Restante para premio mayor</div>
                             <div id="remainingToJackpot" class="dashboard-kpi__value money">0.00</div>
-                            <div class="dashboard-kpi__hint">Meta pendiente actual</div>
                         </article>
 
                         <article class="app-card dashboard-kpi dashboard-kpi--success">
-                            <div class="dashboard-kpi__label">Excedente despues del jackpot</div>
+                            <div class="dashboard-kpi__label">Excedente después del premio mayor</div>
                             <div id="surplusAfterJackpot" class="dashboard-kpi__value money">0.00</div>
-                            <div class="dashboard-kpi__hint">Ganancia posterior a la meta</div>
                         </article>
 
                         <article class="app-card dashboard-kpi">
-                            <div class="dashboard-kpi__label">Participacion socio 1</div>
+                            <div class="dashboard-kpi__label">Ganancia socio 1</div>
                             <div id="firstPartnerShare" class="dashboard-kpi__value money">0.00</div>
-                            <div class="dashboard-kpi__hint">Distribucion correspondiente</div>
                         </article>
 
                         <article class="app-card dashboard-kpi">
-                            <div class="dashboard-kpi__label">Participacion socio 2</div>
+                            <div class="dashboard-kpi__label">Ganancia socio 2</div>
                             <div id="secondPartnerShare" class="dashboard-kpi__value money">0.00</div>
-                            <div class="dashboard-kpi__hint">Distribucion correspondiente</div>
                         </article>
 
                         <article class="app-card dashboard-kpi dashboard-kpi--danger">
-                            <div class="dashboard-kpi__label">Participacion servicios</div>
+                            <div class="dashboard-kpi__label">Fondo de servicios</div>
                             <div id="servicesShare" class="dashboard-kpi__value money">0.00</div>
-                            <div class="dashboard-kpi__hint">Porcentaje destinado a servicios</div>
                         </article>
                     </section>
 
                     <section class="dashboard-bottom">
                         <article class="app-card dashboard-alerts">
-                            <h3 class="section-title">Alertas</h3>
+                            <div class="dashboard-alerts__header">
+                                <h3 class="section-title">Alertas</h3>
+                                <button type="button"
+                                        id="resolveAlertsBtn"
+                                        class="dashboard-alerts__resolve-button"
+                                        style="display: none;">
+                                    Resolver alertas
+                                </button>
+                            </div>
 
                             <div id="dashboardAlertsList" class="dashboard-alerts__list">
                                 <div class="empty-state">Cargando alertas...</div>
-                            </div>
-                        </article>
-
-                        <article class="app-card dashboard-shares">
-                            <h3 class="section-title">Distribucion rapida</h3>
-
-                            <div class="dashboard-shares__list">
-                                <div class="dashboard-shares__row">
-                                    <span class="dashboard-shares__name">Socio 1</span>
-                                    <span id="firstPartnerShareQuick" class="dashboard-shares__value money">0.00</span>
-                                </div>
-
-                                <div class="dashboard-shares__row">
-                                    <span class="dashboard-shares__name">Socio 2</span>
-                                    <span id="secondPartnerShareQuick" class="dashboard-shares__value money">0.00</span>
-                                </div>
-
-                                <div class="dashboard-shares__row">
-                                    <span class="dashboard-shares__name">Servicios</span>
-                                    <span id="servicesShareQuick" class="dashboard-shares__value money">0.00</span>
-                                </div>
                             </div>
                         </article>
                     </section>
@@ -111,6 +92,7 @@
     </main>
 </div>
 
+<script th:src="@{/js/app-confirm-modal.js}"></script>
 <script th:src="@{/js/dashboard.js}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

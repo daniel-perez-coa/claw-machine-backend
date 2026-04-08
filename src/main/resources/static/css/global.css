@@ -543,6 +543,89 @@ textarea {
     background: rgba(243, 154, 154, 0.08);
 }
 
+.app-confirm-modal {
+    background: linear-gradient(180deg, rgba(8, 21, 45, 0.98) 0%, rgba(5, 16, 34, 1) 100%) !important;
+    border: 1px solid rgba(113, 139, 196, 0.2) !important;
+    border-radius: 22px !important;
+    color: var(--text) !important;
+    box-shadow: var(--shadow-panel);
+    overflow: hidden;
+}
+
+#appConfirmModal .modal-dialog {
+    max-width: 620px;
+}
+
+.app-confirm-modal__body {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 26px;
+    background:
+        radial-gradient(circle at top right, rgba(89, 100, 255, 0.14), transparent 32%),
+        linear-gradient(180deg, rgba(8, 21, 45, 0.98) 0%, rgba(5, 16, 34, 1) 100%);
+}
+
+.app-confirm-modal__title {
+    margin: 0;
+    font-size: 24px;
+    line-height: 1.35;
+    font-weight: 900;
+    color: #ffffff;
+    text-align: center;
+}
+
+.app-confirm-modal__text {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text);
+    text-align: center;
+}
+
+.app-confirm-modal__actions {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 6px;
+}
+
+.app-confirm-modal__button {
+    min-width: 140px;
+    min-height: 48px;
+    border: none;
+    border-radius: 14px;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 800;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
+    transition: transform 0.18s ease, filter 0.18s ease;
+}
+
+.app-confirm-modal__button:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+}
+
+.app-confirm-modal__button--cancel {
+    background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%);
+}
+
+.app-confirm-modal__button--secondary {
+    border: 1px solid rgba(126, 139, 163, 0.24);
+    background: linear-gradient(180deg, rgba(126, 139, 163, 0.16) 0%, rgba(19, 29, 48, 0.88) 100%);
+    color: #dfe6ff;
+}
+
+.app-confirm-modal__button--danger {
+    background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%);
+}
+
+.app-confirm-modal__button--success {
+    background: linear-gradient(180deg, #22c55e 0%, #15803d 100%);
+}
+
 .money::before {
     content: "$";
     margin-right: 2px;
@@ -573,6 +656,14 @@ textarea {
     .users-submit-button,
     .redemption-action-button,
     .redemption-submit-button {
+        width: 100%;
+    }
+
+    .app-confirm-modal__actions {
+        flex-direction: column-reverse;
+    }
+
+    .app-confirm-modal__button {
         width: 100%;
     }
 }

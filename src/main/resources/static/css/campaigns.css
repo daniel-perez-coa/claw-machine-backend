@@ -125,9 +125,16 @@
 .campaign-card__target {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     padding: 0 18px;
     color: var(--text-soft);
     font-size: 14px;
+    gap: 6px;
+}
+
+.campaign-card__target-separator {
+    width: 20px;
+    flex: 0 0 20px;
 }
 
 .campaign-card__actions {
@@ -183,6 +190,7 @@
 
     .campaign-card__target {
         min-height: 48px;
+        padding: 12px 18px;
     }
 
     .campaigns-list-shell {

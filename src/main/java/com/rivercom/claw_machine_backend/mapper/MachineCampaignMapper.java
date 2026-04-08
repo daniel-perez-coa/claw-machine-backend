@@ -4,9 +4,11 @@ import com.rivercom.claw_machine_backend.domain.entity.MachineCampaign;
 import com.rivercom.claw_machine_backend.dto.MachineCampaignResponseDTO;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class MachineCampaignMapper {
@@ -14,9 +16,7 @@ public class MachineCampaignMapper {
     private static final DateTimeFormatter CAMPAIGN_DATE_FORMATTER =
             DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    public MachineCampaignResponseDTO toResponse
-            (MachineCampaign entity) {
-
+    public MachineCampaignResponseDTO toResponse(MachineCampaign entity, BigDecimal totalMoneyRaised) {
         if (entity == null) {
             return null;
         }
@@ -28,6 +28,7 @@ public class MachineCampaignMapper {
                 entity.getMajorPrize() != null ? entity.getMajorPrize().getDescription() : null,
                 entity.getStatus(),
                 entity.getBaseTargetAmount(),
+                totalMoneyRaised,
                 entity.getNotes(),
                 formatDate(entity.getOpenedAt()),
                 formatDate(entity.getOpenedAt()),
@@ -35,14 +36,16 @@ public class MachineCampaignMapper {
         );
     }
 
-    public List<MachineCampaignResponseDTO> toResponseList
-            (List<MachineCampaign> entityList) {
+    public List<MachineCampaignResponseDTO> toResponseList(
+            List<MachineCampaign> entityList,
+            Map<Long, BigDecimal> totalMoneyRaisedByCampaign) {
 
         if (entityList == null) {
             return null;
         }
+
         return entityList.stream()
-                .map(this::toResponse)
+                .map((entity) -> toResponse(entity, totalMoneyRaisedByCampaign.getOrDefault(entity.getId(), BigDecimal.ZERO)))
                 .toList();
     }
 

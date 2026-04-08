@@ -20,33 +20,16 @@
               Consulta usuarios registrados, busca por telefono y agrega puntos desde esta pantalla.
             </p>
           </div>
-          <div id="selectedUserContainer" class="user-card-result user-card-result--empty">
-            <div class="user-card-result__placeholder">
-              Aqui aparecera la informacion del usuario encontrado.
-            </div>
-          </div>
-          <div>
-            <button type="button"
-                    id="clearUserBtn"
-                    class="users-danger-button"
-                    disabled>
-              Deseleccionar usuario
-            </button>
-          </div>
         </section>
 
         <section class="app-card users-shell">
 
           <div id="usersAlertContainer"></div>
 
-          <div class="users-grid users-grid--main">
-
-            <article class="app-card users-panel">
+          <div class="users-stack">
+            <article class="users-panel users-panel--search">
               <div class="users-panel__header">
                 <h3 class="users-panel__title">Buscar usuario</h3>
-                <p class="users-panel__text">
-                  Busca un usuario especifico mediante su numero telefonico.
-                </p>
               </div>
 
               <div class="users-search">
@@ -56,7 +39,8 @@
                          type="text"
                          id="searchPhone"
                          placeholder="Ej. 2211234567"
-                         maxlength="20">
+                         maxlength="10"
+                         inputmode="numeric">
                 </div>
 
                 <button type="button"
@@ -64,16 +48,13 @@
                         id="searchUserBtn">
                   Buscar
                 </button>
-              </div>
 
+              </div>
             </article>
 
-            <article class="app-card users-panel">
+            <article class="users-panel users-panel--points">
               <div class="users-panel__header">
                 <h3 class="users-panel__title">Agregar puntos</h3>
-                <p class="users-panel__text">
-                  Suma puntos al usuario seleccionado.
-                </p>
               </div>
 
               <form id="addPointsForm" class="users-form">
@@ -83,6 +64,7 @@
                          type="number"
                          id="pointsToAdd"
                          min="1"
+                         step="1"
                          placeholder="Ej. 50"
                          disabled>
                 </div>
@@ -95,6 +77,26 @@
                 </button>
               </form>
             </article>
+
+            <div class="users-actions-row">
+              <a th:href="@{/users/new}"
+                      class="users-action-button users-action-button--link">
+                Agregar nuevo usuario
+              </a>
+
+              <button type="button"
+                      id="clearUserBtn"
+                      class="users-danger-button"
+                      disabled>
+                Cancelar selección
+              </button>
+
+              <button type="button"
+                      class="users-warning-button"
+                      id="clearFiltersBtn">
+                Limpiar filtros
+              </button>
+            </div>
           </div>
 
           <section class="app-card users-list-shell">
@@ -116,6 +118,35 @@
       </div>
     </section>
   </main>
+</div>
+
+<div class="modal fade" id="confirmAddPointsModal" tabindex="-1" aria-labelledby="confirmAddPointsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content users-confirm-modal">
+      <div class="modal-body users-confirm-modal__body">
+        <h2 id="confirmAddPointsModalLabel" class="users-confirm-modal__title">
+          Usted esta a punto de ingresar <span id="confirmPointsAmount"></span> puntos al usuario: <span id="confirmUserName"></span>.
+        </h2>
+
+        <p class="users-confirm-modal__text">¿Desea continuar?</p>
+
+        <div class="users-confirm-modal__actions">
+          <button type="button"
+                  id="cancelAddPointsBtn"
+                  class="users-confirm-modal__button users-confirm-modal__button--cancel"
+                  data-bs-dismiss="modal">
+            Cancelar
+          </button>
+
+          <button type="button"
+                  id="confirmAddPointsBtn"
+                  class="users-confirm-modal__button users-confirm-modal__button--accept">
+            Aceptar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script th:src="@{/js/users.js}"></script>

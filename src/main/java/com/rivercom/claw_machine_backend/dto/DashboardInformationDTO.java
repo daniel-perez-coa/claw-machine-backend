@@ -10,6 +10,7 @@ public record DashboardInformationDTO(
         BigDecimal firstPartnerShare,
         BigDecimal secondPartnerShare,
         BigDecimal servicesShare,
+        Boolean majorPrizeAlertActive,
         List<AlertDTO> alerts
 ) {
 }

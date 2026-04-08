@@ -11,7 +11,7 @@ public class PrizeRedemptionMapper {
         return new PrizeRedemptionResponseDTO(
                 prizeRedemption.getUser().getName(),
                 prizeRedemption.getUser().getPhone(),
-                prizeRedemption.getPrize().getCategory().getName(),
+                prizeRedemption.getPrize().getName(),
                 prizeRedemption.getPointTransaction().getPreviousBalance(),
                 prizeRedemption.getPointTransaction().getNewBalance(),
                 prizeRedemption.getPointTransaction().getTransactionType().name(),

@@ -33,7 +33,7 @@ public class DashboardService {
     private final PrizeRedemptionsRepository prizeRedemptionsRepository;
     private final MachineExpenseRecordsRepository machineExpenseRecordsRepository;
 
-    @Transactional(readOnly = true)
+    @Transactional
     public DashboardInformationDTO getDashboardInformation() {
         log.debug("Buscando información sobre campañas con estado: OPEN");
 
@@ -72,7 +72,7 @@ public class DashboardService {
         }
 
         List<MachineExpenseRecords> machineExpenseRecordsNeedsToRestock =
-                machineExpenseRecordsRepository.findByRestocked(false);
+                machineExpenseRecordsRepository.findByCampaignIdAndRestocked(campaign.getId(), false);
         List<AlertDTO> alertDTOList = getAlertDTOs(machineExpenseRecordsNeedsToRestock);
 
         BigDecimal totalExpenses = prizeRedemptionTotal.add(machineExpenseTotal);
@@ -90,6 +90,11 @@ public class DashboardService {
             surplusAfterJackpot = jackpotBalance.abs();
         }
 
+        if (surplusAfterJackpot.compareTo(BigDecimal.ZERO) > 0 && !Boolean.TRUE.equals(campaign.getMajorPrizeAlertActive())) {
+            campaign.setMajorPrizeAlertActive(true);
+            machineCampaignRepository.save(campaign);
+        }
+
         return new DashboardInformationDTO(
                 incomeTotalMoney,
                 remainingToJackpot,
@@ -97,6 +102,7 @@ public class DashboardService {
                 incomeTotalMoney.multiply(new BigDecimal("0.40")),
                 incomeTotalMoney.multiply(new BigDecimal("0.40")),
                 incomeTotalMoney.multiply(new BigDecimal("0.20")),
+                campaign.getMajorPrizeAlertActive(),
                 alertDTOList
         );
     }
@@ -114,7 +120,7 @@ public class DashboardService {
             alertDTOList.add(new AlertDTO(
                     entry.getValue(),
                     String.format(
-                            "Los premios con categoría: %s necesitan rellenarse: %s",
+                            "%s necesitan rellenarse: %s vece(s).",
                             entry.getKey(),
                             entry.getValue()
                     )

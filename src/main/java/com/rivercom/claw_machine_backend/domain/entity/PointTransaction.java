@@ -39,6 +39,9 @@ public class PointTransaction {
     @Column(name = "new_balance", nullable = false)
     private Integer newBalance;
 
+    @Column(name = "notes")
+    private String notes;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

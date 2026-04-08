@@ -11,6 +11,7 @@ public record MachineCampaignResponseDTO(
         String prizeDescription,
         MachineCampaignStatus status,
         BigDecimal baseTargetAmount,
+        BigDecimal totalMoneyRaised,
         String notes,
         String createdAt,
         String openedAt,

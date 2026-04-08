@@ -41,6 +41,9 @@ public class MachineCampaign {
     @Column(columnDefinition = "TEXT")
     private String notes;
 
+    @Column(name = "major_prize_alert_active", nullable = false)
+    private Boolean majorPrizeAlertActive = false;
+
     @CreationTimestamp
     @Column(name = "opened_at", nullable = false, updatable = false)
     private LocalDateTime openedAt;

@@ -39,6 +39,12 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 
+    function getConfirmationBody(status) {
+        return status === 'CLOSED'
+            ? 'La siguiente acción es irreversible ¿deseas cerrar la campaña?'
+            : 'La siguiente acción es irreversible ¿deseas cancelar la campaña?';
+    }
+
     function toggleNotesField() {
         const isCancelled = statusSelect.value === 'CANCELLED';
         notesGroup.style.display = isCancelled ? '' : 'none';
@@ -81,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadCampaign() {
         if (!Number.isFinite(campaignId) || campaignId <= 0) {
-            summaryContent.textContent = 'No se pudo identificar la campana.';
+            summaryContent.textContent = 'No se pudo identificar la campaña.';
             return;
         }
 
@@ -89,43 +95,26 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('/api/campaigns');
 
             if (!response.ok) {
-                throw new Error('No se pudieron cargar las campanas.');
+                throw new Error('No se pudieron cargar las campañas.');
             }
 
             const campaigns = await response.json();
             const campaign = campaigns.find((item) => item.id === campaignId);
 
             if (!campaign) {
-                summaryContent.textContent = 'No se encontro la campana solicitada.';
+                summaryContent.textContent = 'No se encontró la campaña solicitada.';
                 submitButton.disabled = true;
                 return;
             }
 
             renderSummary(campaign);
         } catch (error) {
-            summaryContent.textContent = 'No fue posible cargar la campana.';
+            summaryContent.textContent = 'No fue posible cargar la campaña.';
             submitButton.disabled = true;
         }
     }
 
-    form.addEventListener('submit', async (event) => {
-        event.preventDefault();
-
-        const status = statusSelect.value;
-        const notes = notesInput.value.trim();
-
-        if (!status) {
-            showAlert('Debes seleccionar una accion para la campana.', 'error');
-            return;
-        }
-
-        if (status === 'CANCELLED' && !notes) {
-            showAlert('Debes indicar el motivo de cancelacion.', 'error');
-            return;
-        }
-
-        submitButton.disabled = true;
-
+    async function submitCampaignUpdate(status, notes) {
         try {
             const response = await fetch(`/api/campaigns/${campaignId}`, {
                 method: 'PUT',
@@ -139,24 +128,66 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (!response.ok) {
-                throw new Error('No fue posible actualizar la campana.');
+                throw new Error('No fue posible actualizar la campaña.');
             }
 
             const responseText = await response.text();
             const updatedCampaign = responseText ? JSON.parse(responseText) : null;
 
             if (!updatedCampaign) {
-                showAlert('No fue posible actualizar la campana.', 'error');
+                showAlert('No fue posible actualizar la campaña.', 'error');
                 return;
             }
 
-            showAlert('Campana actualizada correctamente.');
+            showAlert('Campaña actualizada correctamente.');
             window.setTimeout(() => {
                 window.location.href = '/campaigns';
             }, 1800);
         } catch (error) {
-            showAlert('Ocurrio un error al actualizar la campana.', 'error');
+            showAlert('Ocurrió un error al actualizar la campaña.', 'error');
         } finally {
+            submitButton.disabled = false;
+        }
+    }
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const status = statusSelect.value;
+        const notes = notesInput.value.trim();
+
+        if (!status) {
+            showAlert('Debes seleccionar una acción para la campaña.', 'error');
+            return;
+        }
+
+        if (status === 'CANCELLED' && !notes) {
+            showAlert('Debes indicar el motivo de cancelación.', 'error');
+            return;
+        }
+
+        submitButton.disabled = true;
+
+        try {
+            if (!window.showAppConfirmModal) {
+                throw new Error('No fue posible cargar el modal de confirmación.');
+            }
+
+            const confirmed = await window.showAppConfirmModal({
+                title: 'Confirmar acción',
+                body: getConfirmationBody(status),
+                confirmText: 'Confirmar',
+                cancelText: 'Cancelar'
+            });
+
+            if (!confirmed) {
+                submitButton.disabled = false;
+                return;
+            }
+
+            await submitCampaignUpdate(status, notes);
+        } catch (error) {
+            showAlert(error.message ?? 'No fue posible mostrar la confirmación.', 'error');
             submitButton.disabled = false;
         }
     });

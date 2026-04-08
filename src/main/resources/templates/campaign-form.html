@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/head :: appHead('Nueva campana')}">
-    <title>Nueva campana</title>
+<head th:replace="~{fragments/head :: appHead('Nueva campaña')}">
+    <title>Nueva campaña</title>
 </head>
 <body>
 <div class="app">
     <div th:replace="~{fragments/sidebar :: sidebar('campaigns')}"></div>
 
     <main class="content">
-        <div th:replace="~{fragments/topbar :: topbar('Nueva campana', 'Inicio / Campanas / Nueva campana')}"></div>
+        <div th:replace="~{fragments/topbar :: topbar('Nueva campaña', 'Inicio / Campañas / Nueva campaña')}"></div>
 
         <section class="page">
             <div class="page-shell campaign-form-page">
 
                 <section class="campaign-form-hero">
-                    <h3 class="campaign-form-hero__title">Crear campana</h3>
+                    <h3 class="campaign-form-hero__title">Crear campaña</h3>
                     <p class="campaign-form-hero__text">
-                        Registra una nueva campana activa indicando nombre, premio mayor y meta base.
+                        Registra una nueva campaña activa indicando nombre, premio mayor y meta base.
                     </p>
                 </section>
 
@@ -25,13 +25,13 @@
                 <section class="app-card campaign-form-shell">
                     <form id="campaignForm" class="campaign-form">
                         <div class="campaign-form__group">
-                            <label for="campaignName" class="campaign-form__label">Nombre de la campana</label>
+                            <label for="campaignName" class="campaign-form__label">Nombre de la campaña</label>
                             <input id="campaignName"
                                    name="name"
                                    type="text"
                                    maxlength="120"
                                    class="campaign-form__input"
-                                   placeholder="Ej. Campana verano 2026"
+                                   placeholder="Ej. Campaña verano 2026"
                                    required>
                         </div>
 
@@ -61,7 +61,7 @@
                             <button type="submit"
                                     id="submitCampaignBtn"
                                     class="campaign-form__button campaign-form__button--primary">
-                                Crear campana
+                                Crear campaña
                             </button>
 
                             <a th:href="@{/campaigns}"

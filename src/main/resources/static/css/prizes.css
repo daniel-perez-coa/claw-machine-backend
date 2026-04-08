@@ -12,6 +12,8 @@
 
 .prizes-list-shell {
     padding: 12px;
+    max-height: 640px;
+    overflow-y: auto;
 }
 
 .prizes-list {
@@ -23,8 +25,8 @@
 .prize-card {
     display: grid;
     grid-template-columns: 1fr 160px;
-    gap: 18px;
-    align-items: center;
+    gap: 14px;
+    align-items: start;
 }
 
 .prize-card__content {
@@ -32,14 +34,14 @@
 }
 
 .prize-card__title {
-    margin: 0 0 10px;
+    margin: 0 0 8px;
     font-size: 18px;
     font-weight: 800;
     color: var(--text);
 }
 
 .prize-card__detail {
-    margin: 0 0 10px;
+    margin: 0 0 8px;
     font-size: 14px;
     color: var(--text-soft);
 }
@@ -51,8 +53,8 @@
 .prize-card__meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 14px 24px;
-    margin-top: 18px;
+    gap: 10px 20px;
+    margin-top: 12px;
 }
 
 .prize-card__target {
@@ -73,6 +75,7 @@
     flex-direction: column;
     gap: 12px;
     flex-shrink: 0;
+    justify-content: flex-start;
 }
 
 .prize-card__button {
@@ -80,7 +83,29 @@
     padding: 12px 18px;
 }
 
+.prizes-list-shell::-webkit-scrollbar {
+    width: 10px;
+}
+
+.prizes-list-shell::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.prizes-list-shell::-webkit-scrollbar-thumb {
+    background: rgba(126, 139, 163, 0.25);
+    border-radius: 999px;
+}
+
 @media (max-width: 992px) {
+    .prizes-list-shell {
+        max-height: none;
+        overflow-y: visible;
+    }
+
+    .prizes-list {
+        gap: 16px;
+    }
+
     .prize-card {
         grid-template-columns: 1fr;
     }

@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const baseTargetAmount = Number(baseTargetAmountInput.value);
 
         if (!name) {
-            showAlert('Debes capturar un nombre para la campana.', 'error');
+            showAlert('Debes capturar un nombre para la campaña.', 'error');
             return;
         }
 
@@ -103,22 +103,22 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (!response.ok) {
-                throw new Error('No fue posible crear la campana.');
+                throw new Error('No fue posible crear la campaña.');
             }
 
             const responseText = await response.text();
             const campaign = responseText ? JSON.parse(responseText) : null;
 
             if (!campaign) {
-                showAlert('No se pudo crear la campana. Verifica si ya existe una campana abierta o si el premio ya no esta disponible.', 'error');
+                showAlert('No se pudo crear la campaña. Verifica si ya existe una campaña abierta o si el premio ya no está disponible.', 'error');
                 return;
             }
 
-            showAlert('Campana creada correctamente.');
+            showAlert('Campaña creada correctamente.');
             form.reset();
             redirectToCampaignsWithDelay();
         } catch (error) {
-            showAlert('Ocurrio un error al crear la campana.', 'error');
+            showAlert('Ocurrió un error al crear la campaña.', 'error');
         } finally {
             submitButton.disabled = false;
         }

@@ -113,6 +113,6 @@ public class MachineExpenseRecordsService {
         MachineCampaign openCampaign = machineCampaignRepository.findByStatus(MachineCampaignStatus.OPEN)
                 .orElseThrow(() -> new IllegalArgumentException("No hay campaña abierta"));
 
-        return mapper.toDTOList(repository.findByCampaignId(openCampaign.getId()));
+        return mapper.toDTOList(repository.findByCampaignIdAndRestocked(openCampaign.getId(), false));
     }
 }

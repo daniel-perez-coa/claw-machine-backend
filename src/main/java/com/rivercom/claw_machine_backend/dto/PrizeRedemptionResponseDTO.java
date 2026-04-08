@@ -2,10 +2,10 @@ package com.rivercom.claw_machine_backend.dto;
 
 public record PrizeRedemptionResponseDTO(
         String userName,
-        String phone,
-        String prizeCategory,
-        Integer previousBalance,
-        Integer newBalance,
+        String userPhone,
+        String prizeName,
+        Integer previousPoints,
+        Integer remainingPoints,
         String transactionType,
         Integer pointsSpent
 ) {

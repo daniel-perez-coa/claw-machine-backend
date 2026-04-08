@@ -1,30 +1,30 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/head :: appHead('Actualizar campana')}">
-    <title>Actualizar campana</title>
+<head th:replace="~{fragments/head :: appHead('Actualizar campaña')}">
+    <title>Actualizar campaña</title>
 </head>
 <body>
 <div class="app">
     <div th:replace="~{fragments/sidebar :: sidebar('campaigns')}"></div>
 
     <main class="content">
-        <div th:replace="~{fragments/topbar :: topbar('Actualizar campana', 'Inicio / Campanas / Actualizar campana')}"></div>
+        <div th:replace="~{fragments/topbar :: topbar('Actualizar campaña', 'Inicio / Campañas / Actualizar campaña')}"></div>
 
         <section class="page">
             <div class="page-shell campaign-update-page">
 
                 <section class="campaign-form-hero">
-                    <h3 class="campaign-form-hero__title">Actualizar campana</h3>
+                    <h3 class="campaign-form-hero__title">Actualizar campaña</h3>
                     <p class="campaign-form-hero__text">
-                        Cierra una campana al completar la meta o cancelala indicando el motivo.
+                        Cierra una campaña al completar la meta o cancélala indicando el motivo.
                     </p>
                 </section>
 
                 <div id="campaignUpdateAlertContainer"></div>
 
                 <section class="app-card campaign-update-summary">
-                    <h3 class="section-title">Resumen de la campana</h3>
-                    <div id="campaignUpdateSummaryContent" class="empty-state">Cargando campana...</div>
+                    <h3 class="section-title">Resumen de la campaña</h3>
+                    <div id="campaignUpdateSummaryContent" class="empty-state">Cargando campaña...</div>
                 </section>
 
                 <section class="app-card campaign-form-shell">
@@ -36,8 +36,8 @@
                                     class="campaign-form__select"
                                     required>
                                 <option value="">Selecciona una accion</option>
-                                <option value="CLOSED">Cerrar campana</option>
-                                <option value="CANCELLED">Cancelar campana</option>
+                                <option value="CLOSED">Cerrar campaña</option>
+                                <option value="CANCELLED">Cancelar campaña</option>
                             </select>
                         </div>
 
@@ -46,7 +46,7 @@
                             <textarea id="campaignNotes"
                                       name="notes"
                                       class="campaign-form__textarea"
-                                      placeholder="Explica por que se cancela la campana"></textarea>
+                                      placeholder="Explica por qué se cancela la campaña"></textarea>
                         </div>
 
                         <div class="campaign-form__actions">
@@ -69,6 +69,7 @@
     </main>
 </div>
 
+<script th:src="@{/js/app-confirm-modal.js}"></script>
 <script th:src="@{/js/campaign-update-form.js}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
