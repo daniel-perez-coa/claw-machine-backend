@@ -9,9 +9,11 @@ public class PrizeRedemptionMapper {
 
     public PrizeRedemptionResponseDTO toResponse(PrizeRedemption prizeRedemption) {
         return new PrizeRedemptionResponseDTO(
+                prizeRedemption.getId(),
                 prizeRedemption.getUser().getName(),
                 prizeRedemption.getUser().getPhone(),
                 prizeRedemption.getPrize().getName(),
+                prizeRedemption.getPrize().getCategory().getName(),
                 prizeRedemption.getPointTransaction().getPreviousBalance(),
                 prizeRedemption.getPointTransaction().getNewBalance(),
                 prizeRedemption.getPointTransaction().getTransactionType().name(),

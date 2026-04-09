@@ -126,6 +126,11 @@
     min-height: 0;
 }
 
+.users-pagination-shell {
+    justify-content: center;
+    padding-top: 0;
+}
+
 .user-list-card {
     display: grid;
     grid-template-columns: 1fr 160px;
@@ -376,6 +381,10 @@
     .users-list {
         flex: initial;
         overflow-y: visible;
+    }
+
+    .users-pagination-shell {
+        flex-wrap: wrap;
     }
 
     .users-confirm-modal__actions {

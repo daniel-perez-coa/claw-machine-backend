@@ -591,6 +591,10 @@ textarea {
     color: #fde68a;
 }
 
+.app-confirm-modal__text-accent--success {
+    color: #22c55e;
+}
+
 .app-confirm-modal__actions {
     display: flex;
     gap: 20px;

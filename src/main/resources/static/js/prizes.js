@@ -1,6 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
     const prizesList = document.getElementById('prizesList');
+    const prizesPagination = document.getElementById('prizesPagination');
     const alertContainer = document.getElementById('prizesAlertContainer');
+    const pageSize = 6;
+    let allPrizes = [];
+    let currentPage = 1;
 
     const moneyFormatter = new Intl.NumberFormat('es-MX', {
         minimumFractionDigits: 2,
@@ -35,6 +39,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadPrizes() {
         prizesList.innerHTML = '<div class="empty-state">Cargando premios...</div>';
+        if (prizesPagination) {
+            prizesPagination.innerHTML = '';
+        }
 
         try {
             const response = await fetch('/api/prizes/active');
@@ -43,10 +50,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error('No se pudieron cargar los premios.');
             }
 
-            const prizes = await response.json();
-            renderPrizes(prizes);
+            allPrizes = await response.json();
+            currentPage = 1;
+            renderPrizes();
         } catch (error) {
             prizesList.innerHTML = '<div class="empty-state">No fue posible cargar los premios.</div>';
+            if (prizesPagination) {
+                prizesPagination.innerHTML = '';
+            }
         }
     }
 
@@ -81,11 +92,41 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function renderPrizes(prizes) {
-        if (!prizes || prizes.length === 0) {
-            prizesList.innerHTML = '<div class="empty-state">No hay premios registrados por el momento.</div>';
+    function renderPagination(totalItems) {
+        if (!prizesPagination) {
             return;
         }
+
+        const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+
+        prizesPagination.innerHTML = `
+            <button type="button"
+                    class="reports-action-card__button reports-action-card__button--secondary reports-pagination__button"
+                    data-page-action="previous"
+                    ${currentPage === 1 ? 'disabled' : ''}>
+                Anterior
+            </button>
+            <span class="reports-pagination__info">Pagina ${currentPage} de ${totalPages}</span>
+            <button type="button"
+                    class="reports-action-card__button reports-action-card__button--secondary reports-pagination__button"
+                    data-page-action="next"
+                    ${currentPage === totalPages ? 'disabled' : ''}>
+                Siguiente
+            </button>
+        `;
+    }
+
+    function renderPrizes() {
+        if (!allPrizes || allPrizes.length === 0) {
+            prizesList.innerHTML = '<div class="empty-state">No hay premios registrados por el momento.</div>';
+            renderPagination(0);
+            return;
+        }
+
+        const totalPages = Math.max(1, Math.ceil(allPrizes.length / pageSize));
+        currentPage = Math.min(Math.max(1, currentPage), totalPages);
+        const startIndex = (currentPage - 1) * pageSize;
+        const prizes = allPrizes.slice(startIndex, startIndex + pageSize);
 
         prizesList.innerHTML = prizes.map((prize) => `
             <article class="app-card prize-card">
@@ -137,7 +178,27 @@ document.addEventListener('DOMContentLoaded', () => {
         `).join('');
 
         attachDeactivateActions();
+        renderPagination(allPrizes.length);
     }
+
+    prizesPagination?.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-page-action]');
+
+        if (!button || button.disabled) {
+            return;
+        }
+
+        if (button.dataset.pageAction === 'previous' && currentPage > 1) {
+            currentPage -= 1;
+            renderPrizes();
+            return;
+        }
+
+        if (button.dataset.pageAction === 'next' && currentPage < Math.ceil(allPrizes.length / pageSize)) {
+            currentPage += 1;
+            renderPrizes();
+        }
+    });
 
     loadPrizes();
 });

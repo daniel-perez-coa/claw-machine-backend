@@ -22,6 +22,11 @@
     gap: 16px;
 }
 
+.prizes-pagination-shell {
+    justify-content: center;
+    padding-top: 0;
+}
+
 .prize-card {
     display: grid;
     grid-template-columns: 1fr 160px;
@@ -116,5 +121,9 @@
 
     .prize-card__button {
         width: 100%;
+    }
+
+    .prizes-pagination-shell {
+        flex-wrap: wrap;
     }
 }

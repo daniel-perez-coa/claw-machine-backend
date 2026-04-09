@@ -22,6 +22,15 @@
     gap: 16px;
 }
 
+.reports-pagination {
+    justify-content: center;
+    padding-top: 16px;
+}
+
+.campaigns-pagination-shell {
+    padding-top: 0;
+}
+
 .campaign-card {
     display: grid;
     grid-template-columns: 1fr 180px;
@@ -197,5 +206,9 @@
         max-height: none;
         overflow-y: visible;
         padding: 0;
+    }
+
+    .reports-pagination {
+        flex-wrap: wrap;
     }
 }

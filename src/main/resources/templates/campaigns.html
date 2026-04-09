@@ -1,31 +1,31 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/head :: appHead('Campañas')}">
-    <title>Campañas</title>
+<head th:replace="~{fragments/head :: appHead('Campanas')}">
+    <title>Campanas</title>
 </head>
 <body>
 <div class="app">
     <div th:replace="~{fragments/sidebar :: sidebar('campaigns')}"></div>
 
     <main class="content">
-        <div th:replace="~{fragments/topbar :: topbar('Campañas', 'Inicio / Campañas')}"></div>
+        <div th:replace="~{fragments/topbar :: topbar('Campanas', 'Inicio / Campanas')}"></div>
 
         <section class="page">
             <div class="page-shell campaigns-page">
 
                 <section class="campaigns-header">
                     <div class="page-title-banner">
-                        <h3 class="page-title-banner__title">Campañas</h3>
+                        <h3 class="page-title-banner__title">Campanas</h3>
                         <p class="page-title-banner__text">
-                            Consulta, visualiza y actualiza las campañas registradas.
-                            Usa el botón de crear para registrar una nueva campaña.
+                            Consulta, visualiza y actualiza las campanas registradas.
+                            Usa el boton de crear para registrar una nueva campana.
                         </p>
                     </div>
 
                     <div class="campaigns-create-wrapper">
                         <a th:href="@{/campaigns/new}"
                            class="campaigns-create-card"
-                           aria-label="Crear campaña">
+                           aria-label="Crear campana">
                             +
                         </a>
                     </div>
@@ -33,9 +33,11 @@
 
                 <section class="app-card campaigns-list-shell">
                     <div id="campaignsList" class="campaigns-list">
-                        <div class="empty-state">Cargando campañas...</div>
+                        <div class="empty-state">Cargando campanas...</div>
                     </div>
                 </section>
+
+                <div id="campaignsPagination" class="reports-pagination campaigns-pagination-shell"></div>
 
             </div>
         </section>

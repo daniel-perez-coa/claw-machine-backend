@@ -1,5 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     const campaignsList = document.getElementById('campaignsList');
+    const campaignsPagination = document.getElementById('campaignsPagination');
+    const pageSize = 6;
+    let allCampaigns = [];
+    let currentPage = 1;
 
     const moneyFormatter = new Intl.NumberFormat('es-MX', {
         minimumFractionDigits: 2,
@@ -63,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         return `
             <p class="campaign-card__prize">
-                <strong>Fecha de creación:</strong>
+                <strong>Fecha de creacion:</strong>
                 <span>${escapeHtml(campaign.createdAt ?? 'Sin fecha')}</span>
             </p>
         `;
@@ -76,17 +80,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
         return `
             <p class="campaign-card__notes">
-                <strong>Motivo de cancelaci&oacute;n:</strong>
+                <strong>Motivo de cancelacion:</strong>
                 <span>${escapeHtml(campaign.notes)}</span>
             </p>
         `;
     }
 
-    function renderCampaigns(campaigns) {
-        if (!campaigns || campaigns.length === 0) {
-            campaignsList.innerHTML = '<div class="empty-state">No hay campanas registradas por el momento.</div>';
+    function renderPagination(totalItems) {
+        if (!campaignsPagination) {
             return;
         }
+
+        if (totalItems <= pageSize) {
+            campaignsPagination.innerHTML = '';
+            return;
+        }
+
+        const totalPages = Math.ceil(totalItems / pageSize);
+        const previousDisabled = currentPage <= 1 ? 'disabled' : '';
+        const nextDisabled = currentPage >= totalPages ? 'disabled' : '';
+
+        campaignsPagination.innerHTML = `
+            <button type="button"
+                    class="reports-action-card__button reports-action-card__button--secondary reports-pagination__button"
+                    data-page-action="previous"
+                    ${previousDisabled}>
+                Anterior
+            </button>
+            <span class="reports-pagination__info">Pagina ${currentPage} de ${totalPages}</span>
+            <button type="button"
+                    class="reports-action-card__button reports-action-card__button--secondary reports-pagination__button"
+                    data-page-action="next"
+                    ${nextDisabled}>
+                Siguiente
+            </button>
+        `;
+    }
+
+    function renderCampaignsPage() {
+        if (!allCampaigns || allCampaigns.length === 0) {
+            campaignsList.innerHTML = '<div class="empty-state">No hay campanas registradas por el momento.</div>';
+            if (campaignsPagination) {
+                campaignsPagination.innerHTML = '';
+            }
+            return;
+        }
+
+        const totalPages = Math.max(1, Math.ceil(allCampaigns.length / pageSize));
+        currentPage = Math.min(Math.max(1, currentPage), totalPages);
+        const startIndex = (currentPage - 1) * pageSize;
+        const campaigns = allCampaigns.slice(startIndex, startIndex + pageSize);
 
         campaignsList.innerHTML = campaigns.map((campaign) => `
             <article class="app-card campaign-card">
@@ -124,10 +167,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 ` : ''}
             </article>
         `).join('');
+
+        renderPagination(allCampaigns.length);
     }
 
     async function loadCampaigns() {
         campaignsList.innerHTML = '<div class="empty-state">Cargando campanas...</div>';
+        if (campaignsPagination) {
+            campaignsPagination.innerHTML = '';
+        }
 
         try {
             const response = await fetch('/api/campaigns');
@@ -136,12 +184,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error('No se pudieron cargar las campanas.');
             }
 
-            const campaigns = await response.json();
-            renderCampaigns(campaigns);
+            allCampaigns = await response.json();
+            currentPage = 1;
+            renderCampaignsPage();
         } catch (error) {
             campaignsList.innerHTML = '<div class="empty-state">No fue posible cargar las campanas.</div>';
+            if (campaignsPagination) {
+                campaignsPagination.innerHTML = '';
+            }
         }
     }
+
+    campaignsPagination?.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-page-action]');
+
+        if (!button || button.disabled) {
+            return;
+        }
+
+        if (button.dataset.pageAction === 'previous' && currentPage > 1) {
+            currentPage -= 1;
+            renderCampaignsPage();
+            return;
+        }
+
+        if (button.dataset.pageAction === 'next' && currentPage < Math.ceil(allCampaigns.length / pageSize)) {
+            currentPage += 1;
+            renderCampaignsPage();
+        }
+    });
 
     loadCampaigns();
 });

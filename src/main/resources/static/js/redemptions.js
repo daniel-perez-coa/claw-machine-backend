@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const prizeSelect = document.getElementById('prizeId');
     const redeemBtn = document.getElementById('redeemBtn');
     const redeemForm = document.getElementById('redeemForm');
+    const printTicketBtn = document.getElementById('printTicketBtn');
     const alertContainer = document.getElementById('redemptionsAlertContainer');
     const redemptionResultSection = document.getElementById('redemptionResultSection');
     const redemptionResultGrid = document.getElementById('redemptionResultGrid');
@@ -13,10 +14,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const redemptionsUnavailableState = document.getElementById('redemptionsUnavailableState');
 
     if (!phoneSearchInput || !searchUserBtn || !userResultContainer || !selectedUserPhone || !prizeSelect ||
-        !redeemBtn || !redeemForm || !alertContainer || !redemptionResultSection || !redemptionResultGrid ||
-        !redemptionsContent || !redemptionsUnavailableState) {
+        !redeemBtn || !redeemForm || !printTicketBtn || !alertContainer || !redemptionResultSection ||
+        !redemptionResultGrid || !redemptionsContent || !redemptionsUnavailableState) {
         return;
     }
+
+    let lastRedemptionId = null;
 
     function escapeHtml(value) {
         return String(value ?? '')
@@ -60,11 +63,15 @@ document.addEventListener('DOMContentLoaded', () => {
         prizeSelect.disabled = true;
         redeemBtn.disabled = true;
         prizeSelect.value = '';
+        lastRedemptionId = null;
+        printTicketBtn.style.display = 'none';
     }
 
     function hideResult() {
         redemptionResultSection.style.display = 'none';
         redemptionResultGrid.innerHTML = '';
+        lastRedemptionId = null;
+        printTicketBtn.style.display = 'none';
     }
 
     function renderEmpty(message) {
@@ -176,6 +183,8 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
 
         redemptionResultSection.style.display = '';
+        lastRedemptionId = result.redemptionId ?? null;
+        printTicketBtn.style.display = lastRedemptionId ? '' : 'none';
     }
 
     async function hasOpenCampaign() {
@@ -245,6 +254,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    async function refreshUserCard(phone) {
+        const response = await fetch(`/api/users/by-phone/${encodeURIComponent(phone)}`);
+
+        if (!response.ok) {
+            throw new Error('No fue posible recargar el usuario.');
+        }
+
+        const user = await response.json();
+        renderUser(user);
+    }
+
     async function redeemPrize(event) {
         event.preventDefault();
 
@@ -282,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
             renderRedemptionResult(result);
             showAlert('Canje realizado correctamente.', 'success');
-            await searchUserByPhone();
+            await refreshUserCard(phone);
             prizeSelect.value = '';
         } catch (error) {
             showAlert('Ocurrio un error al realizar el canje.', 'error');
@@ -292,8 +312,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    async function printTicket() {
+        if (!lastRedemptionId || !window.appReportPrinter) {
+            return;
+        }
+
+        const printWindow = window.appReportPrinter.openPrintWindow('Preparando ticket de canje...');
+
+        try {
+            await window.appReportPrinter.printPdfFromUrl(`/api/reports/tickets/user-redemption/${lastRedemptionId}`, printWindow);
+        } catch (error) {
+            printWindow?.close();
+            showAlert('No fue posible abrir la impresion del ticket.', 'error');
+        }
+    }
+
     searchUserBtn.addEventListener('click', searchUserByPhone);
     redeemForm.addEventListener('submit', redeemPrize);
+    printTicketBtn.addEventListener('click', printTicket);
 
     phoneSearchInput.addEventListener('input', () => {
         const sanitizedValue = sanitizePhone(phoneSearchInput.value);

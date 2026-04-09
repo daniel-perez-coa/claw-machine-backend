@@ -1,0 +1,201 @@
+.reports-page:has(.campaign-quick-redemptions-shell) {
+    height: calc(100vh - 160px);
+    min-height: 0;
+}
+
+.campaign-quick-redemptions-shell {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.campaign-quick-redemptions-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 16px;
+}
+
+.campaign-quick-redemptions-toolbar__button {
+    min-width: 220px;
+}
+
+.campaign-quick-redemptions-field {
+    flex: 1 1 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.campaign-quick-redemptions-field__label {
+    margin: 0;
+    color: var(--text-soft);
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.campaign-quick-redemptions-field__control {
+    width: 100%;
+    min-height: 50px;
+    padding: 0 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(126, 139, 163, 0.26);
+    background: rgba(15, 23, 42, 0.88);
+    color: var(--text);
+    font-size: 0.98rem;
+}
+
+.campaign-quick-redemptions-summary {
+    min-height: 0;
+}
+
+.campaign-quick-redemptions-summary__card {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    padding: 18px;
+    border-radius: 18px;
+    border: 1px solid rgba(126, 139, 163, 0.18);
+    background: rgba(9, 16, 30, 0.72);
+}
+
+.campaign-quick-redemptions-summary__item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.campaign-quick-redemptions-summary__label {
+    color: var(--text-soft);
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.campaign-quick-redemptions-summary__value {
+    color: var(--text);
+    font-size: 1rem;
+    font-weight: 800;
+}
+
+.campaign-quick-redemptions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
+.campaign-quick-redemptions-list::-webkit-scrollbar {
+    width: 10px;
+}
+
+.campaign-quick-redemptions-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.campaign-quick-redemptions-list::-webkit-scrollbar-thumb {
+    background: rgba(126, 139, 163, 0.25);
+    border-radius: 999px;
+}
+
+.campaign-quick-redemption-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.campaign-quick-redemption-card__content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.campaign-quick-redemption-card__title {
+    margin: 0;
+    color: #eef4ff;
+    font-size: 1.05rem;
+    font-weight: 800;
+}
+
+.campaign-quick-redemption-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 18px;
+    color: var(--text-soft);
+    font-size: 0.94rem;
+}
+
+.campaign-quick-redemption-card__items {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.campaign-quick-redemption-card__item {
+    padding: 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(126, 139, 163, 0.14);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.campaign-quick-redemption-card__item-title {
+    display: block;
+    margin-bottom: 8px;
+    color: #eef4ff;
+    font-size: 0.98rem;
+}
+
+.campaign-quick-redemption-card__item-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    color: var(--text-soft);
+    font-size: 0.92rem;
+}
+
+.campaign-quick-redemption-card__actions {
+    display: flex;
+    align-items: center;
+}
+
+.campaign-quick-redemption-card__button {
+    min-width: 220px;
+}
+
+@media (max-width: 720px) {
+    .campaign-quick-redemption-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .campaign-quick-redemptions-toolbar__button,
+    .campaign-quick-redemption-card__button {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .campaign-quick-redemptions-shell {
+        flex: initial;
+        overflow: visible;
+    }
+
+    .campaign-quick-redemptions-list {
+        flex: initial;
+        overflow-y: visible;
+        padding-right: 0;
+    }
+}
+
+@media (max-width: 1100px) {
+    .reports-page:has(.campaign-quick-redemptions-shell) {
+        height: auto;
+    }
+}

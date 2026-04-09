@@ -22,6 +22,9 @@ configurations {
 
 repositories {
 	mavenCentral()
+	maven {
+		url = uri("https://jaspersoft.jfrog.io/jaspersoft/third-party-ce-artifacts/")
+	}
 }
 
 dependencies {
@@ -31,7 +34,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-webmvc")
 	implementation("org.springframework.boot:spring-boot-h2console")
-	implementation("net.sf.jasperreports:jasperreports:7.0.3")
+	implementation("net.sf.jasperreports:jasperreports:6.20.6")
 
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")

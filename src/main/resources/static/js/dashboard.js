@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const confirmed = await window.showAppConfirmModal({
                 title: 'Resolver alertas',
-                body: 'Antes de cerrar las alertas confirme que haya realizado la carga de la máquina.',
+                bodyHtml: 'Antes de cerrar las alertas <span class="app-confirm-modal__text-accent--success">confirme</span> que haya realizado la carga de la maquina.',
                 confirmText: 'Confirmar',
                 cancelText: 'Cancelar',
                 confirmVariant: 'success'

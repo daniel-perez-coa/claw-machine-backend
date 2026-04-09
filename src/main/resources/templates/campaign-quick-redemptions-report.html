@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: appHead('Canjes rapidos por campana')}">
+    <title>Canjes rapidos por campana</title>
+</head>
+<body>
+<div class="app">
+    <div th:replace="~{fragments/sidebar :: sidebar('reports')}"></div>
+
+    <main class="content">
+        <div th:replace="~{fragments/topbar :: topbar('Canjes rapidos por campana', 'Inicio / Reportes / Canjes rapidos por campana')}"></div>
+
+        <section class="page">
+            <div class="page-shell reports-page">
+
+                <section class="page-title-banner">
+                    <h3 class="page-title-banner__title">Transacciones de canje rapido</h3>
+                    <p class="page-title-banner__text">
+                        Visualiza todos los canjes rapidos por campana y reimprime el ticket cuando sea necesario.
+                    </p>
+                </section>
+
+                <div class="reports-action-card__actions">
+                    <a href="/reports"
+                       class="reports-action-card__button reports-action-card__button--secondary">
+                        Volver a reportes
+                    </a>
+                </div>
+
+                <section class="app-card campaign-quick-redemptions-shell">
+                    <div id="campaignQuickRedemptionsAlert" class="reports-status" aria-live="polite"></div>
+
+                    <div class="campaign-quick-redemptions-toolbar">
+                        <div class="campaign-quick-redemptions-field">
+                            <label class="campaign-quick-redemptions-field__label" for="campaignQuickRedemptionsSelector">Campana</label>
+                            <select id="campaignQuickRedemptionsSelector" class="campaign-quick-redemptions-field__control">
+                                <option value="">Seleccione una campana</option>
+                            </select>
+                        </div>
+
+                        <button type="button"
+                                id="reloadCampaignQuickRedemptionsBtn"
+                                class="reports-action-card__button reports-action-card__button--secondary campaign-quick-redemptions-toolbar__button">
+                            Recargar canjes rapidos
+                        </button>
+                    </div>
+
+                    <div id="campaignQuickRedemptionsSummary" class="campaign-quick-redemptions-summary"></div>
+                    <div id="campaignQuickRedemptionsList" class="campaign-quick-redemptions-list">
+                        <div class="empty-state">Seleccione una campana para consultar canjes rapidos.</div>
+                    </div>
+                    <div id="campaignQuickRedemptionsPagination" class="reports-pagination"></div>
+                </section>
+
+            </div>
+        </section>
+    </main>
+</div>
+
+<script th:src="@{/js/report-print.js}"></script>
+<script th:src="@{/js/campaign-quick-redemptions-report.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

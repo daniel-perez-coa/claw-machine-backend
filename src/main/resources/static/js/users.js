@@ -2,8 +2,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const apiBase = '/api/users';
 
     const usersList = document.getElementById('usersList');
+    const usersPagination = document.getElementById('usersPagination');
     const reloadUsersBtn = document.getElementById('reloadUsersBtn');
     const usersAlertContainer = document.getElementById('usersAlertContainer');
+    const pageSize = 6;
 
     const searchPhone = document.getElementById('searchPhone');
     const searchUserBtn = document.getElementById('searchUserBtn');
@@ -24,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let selectedUser = null;
     let allUsers = [];
+    let currentPage = 1;
 
     function sanitizePhone(value) {
         return String(value ?? '').replaceAll(/\D/g, '').slice(0, 10);
@@ -58,6 +61,30 @@ document.addEventListener('DOMContentLoaded', () => {
         );
     }
 
+    function renderPagination(totalItems) {
+        if (!usersPagination) {
+            return;
+        }
+
+        const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+
+        usersPagination.innerHTML = `
+            <button type="button"
+                    class="reports-action-card__button reports-action-card__button--secondary reports-pagination__button"
+                    data-page-action="previous"
+                    ${currentPage === 1 ? 'disabled' : ''}>
+                Anterior
+            </button>
+            <span class="reports-pagination__info">Pagina ${currentPage} de ${totalPages}</span>
+            <button type="button"
+                    class="reports-action-card__button reports-action-card__button--secondary reports-pagination__button"
+                    data-page-action="next"
+                    ${currentPage === totalPages ? 'disabled' : ''}>
+                Siguiente
+            </button>
+        `;
+    }
+
     function clearSelectedUser() {
         selectedUser = null;
 
@@ -70,6 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
         addPointsBtn.disabled = true;
         clearUserBtn.disabled = true;
 
+        currentPage = 1;
         renderUsers(allUsers);
     }
 
@@ -103,10 +131,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderUsers(users) {
         if (!users || users.length === 0) {
             usersList.innerHTML = `<div class="empty-state">No hay usuarios que coincidan con la busqueda.</div>`;
+            renderPagination(0);
             return;
         }
 
-        usersList.innerHTML = users.map((user) => {
+        const totalPages = Math.max(1, Math.ceil(users.length / pageSize));
+        currentPage = Math.min(Math.max(1, currentPage), totalPages);
+        const startIndex = (currentPage - 1) * pageSize;
+        const paginatedUsers = users.slice(startIndex, startIndex + pageSize);
+
+        usersList.innerHTML = paginatedUsers.map((user) => {
             const isSelected = selectedUser?.phone === user.phone;
 
             return `
@@ -143,10 +177,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }).join('');
 
         attachSelectUserActions();
+        renderPagination(users.length);
     }
 
     async function loadUsers() {
         usersList.innerHTML = `<div class="empty-state">Cargando usuarios...</div>`;
+        if (usersPagination) {
+            usersPagination.innerHTML = '';
+        }
 
         try {
             const response = await fetch(apiBase);
@@ -156,13 +194,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             allUsers = await response.json();
+            currentPage = 1;
             renderUsers(getFilteredUsers());
         } catch (error) {
             usersList.innerHTML = `<div class="empty-state">No fue posible cargar los usuarios.</div>`;
+            if (usersPagination) {
+                usersPagination.innerHTML = '';
+            }
         }
     }
 
     function filterUsers() {
+        currentPage = 1;
         renderUsers(getFilteredUsers());
     }
 
@@ -171,6 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
             searchPhone.value = '';
         }
 
+        currentPage = 1;
         renderUsers(allUsers);
     }
 
@@ -192,6 +236,8 @@ document.addEventListener('DOMContentLoaded', () => {
             points
         };
 
+        const printWindow = window.appReportPrinter?.openPrintWindow('Preparando ticket de puntos...');
+
         try {
             const response = await fetch(`${apiBase}/add-points`, {
                 method: 'PUT',
@@ -205,7 +251,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error('No fue posible agregar puntos.');
             }
 
-            const updatedUser = await response.json();
+            const result = await response.json();
+            const updatedUser = result.user;
+
             selectedUser = updatedUser;
             allUsers = allUsers.map((user) => user.phone === updatedUser.phone ? updatedUser : user);
 
@@ -214,7 +262,19 @@ document.addEventListener('DOMContentLoaded', () => {
             clearSelectedUser();
 
             showAlert('Puntos agregados correctamente.', 'success');
+
+            try {
+                if (result.transactionId && window.appReportPrinter) {
+                    await window.appReportPrinter.printPdfFromUrl(`/api/reports/tickets/add-points/${result.transactionId}`, printWindow);
+                } else {
+                    printWindow?.close();
+                }
+            } catch (printError) {
+                printWindow?.close();
+                showAlert('Los puntos se agregaron, pero no fue posible abrir la impresion del ticket.', 'error');
+            }
         } catch (error) {
+            printWindow?.close();
             showAlert('Ocurrio un error al agregar puntos.', 'error');
         }
     }
@@ -269,6 +329,27 @@ document.addEventListener('DOMContentLoaded', () => {
         if (event.key === 'Enter') {
             event.preventDefault();
             filterUsers();
+        }
+    });
+
+    usersPagination?.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-page-action]');
+
+        if (!button || button.disabled) {
+            return;
+        }
+
+        const filteredUsers = getFilteredUsers();
+
+        if (button.dataset.pageAction === 'previous' && currentPage > 1) {
+            currentPage -= 1;
+            renderUsers(filteredUsers);
+            return;
+        }
+
+        if (button.dataset.pageAction === 'next' && currentPage < Math.ceil(filteredUsers.length / pageSize)) {
+            currentPage += 1;
+            renderUsers(filteredUsers);
         }
     });
 

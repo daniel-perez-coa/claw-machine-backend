@@ -21,13 +21,40 @@
     display: grid;
     grid-template-columns: 1.1fr 0.9fr;
     gap: 18px;
-    align-items: start;
+    align-items: stretch;
+}
+
+.redemption-panel {
+    height: 100%;
 }
 
 .redemption-result-section {
     display: flex;
     flex-direction: column;
     gap: 12px;
+}
+
+.redeem-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.redemption-submit-button--secondary {
+    border-color: rgba(126, 139, 163, 0.24);
+    background: linear-gradient(180deg, rgba(126, 139, 163, 0.16) 0%, rgba(19, 29, 48, 0.88) 100%);
+    color: #dfe6ff;
+}
+
+.redemption-submit-button--success {
+    border-color: rgba(104, 224, 160, 0.34);
+    background: linear-gradient(180deg, rgba(104, 224, 160, 0.24) 0%, rgba(18, 92, 54, 0.92) 100%);
+    color: #ecfff4;
+}
+
+.redemption-submit-button--success:hover:not(:disabled) {
+    border-color: rgba(134, 239, 172, 0.48);
+    background: linear-gradient(180deg, rgba(104, 224, 160, 0.34) 0%, rgba(22, 120, 68, 0.96) 100%);
 }
 
 @media (max-width: 1100px) {

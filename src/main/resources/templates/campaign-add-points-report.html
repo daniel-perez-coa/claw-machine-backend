@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: appHead('Transacciones de puntos por campana')}">
+    <title>Transacciones de puntos por campana</title>
+</head>
+<body>
+<div class="app">
+    <div th:replace="~{fragments/sidebar :: sidebar('reports')}"></div>
+
+    <main class="content">
+        <div th:replace="~{fragments/topbar :: topbar('Transacciones de puntos', 'Inicio / Reportes / Transacciones de puntos')}"></div>
+
+        <section class="page">
+            <div class="page-shell reports-page">
+
+                <section class="page-title-banner">
+                    <h3 class="page-title-banner__title">Transacciones de agregar puntos</h3>
+                    <p class="page-title-banner__text">
+                        Visualiza todas las transacciones de agregar puntos por campana y reimprime el ticket cuando sea necesario.
+                    </p>
+                </section>
+
+                <div class="reports-action-card__actions">
+                    <a href="/reports"
+                       class="reports-action-card__button reports-action-card__button--secondary">
+                        Volver a reportes
+                    </a>
+                </div>
+
+                <section class="app-card campaign-add-points-shell">
+                    <div id="campaignAddPointsAlert" class="reports-status" aria-live="polite"></div>
+
+                    <div class="campaign-add-points-toolbar">
+                        <div class="campaign-add-points-field">
+                            <label class="campaign-add-points-field__label" for="campaignSelector">Campana</label>
+                            <select id="campaignSelector" class="campaign-add-points-field__control">
+                                <option value="">Seleccione una campana</option>
+                            </select>
+                        </div>
+
+                        <button type="button"
+                                id="reloadCampaignTransactionsBtn"
+                                class="reports-action-card__button reports-action-card__button--secondary campaign-add-points-toolbar__button">
+                            Recargar transacciones
+                        </button>
+                    </div>
+
+                    <div id="campaignAddPointsSummary" class="campaign-add-points-summary"></div>
+                    <div id="campaignAddPointsList" class="campaign-add-points-list">
+                        <div class="empty-state">Seleccione una campana para consultar transacciones.</div>
+                    </div>
+                    <div id="campaignAddPointsPagination" class="reports-pagination"></div>
+                </section>
+
+            </div>
+        </section>
+    </main>
+</div>
+
+<script th:src="@{/js/report-print.js}"></script>
+<script th:src="@{/js/campaign-add-points-report.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

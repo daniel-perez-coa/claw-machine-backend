@@ -1,5 +1,8 @@
 package com.rivercom.claw_machine_backend.controller.api;
 
+import com.rivercom.claw_machine_backend.dto.CampaignAddPointsTransactionDTO;
+import com.rivercom.claw_machine_backend.dto.CampaignQuickRedemptionDTO;
+import com.rivercom.claw_machine_backend.dto.CampaignPrizeRedemptionDTO;
 import com.rivercom.claw_machine_backend.service.ReportsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ContentDisposition;
@@ -10,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -21,8 +25,55 @@ public class ReportsController {
 
     @GetMapping("/database-backup")
     public ResponseEntity<byte[]> exportDatabaseBackup() {
-        ReportsService.DatabaseBackupExport backupExport = reportsService.generateDatabaseBackup();
+        return buildSqlResponse(reportsService.generateDatabaseBackup());
+    }
 
+    @PostMapping("/database-backup/import")
+    public ResponseEntity<Map<String, String>> importDatabaseBackup(@RequestParam("file") MultipartFile file) {
+        reportsService.importDatabaseBackup(file);
+        return ResponseEntity.ok(Map.of("message", "Base de datos importada correctamente."));
+    }
+
+    @DeleteMapping("/database-backup")
+    public ResponseEntity<Map<String, String>> deleteDatabaseBackup() {
+        reportsService.resetDatabase();
+        return ResponseEntity.ok(Map.of("message", "Base de datos eliminada correctamente."));
+    }
+
+    @GetMapping("/tickets/add-points/{transactionId}")
+    public ResponseEntity<byte[]> printAddPointsTicket(@PathVariable Long transactionId) {
+        return buildPdfResponse(reportsService.generateAddPointsTicket(transactionId));
+    }
+
+    @GetMapping("/tickets/quick-redemption")
+    public ResponseEntity<byte[]> printQuickRedemptionTicket(@RequestParam List<Long> expenseIds) {
+        return buildPdfResponse(reportsService.generateQuickRedemptionTicket(expenseIds));
+    }
+
+    @GetMapping("/tickets/user-redemption/{redemptionId}")
+    public ResponseEntity<byte[]> printUserRedemptionTicket(@PathVariable Long redemptionId) {
+        return buildPdfResponse(reportsService.generateUserRedemptionTicket(redemptionId));
+    }
+
+    @GetMapping("/campaigns/{campaignId}/add-points-transactions")
+    public ResponseEntity<List<CampaignAddPointsTransactionDTO>> listCampaignAddPointsTransactions(
+            @PathVariable Long campaignId) {
+        return ResponseEntity.ok(reportsService.listCampaignAddPointsTransactions(campaignId));
+    }
+
+    @GetMapping("/campaigns/{campaignId}/prize-redemptions")
+    public ResponseEntity<List<CampaignPrizeRedemptionDTO>> listCampaignPrizeRedemptions(
+            @PathVariable Long campaignId) {
+        return ResponseEntity.ok(reportsService.listCampaignPrizeRedemptions(campaignId));
+    }
+
+    @GetMapping("/campaigns/{campaignId}/quick-redemptions")
+    public ResponseEntity<List<CampaignQuickRedemptionDTO>> listCampaignQuickRedemptions(
+            @PathVariable Long campaignId) {
+        return ResponseEntity.ok(reportsService.listCampaignQuickRedemptions(campaignId));
+    }
+
+    private ResponseEntity<byte[]> buildSqlResponse(ReportsService.DatabaseBackupExport backupExport) {
         return ResponseEntity.ok()
                 .header(
                         HttpHeaders.CONTENT_DISPOSITION,
@@ -36,15 +87,17 @@ public class ReportsController {
                 .body(backupExport.content());
     }
 
-    @PostMapping("/database-backup/import")
-    public ResponseEntity<Map<String, String>> importDatabaseBackup(@RequestParam("file") MultipartFile file) {
-        reportsService.importDatabaseBackup(file);
-        return ResponseEntity.ok(Map.of("message", "Base de datos importada correctamente."));
-    }
-
-    @DeleteMapping("/database-backup")
-    public ResponseEntity<Map<String, String>> deleteDatabaseBackup() {
-        reportsService.resetDatabase();
-        return ResponseEntity.ok(Map.of("message", "Base de datos eliminada correctamente."));
+    private ResponseEntity<byte[]> buildPdfResponse(ReportsService.PdfReportExport reportExport) {
+        return ResponseEntity.ok()
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        ContentDisposition.inline()
+                                .filename(reportExport.fileName(), StandardCharsets.UTF_8)
+                                .build()
+                                .toString()
+                )
+                .contentType(MediaType.APPLICATION_PDF)
+                .contentLength(reportExport.content().length)
+                .body(reportExport.content());
     }
 }

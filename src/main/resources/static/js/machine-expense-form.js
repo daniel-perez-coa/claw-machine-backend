@@ -142,6 +142,16 @@
         refreshRemoveButtons();
     }
 
+    async function printQuickRedemptionTickets(expenseIds, printWindow) {
+        if (!Array.isArray(expenseIds) || expenseIds.length === 0 || !window.appReportPrinter) {
+            return;
+        }
+
+        const params = new URLSearchParams();
+        expenseIds.forEach((expenseId) => params.append('expenseIds', String(expenseId)));
+        await window.appReportPrinter.printPdfFromUrl(`/api/reports/tickets/quick-redemption?${params.toString()}`, printWindow);
+    }
+
     async function loadPrizes() {
         try {
             const response = await fetch('/api/prizes/active');
@@ -157,21 +167,11 @@
         }
     }
 
-    rowsContainer.addEventListener('input', function (event) {
-        const row = event.target.closest('.machine-expense-row');
-        if (!row) {
-            return;
-        }
-
+    rowsContainer.addEventListener('input', function () {
         ensureTrailingEmptyRow();
     });
 
-    rowsContainer.addEventListener('change', function (event) {
-        const row = event.target.closest('.machine-expense-row');
-        if (!row) {
-            return;
-        }
-
+    rowsContainer.addEventListener('change', function () {
         ensureTrailingEmptyRow();
     });
 
@@ -238,6 +238,7 @@
         }
 
         submitButton.disabled = true;
+        const printWindow = window.appReportPrinter?.openPrintWindow('Preparando ticket de canje rapido...');
 
         try {
             const response = await fetch('/api/machine-expense-records', {
@@ -252,10 +253,20 @@
                 throw new Error('No se pudo registrar el canje.');
             }
 
+            const result = await response.json();
             showAlert('Canje registrado correctamente.', 'success');
+
+            try {
+                await printQuickRedemptionTickets(result.expenseIds ?? [], printWindow);
+            } catch (printError) {
+                printWindow?.close();
+                showAlert('El canje se guardo, pero no fue posible abrir la impresion del ticket.', 'error');
+            }
+
             resetFormRows();
             redirectToDashboardWithDelay();
         } catch (error) {
+            printWindow?.close();
             showAlert('Ocurrio un error al registrar el canje.', 'error');
         } finally {
             submitButton.disabled = false;

@@ -42,6 +42,9 @@ public class MachineExpenseRecords {
     @Column(nullable = false)
     private Boolean restocked = false;
 
+    @Column(name = "operation_group_id", nullable = false, length = 64)
+    private String operationGroupId;
+
     @CreationTimestamp
     @Column(name = "registered_at", nullable = false, updatable = false)
     private LocalDateTime registeredAt;

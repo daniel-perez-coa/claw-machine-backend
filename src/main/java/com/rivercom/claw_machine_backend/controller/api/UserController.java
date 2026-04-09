@@ -2,6 +2,7 @@ package com.rivercom.claw_machine_backend.controller.api;
 
 import com.rivercom.claw_machine_backend.dto.NewUserDTO;
 import com.rivercom.claw_machine_backend.dto.UserAddPointsDTO;
+import com.rivercom.claw_machine_backend.dto.UserAddPointsResponseDTO;
 import com.rivercom.claw_machine_backend.dto.UserDTO;
 import com.rivercom.claw_machine_backend.dto.UserLookupDTO;
 import com.rivercom.claw_machine_backend.dto.UserRemovePointsDTO;
@@ -49,7 +50,7 @@ public class UserController {
     }
 
     @PutMapping("/add-points")
-    public ResponseEntity<UserDTO> addPoints(@RequestBody UserAddPointsDTO user) {
+    public ResponseEntity<UserAddPointsResponseDTO> addPoints(@RequestBody UserAddPointsDTO user) {
         return ResponseEntity.ok(service.addPoints(user));
     }
 

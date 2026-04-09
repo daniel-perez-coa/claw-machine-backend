@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 6.20.6-5c96b6aa8a39ac1dc6b6bea4b81168e16dd39231  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="quick_redemption_ticket" pageWidth="156" pageHeight="420" columnWidth="140" leftMargin="8" rightMargin="8" topMargin="10" bottomMargin="10" uuid="61543276-fd47-47f6-b86c-c700be638867">
-	<parameter name="PRIZE_NAME" class="java.lang.String"/>
-	<parameter name="PRIZE_CATEGORY" class="java.lang.String"/>
-	<parameter name="PRIZE_COST" class="java.lang.Integer"/>
-	<parameter name="QUANTITY" class="java.lang.Integer"/>
+	<parameter name="OPERATION_ITEMS_TEXT" class="java.lang.String"/>
+	<parameter name="TOTAL_QUANTITY" class="java.lang.Integer"/>
 	<parameter name="TOTAL_COST" class="java.lang.Integer"/>
 	<parameter name="REPORT_TIMESTAMP" class="java.util.Date"/>
 	<title>
-		<band height="206">
+		<band height="201" splitType="Stretch">
 			<staticText>
 				<reportElement x="0" y="0" width="140" height="18" uuid="4c99dd0f-0170-45d6-b05a-1184e96f933d"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -26,71 +24,57 @@
 				</textElement>
 				<text><![CDATA[Informacion de la operacion]]></text>
 			</staticText>
-			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="44" width="140" height="11" uuid="f5237934-8b9d-410c-b47c-c7035452ae73"/>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="0" y="44" width="140" height="92" uuid="f5237934-8b9d-410c-b47c-c7035452ae73"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Premio: " + ($P{PRIZE_NAME} == null ? "" : $P{PRIZE_NAME})]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="57" width="140" height="11" uuid="fef330b5-4adb-460d-af08-641983bcdeee"/>
-				<textElement>
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression><![CDATA["Categoria: " + ($P{PRIZE_CATEGORY} == null ? "" : $P{PRIZE_CATEGORY})]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="70" width="140" height="11" uuid="1c77a90d-0e08-4ad6-93e1-e0a2f8327542"/>
-				<textElement>
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression><![CDATA["Cantidad: " + String.valueOf($P{QUANTITY} == null ? 0 : $P{QUANTITY})]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{OPERATION_ITEMS_TEXT}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="118" width="140" height="12" uuid="6313624b-bc3a-4f52-b55c-f5585049ffc9"/>
+				<reportElement positionType="Float" x="0" y="136" width="140" height="12" uuid="6313624b-bc3a-4f52-b55c-f5585049ffc9"/>
 				<textElement>
 					<font size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Resumen]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="133" width="140" height="26" uuid="0a609b90-b3bd-4520-ae32-81e5f4d7f43f"/>
+				<reportElement positionType="Float" x="0" y="151" width="140" height="26" uuid="0a609b90-b3bd-4520-ae32-81e5f4d7f43f"/>
 				<textElement textAlignment="Center">
 					<font size="7"/>
 				</textElement>
 				<text><![CDATA[Se realizo un canje rapido y el premio fue entregado en este momento.]]></text>
 			</staticText>
 			<textField pattern="dd/MM/yyyy">
-				<reportElement x="0" y="167" width="68" height="11" uuid="9b36d20a-91f0-4f82-aad6-a3c451bdc8df"/>
+				<reportElement positionType="Float" x="0" y="180" width="68" height="11" uuid="9b36d20a-91f0-4f82-aad6-a3c451bdc8df"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{REPORT_TIMESTAMP}]]></textFieldExpression>
 			</textField>
 			<textField pattern="HH:mm:ss">
-				<reportElement x="72" y="167" width="68" height="11" uuid="ddbd0cae-659b-410b-b182-77b9759e16dc"/>
+				<reportElement positionType="Float" x="72" y="180" width="68" height="11" uuid="ddbd0cae-659b-410b-b182-77b9759e16dc"/>
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{REPORT_TIMESTAMP}]]></textFieldExpression>
 			</textField>
 			<line>
-				<reportElement x="0" y="184" width="140" height="1" uuid="b6ad753e-0386-4a52-9dae-1b09066f58c5"/>
+				<reportElement positionType="Float" x="0" y="197" width="140" height="1" uuid="b6ad753e-0386-4a52-9dae-1b09066f58c5"/>
 			</line>
 		</band>
 	</title>
 	<detail>
-		<band height="96">
+		<band height="70">
 			<staticText>
-				<reportElement x="0" y="8" width="140" height="14" uuid="3830c886-10d8-4b59-8ffd-a0bc701dcebd"/>
+				<reportElement x="0" y="6" width="140" height="14" uuid="3830c886-10d8-4b59-8ffd-a0bc701dcebd"/>
 				<textElement textAlignment="Center">
 					<font size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Mensaje importante]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="28" width="140" height="44" uuid="0bb85dbd-1a84-46d9-8574-195fe2396ac5"/>
+				<reportElement x="0" y="26" width="140" height="44" uuid="0bb85dbd-1a84-46d9-8574-195fe2396ac5"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
@@ -101,10 +85,10 @@
 	<pageFooter>
 		<band height="34">
 			<line>
-				<reportElement x="0" y="2" width="140" height="1" uuid="1181d1d5-6dbb-4794-9993-0b39d9ba9c1d"/>
+				<reportElement x="0" y="3" width="140" height="1" uuid="1181d1d5-6dbb-4794-9993-0b39d9ba9c1d"/>
 			</line>
 			<staticText>
-				<reportElement x="0" y="9" width="140" height="18" uuid="ea8f47d6-4fd5-4d5b-b830-e454a22bdc83"/>
+				<reportElement x="0" y="10" width="140" height="18" uuid="ea8f47d6-4fd5-4d5b-b830-e454a22bdc83"/>
 				<textElement textAlignment="Center">
 					<font size="6"/>
 				</textElement>

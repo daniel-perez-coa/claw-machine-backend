@@ -2,6 +2,7 @@ package com.rivercom.claw_machine_backend.controller.api;
 
 import com.rivercom.claw_machine_backend.dto.MachineExpenseDTO;
 import com.rivercom.claw_machine_backend.dto.MachineExpenseFormDTO;
+import com.rivercom.claw_machine_backend.dto.MachineExpenseRegistrationResponseDTO;
 import com.rivercom.claw_machine_backend.dto.MachineExpenseRequestDTO;
 import com.rivercom.claw_machine_backend.service.MachineExpenseRecordsService;
 import jakarta.validation.Valid;
@@ -21,11 +22,10 @@ public class MachineExpenseRecordsController {
     private final MachineExpenseRecordsService service;
 
     @PostMapping
-    public ResponseEntity<Map<String, String>> registerExpense(
+    public ResponseEntity<MachineExpenseRegistrationResponseDTO> registerExpense(
             @Valid @RequestBody MachineExpenseFormDTO request) {
-        service.registerExpenses(request.items());
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Map.of("message", "Registrado con éxito"));
+        MachineExpenseRegistrationResponseDTO response = service.registerExpenses(request.items());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
@@ -53,6 +53,6 @@ public class MachineExpenseRecordsController {
     @PatchMapping("/{id}/restocked")
     public ResponseEntity<Map<String, String>> markAsRestocked(@PathVariable Long id) {
         service.markAsRestocked(id);
-        return ResponseEntity.ok(Map.of("message", "Marcado como resurtido con éxito"));
+        return ResponseEntity.ok(Map.of("message", "Marcado como resurtido con exito"));
     }
 }

@@ -5,6 +5,7 @@ import com.rivercom.claw_machine_backend.domain.entity.MachineExpenseRecords;
 import com.rivercom.claw_machine_backend.domain.entity.Prize;
 import com.rivercom.claw_machine_backend.domain.enums.MachineCampaignStatus;
 import com.rivercom.claw_machine_backend.dto.MachineExpenseDTO;
+import com.rivercom.claw_machine_backend.dto.MachineExpenseRegistrationResponseDTO;
 import com.rivercom.claw_machine_backend.dto.MachineExpenseRequestDTO;
 import com.rivercom.claw_machine_backend.mapper.MachineExpenseRecordsMapper;
 import com.rivercom.claw_machine_backend.repository.MachineCampaignRepository;
@@ -16,7 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -26,20 +29,22 @@ public class MachineExpenseRecordsService {
     private final MachineExpenseRecordsRepository repository;
     private final MachineCampaignRepository machineCampaignRepository;
     private final PrizeRepository prizeRepository;
-
     private final MachineExpenseRecordsMapper mapper;
 
     @Transactional
-    public void registerExpenses(List<MachineExpenseRequestDTO> requests) {
+    public MachineExpenseRegistrationResponseDTO registerExpenses(List<MachineExpenseRequestDTO> requests) {
         MachineCampaign openCampaign = machineCampaignRepository.findByStatus(MachineCampaignStatus.OPEN)
-                .orElseThrow(() -> new IllegalArgumentException("No hay campaña abierta"));
+                .orElseThrow(() -> new IllegalArgumentException("No hay campana abierta"));
+
+        List<Long> savedIds = new ArrayList<>();
+        String operationGroupId = UUID.randomUUID().toString();
 
         for (MachineExpenseRequestDTO request : requests) {
             Prize prize = prizeRepository.findById(request.prizeId())
                     .orElseThrow(() -> new IllegalArgumentException("El premio no existe"));
 
             if (!Boolean.TRUE.equals(prize.getIsActive())) {
-                throw new IllegalArgumentException("El premio no está activo");
+                throw new IllegalArgumentException("El premio no esta activo");
             }
 
             BigDecimal unitCost = prize.getCost();
@@ -52,14 +57,18 @@ public class MachineExpenseRecordsService {
             expenseRecord.setUnitCost(unitCost);
             expenseRecord.setTotalCost(totalCost);
             expenseRecord.setRestocked(false);
+            expenseRecord.setOperationGroupId(operationGroupId);
 
-            repository.save(expenseRecord);
+            MachineExpenseRecords savedRecord = repository.save(expenseRecord);
+            savedIds.add(savedRecord.getId());
         }
+
+        return new MachineExpenseRegistrationResponseDTO("Registrado con exito", savedIds);
     }
 
     @Transactional
     public MachineExpenseDTO updateExpense(Long id, MachineExpenseRequestDTO request) {
-        log.debug("Actualizando gasto/canje rápido id={}", id);
+        log.debug("Actualizando gasto/canje rapido id={}", id);
 
         MachineExpenseRecords existingRecord = repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("El registro no existe"));
@@ -68,7 +77,7 @@ public class MachineExpenseRecordsService {
                 .orElseThrow(() -> new IllegalArgumentException("El premio no existe"));
 
         if (!Boolean.TRUE.equals(prize.getIsActive())) {
-            throw new IllegalArgumentException("El premio no está activo");
+            throw new IllegalArgumentException("El premio no esta activo");
         }
 
         BigDecimal unitCost = prize.getCost();
@@ -98,20 +107,23 @@ public class MachineExpenseRecordsService {
         log.debug("Registro marcado como resurtido id={}", id);
     }
 
+    @Transactional
     public List<MachineExpenseDTO> findAll() {
         return mapper.toDTOList(repository.findAll());
     }
 
+    @Transactional
     public List<MachineExpenseDTO> findOpenCampaignExpenses() {
         MachineCampaign openCampaign = machineCampaignRepository.findByStatus(MachineCampaignStatus.OPEN)
-                .orElseThrow(() -> new IllegalArgumentException("No hay campaña abierta"));
+                .orElseThrow(() -> new IllegalArgumentException("No hay campana abierta"));
 
         return mapper.toDTOList(repository.findByCampaignId(openCampaign.getId()));
     }
 
+    @Transactional
     public List<MachineExpenseDTO> findPendingRestock() {
         MachineCampaign openCampaign = machineCampaignRepository.findByStatus(MachineCampaignStatus.OPEN)
-                .orElseThrow(() -> new IllegalArgumentException("No hay campaña abierta"));
+                .orElseThrow(() -> new IllegalArgumentException("No hay campana abierta"));
 
         return mapper.toDTOList(repository.findByCampaignIdAndRestocked(openCampaign.getId(), false));
     }

@@ -5,6 +5,7 @@ import com.rivercom.claw_machine_backend.domain.entity.User;
 import com.rivercom.claw_machine_backend.domain.enums.TransactionType;
 import com.rivercom.claw_machine_backend.dto.NewUserDTO;
 import com.rivercom.claw_machine_backend.dto.UserAddPointsDTO;
+import com.rivercom.claw_machine_backend.dto.UserAddPointsResponseDTO;
 import com.rivercom.claw_machine_backend.dto.UserDTO;
 import com.rivercom.claw_machine_backend.dto.UserLookupDTO;
 import com.rivercom.claw_machine_backend.dto.UserRemovePointsDTO;
@@ -33,7 +34,7 @@ public class UserService {
     private final PointTransactionRepository pointTransactionRepository;
     private final UserMapper mapper;
 
-    public List<UserDTO> getAllUsers () {
+    public List<UserDTO> getAllUsers() {
         return mapper.toResponseUsers(repository.findByIsActiveTrue());
     }
 
@@ -43,7 +44,7 @@ public class UserService {
         return mapper.toResponseUser(user);
     }
 
-    public UserDTO newUser (NewUserDTO newUserDTO) {
+    public UserDTO newUser(NewUserDTO newUserDTO) {
         String normalizedPhone = normalizePhone(newUserDTO.phone());
         String normalizedName = normalizeNameForStorage(newUserDTO.name());
 
@@ -60,16 +61,16 @@ public class UserService {
             throw new ResponseStatusException(CONFLICT, "Ya existe un usuario inactivo con ese nombre");
         }
 
-        User newUSer = new User();
-        newUSer.setPhone(normalizedPhone);
-        newUSer.setName(normalizedName);
-        newUSer.setCurrentPoints(0);
-        newUSer.setIsActive(true);
-        User savedUser = repository.save(newUSer);
+        User newUser = new User();
+        newUser.setPhone(normalizedPhone);
+        newUser.setName(normalizedName);
+        newUser.setCurrentPoints(0);
+        newUser.setIsActive(true);
+        User savedUser = repository.save(newUser);
         return mapper.toResponseUser(savedUser);
     }
 
-    public UserDTO updateUser (UserDTO userDTO, String phone) {
+    public UserDTO updateUser(UserDTO userDTO, String phone) {
         String normalizedPhone = normalizePhone(phone);
         Optional<User> existingUser = repository.findByPhoneAndIsActiveTrue(normalizedPhone);
         if (existingUser.isEmpty()) {
@@ -99,7 +100,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserDTO addPoints(UserAddPointsDTO userRequest) {
+    public UserAddPointsResponseDTO addPoints(UserAddPointsDTO userRequest) {
         User existingUser = repository.findByPhoneAndIsActiveTrue(normalizePhone(userRequest.phone()))
                 .orElseThrow(() -> new ResponseStatusException(BAD_REQUEST, "El usuario no existe"));
 
@@ -117,9 +118,12 @@ public class UserService {
         transaction.setPreviousBalance(previousBalance);
         transaction.setNewBalance(newBalance);
 
-        pointTransactionRepository.save(transaction);
+        PointTransaction savedTransaction = pointTransactionRepository.save(transaction);
 
-        return mapper.toResponseUser(savedUser);
+        return new UserAddPointsResponseDTO(
+                mapper.toResponseUser(savedUser),
+                savedTransaction.getId()
+        );
     }
 
     @Transactional
