@@ -241,7 +241,7 @@ public class ReportsService {
 
     public List<CampaignAddPointsTransactionDTO> listCampaignAddPointsTransactions(Long campaignId) {
         MachineCampaign campaign = machineCampaignRepository.findById(campaignId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "La campana no existe."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "La campaña no existe."));
 
         LocalDateTime start = campaign.getOpenedAt();
         LocalDateTime endExclusive = campaign.getClosedAt() != null
@@ -271,7 +271,7 @@ public class ReportsService {
 
     public List<CampaignPrizeRedemptionDTO> listCampaignPrizeRedemptions(Long campaignId) {
         MachineCampaign campaign = machineCampaignRepository.findById(campaignId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "La campana no existe."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "La campaña no existe."));
 
         return prizeRedemptionsRepository.findByCampaignIdOrderByRedeemedAtDesc(campaignId)
                 .stream()
@@ -293,7 +293,7 @@ public class ReportsService {
 
     public List<CampaignQuickRedemptionDTO> listCampaignQuickRedemptions(Long campaignId) {
         MachineCampaign campaign = machineCampaignRepository.findById(campaignId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "La campana no existe."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "La campaña no existe."));
 
         Map<String, List<MachineExpenseRecords>> recordsByOperation = machineExpenseRecordsRepository
                 .findByCampaignIdOrderByRegisteredAtDesc(campaignId)

@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
         summaryElement.innerHTML = `
             <article class="campaign-add-points-summary__card">
                 <div class="campaign-add-points-summary__item">
-                    <span class="campaign-add-points-summary__label">Campana</span>
+                    <span class="campaign-add-points-summary__label">Campaña</span>
                     <strong class="campaign-add-points-summary__value">${escapeHtml(campaign.name)}</strong>
                 </div>
                 <div class="campaign-add-points-summary__item">
@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (!transactions.length) {
-            listElement.innerHTML = '<div class="empty-state">No hay transacciones de agregar puntos para esta campana.</div>';
+            listElement.innerHTML = '<div class="empty-state">No hay transacciones de agregar puntos para esta campaña.</div>';
             if (paginationElement) {
                 paginationElement.innerHTML = '';
             }
@@ -199,7 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const response = await fetch('/api/campaigns');
 
         if (!response.ok) {
-            throw new Error('No fue posible cargar las campanas.');
+            throw new Error('No fue posible cargar las campañas.');
         }
 
         return response.json();
@@ -219,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const selectedCampaignId = getCampaignIdFromQuery();
         campaignSelector.innerHTML = `
-            <option value="">Seleccione una campana</option>
+            <option value="">Seleccione una campaña</option>
             ${campaigns.map((campaign) => `
                 <option value="${campaign.id}" ${String(campaign.id) === selectedCampaignId ? 'selected' : ''}>
                     ${escapeHtml(campaign.name)} (${escapeHtml(getStatusLabel(campaign))})
@@ -241,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentPage = 1;
             renderSummary(null, 0);
             if (listElement) {
-                listElement.innerHTML = '<div class="empty-state">Seleccione una campana para consultar transacciones.</div>';
+                listElement.innerHTML = '<div class="empty-state">Seleccione una campaña para consultar transacciones.</div>';
             }
             if (paginationElement) {
                 paginationElement.innerHTML = '';
@@ -262,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ]);
 
             if (!campaignsResponse.ok) {
-                throw new Error('No fue posible cargar la campana seleccionada.');
+                throw new Error('No fue posible cargar la campaña seleccionada.');
             }
 
             if (!transactionsResponse.ok) {
@@ -288,7 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function initialize() {
         try {
-            setAlert('Cargando campanas...');
+            setAlert('Cargando campañas...');
             const campaigns = await fetchCampaigns();
             populateCampaignSelector(campaigns);
             setAlert('');
@@ -297,9 +297,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 await loadTransactions();
             }
         } catch (error) {
-            setAlert(error.message ?? 'No fue posible cargar las campanas.', 'error');
+            setAlert(error.message ?? 'No fue posible cargar las campañas.', 'error');
             if (listElement) {
-                listElement.innerHTML = '<div class="empty-state">No fue posible cargar las campanas.</div>';
+                listElement.innerHTML = '<div class="empty-state">No fue posible cargar las campañas.</div>';
             }
         }
     }

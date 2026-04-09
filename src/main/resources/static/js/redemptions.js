@@ -191,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const response = await fetch('/api/campaigns');
 
         if (!response.ok) {
-            throw new Error('No se pudieron cargar las campanas.');
+                throw new Error('No se pudieron cargar las campañas.');
         }
 
         const campaigns = await response.json();

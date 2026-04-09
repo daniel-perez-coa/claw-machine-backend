@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderCampaignsPage() {
         if (!allCampaigns || allCampaigns.length === 0) {
-            campaignsList.innerHTML = '<div class="empty-state">No hay campanas registradas por el momento.</div>';
+            campaignsList.innerHTML = '<div class="empty-state">No hay campañas registradas por el momento.</div>';
             if (campaignsPagination) {
                 campaignsPagination.innerHTML = '';
             }
@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function loadCampaigns() {
-        campaignsList.innerHTML = '<div class="empty-state">Cargando campanas...</div>';
+        campaignsList.innerHTML = '<div class="empty-state">Cargando campañas...</div>';
         if (campaignsPagination) {
             campaignsPagination.innerHTML = '';
         }
@@ -181,14 +181,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('/api/campaigns');
 
             if (!response.ok) {
-                throw new Error('No se pudieron cargar las campanas.');
+                throw new Error('No se pudieron cargar las campañas.');
             }
 
             allCampaigns = await response.json();
             currentPage = 1;
             renderCampaignsPage();
         } catch (error) {
-            campaignsList.innerHTML = '<div class="empty-state">No fue posible cargar las campanas.</div>';
+            campaignsList.innerHTML = '<div class="empty-state">No fue posible cargar las campañas.</div>';
             if (campaignsPagination) {
                 campaignsPagination.innerHTML = '';
             }

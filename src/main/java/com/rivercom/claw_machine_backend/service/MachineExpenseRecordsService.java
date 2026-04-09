@@ -34,7 +34,7 @@ public class MachineExpenseRecordsService {
     @Transactional
     public MachineExpenseRegistrationResponseDTO registerExpenses(List<MachineExpenseRequestDTO> requests) {
         MachineCampaign openCampaign = machineCampaignRepository.findByStatus(MachineCampaignStatus.OPEN)
-                .orElseThrow(() -> new IllegalArgumentException("No hay campana abierta"));
+                .orElseThrow(() -> new IllegalArgumentException("No hay campaña abierta"));
 
         List<Long> savedIds = new ArrayList<>();
         String operationGroupId = UUID.randomUUID().toString();
@@ -115,7 +115,7 @@ public class MachineExpenseRecordsService {
     @Transactional
     public List<MachineExpenseDTO> findOpenCampaignExpenses() {
         MachineCampaign openCampaign = machineCampaignRepository.findByStatus(MachineCampaignStatus.OPEN)
-                .orElseThrow(() -> new IllegalArgumentException("No hay campana abierta"));
+                .orElseThrow(() -> new IllegalArgumentException("No hay campaña abierta"));
 
         return mapper.toDTOList(repository.findByCampaignId(openCampaign.getId()));
     }
@@ -123,7 +123,7 @@ public class MachineExpenseRecordsService {
     @Transactional
     public List<MachineExpenseDTO> findPendingRestock() {
         MachineCampaign openCampaign = machineCampaignRepository.findByStatus(MachineCampaignStatus.OPEN)
-                .orElseThrow(() -> new IllegalArgumentException("No hay campana abierta"));
+                .orElseThrow(() -> new IllegalArgumentException("No hay campaña abierta"));
 
         return mapper.toDTOList(repository.findByCampaignIdAndRestocked(openCampaign.getId(), false));
     }
