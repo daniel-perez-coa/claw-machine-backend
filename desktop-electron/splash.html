@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Claw Machine Admin</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #101215;
+      --panel: #171b20;
+      --text: #f3f4f6;
+      --muted: #9aa4af;
+      --accent: #f97316;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(249, 115, 22, 0.22), transparent 35%),
+        linear-gradient(160deg, var(--bg), #090a0c 70%);
+      color: var(--text);
+    }
+
+    .card {
+      width: min(420px, calc(100vw - 40px));
+      padding: 32px 28px;
+      border-radius: 24px;
+      background: rgba(23, 27, 32, 0.86);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+      text-align: center;
+    }
+
+    .glyph {
+      font-size: 54px;
+      line-height: 1;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+      font-weight: 700;
+    }
+
+    .bar {
+      margin-top: 24px;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+
+    .bar::after {
+      content: "";
+      display: block;
+      width: 35%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent), #fdba74);
+      animation: load 1.2s ease-in-out infinite;
+    }
+
+    @keyframes load {
+      from {
+        transform: translateX(-120%);
+      }
+
+      to {
+        transform: translateX(320%);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="glyph">CM</div>
+    <h1>Claw Machine Admin</h1>
+    <div class="bar"></div>
+  </main>
+</body>
+</html>

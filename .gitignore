@@ -39,6 +39,7 @@ Thumbs.db
 *.zip
 *.tar.gz
 *.rar
+!gradle/wrapper/gradle-wrapper.jar
 
 # =========================
 # JVM crash logs
@@ -69,3 +70,10 @@ data/
 *.mv.db
 *.lock.db
 *.trace.db
+
+# =========================
+# Electron desktop shell
+# =========================
+desktop-electron/node_modules/
+desktop-electron/dist/
+desktop-electron/.electron-builder/

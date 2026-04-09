@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.rivercom"
-version = "0.0.1-SNAPSHOT"
+version = "1.0.0"
 description = "Backend service for Claw Machine rewards system"
 
 java {
@@ -48,4 +48,44 @@ dependencies {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+val bootJarTask = tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar")
+val currentOs = System.getProperty("os.name").lowercase()
+val javaHome = System.getenv("JAVA_HOME") ?: System.getProperty("java.home")
+val jlinkExecutable = file(
+	if (currentOs.startsWith("windows")) "$javaHome/bin/jlink.exe" else "$javaHome/bin/jlink"
+)
+
+tasks.register<Copy>("prepareElectronJar") {
+	dependsOn(bootJarTask)
+
+	from(bootJarTask.flatMap { it.archiveFile })
+	into(layout.buildDirectory.dir("electron/backend"))
+	rename { "claw-machine-backend.jar" }
+}
+
+tasks.register<Exec>("prepareElectronRuntime") {
+	onlyIf { jlinkExecutable.exists() }
+
+	doFirst {
+		val outputDir = layout.buildDirectory.dir("electron/runtime").get().asFile
+		project.delete(outputDir)
+
+		commandLine(
+			jlinkExecutable.absolutePath,
+			"--add-modules",
+			"java.base,java.compiler,java.datatransfer,java.desktop,java.instrument,java.logging,java.management,java.naming,java.net.http,java.prefs,java.scripting,java.security.jgss,java.sql,java.xml,jdk.crypto.ec,jdk.unsupported",
+			"--strip-debug",
+			"--no-header-files",
+			"--no-man-pages",
+			"--compress=zip-6",
+			"--output",
+			outputDir.absolutePath
+		)
+	}
+}
+
+tasks.register("prepareElectronDist") {
+	dependsOn("prepareElectronJar", "prepareElectronRuntime")
 }

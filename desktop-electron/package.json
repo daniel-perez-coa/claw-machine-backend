@@ -1,0 +1,17 @@
+{
+  "name": "claw-machine-admin-desktop",
+  "version": "1.0.0",
+  "private": true,
+  "author": "Rivercom",
+  "description": "Shell de escritorio para Claw Machine Admin",
+  "main": "main.js",
+  "scripts": {
+    "dev": "electron .",
+    "build:backend": "..\\gradlew.bat -p .. prepareElectronDist",
+    "dist": "npm run build:backend && electron-builder --win nsis"
+  },
+  "devDependencies": {
+    "electron": "^35.1.5",
+    "electron-builder": "^24.13.3"
+  }
+}
