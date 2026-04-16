@@ -16,7 +16,7 @@
                 <section class="page-title-banner">
                     <h3 class="page-title-banner__title">Transacciones de agregar puntos</h3>
                     <p class="page-title-banner__text">
-                        Visualiza todas las transacciones de agregar puntos por campaña y reimprime el ticket cuando sea necesario.
+                        Visualiza todas las transacciones de agregar puntos, con o sin campaña, y reimprime el ticket cuando sea necesario.
                     </p>
                 </section>
 
@@ -34,7 +34,8 @@
                         <div class="campaign-add-points-field">
                             <label class="campaign-add-points-field__label" for="campaignSelector">Campaña</label>
                             <select id="campaignSelector" class="campaign-add-points-field__control">
-                                <option value="">Seleccione una campaña</option>
+                                <option value="ALL">Todas las transacciones</option>
+                                <option value="UNASSIGNED">Sin campaña</option>
                             </select>
                         </div>
 
@@ -47,7 +48,7 @@
 
                     <div id="campaignAddPointsSummary" class="campaign-add-points-summary"></div>
                     <div id="campaignAddPointsList" class="campaign-add-points-list">
-                        <div class="empty-state">Seleccione una campaña para consultar transacciones.</div>
+                        <div class="empty-state">Cargando transacciones...</div>
                     </div>
                     <div id="campaignAddPointsPagination" class="reports-pagination"></div>
                 </section>

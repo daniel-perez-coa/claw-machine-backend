@@ -649,7 +649,28 @@ textarea {
     }
 }
 
+@media (max-width: 1240px) {
+    .page {
+        padding: 18px;
+    }
+
+    .app-card {
+        padding: 18px;
+    }
+}
+
 @media (max-width: 720px) {
+    .page {
+        padding: 14px;
+    }
+
+    .app-card,
+    .page-title-banner,
+    .income-record-hero,
+    .machine-expense-hero {
+        padding: 16px;
+    }
+
     .campaigns-create-card,
     .prizes-create-card {
         min-height: 80px;

@@ -1,0 +1,5 @@
+extends: ./electron-builder.yml
+win:
+  signAndEditExecutable: false
+nsis:
+  script: build/nsis/unsigned-installer.nsi

@@ -76,6 +76,12 @@
 }
 
 /* Responsive */
+@media (max-width: 1240px) {
+    .sidebar--desktop {
+        display: none;
+    }
+}
+
 @media (max-width: 991.98px) {
     .sidebar--desktop {
         display: none;

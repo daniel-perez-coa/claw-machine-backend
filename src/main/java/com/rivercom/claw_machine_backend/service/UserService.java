@@ -1,7 +1,9 @@
 package com.rivercom.claw_machine_backend.service;
 
 import com.rivercom.claw_machine_backend.domain.entity.PointTransaction;
+import com.rivercom.claw_machine_backend.domain.entity.MachineCampaign;
 import com.rivercom.claw_machine_backend.domain.entity.User;
+import com.rivercom.claw_machine_backend.domain.enums.MachineCampaignStatus;
 import com.rivercom.claw_machine_backend.domain.enums.TransactionType;
 import com.rivercom.claw_machine_backend.dto.NewUserDTO;
 import com.rivercom.claw_machine_backend.dto.UserAddPointsDTO;
@@ -10,6 +12,7 @@ import com.rivercom.claw_machine_backend.dto.UserDTO;
 import com.rivercom.claw_machine_backend.dto.UserLookupDTO;
 import com.rivercom.claw_machine_backend.dto.UserRemovePointsDTO;
 import com.rivercom.claw_machine_backend.mapper.UserMapper;
+import com.rivercom.claw_machine_backend.repository.MachineCampaignRepository;
 import com.rivercom.claw_machine_backend.repository.PointTransactionRepository;
 import com.rivercom.claw_machine_backend.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -32,6 +35,7 @@ public class UserService {
 
     private final UserRepository repository;
     private final PointTransactionRepository pointTransactionRepository;
+    private final MachineCampaignRepository machineCampaignRepository;
     private final UserMapper mapper;
 
     public List<UserDTO> getAllUsers() {
@@ -113,6 +117,8 @@ public class UserService {
 
         PointTransaction transaction = new PointTransaction();
         transaction.setUser(savedUser);
+        MachineCampaign openCampaign = machineCampaignRepository.findByStatus(MachineCampaignStatus.OPEN).orElse(null);
+        transaction.setCampaign(openCampaign);
         transaction.setTransactionType(TransactionType.EARN);
         transaction.setPointsDelta(pointsToAdd);
         transaction.setPreviousBalance(previousBalance);

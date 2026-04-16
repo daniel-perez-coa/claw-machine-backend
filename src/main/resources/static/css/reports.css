@@ -138,7 +138,7 @@
 
 .reports-action-card__button:disabled {
     opacity: 0.72;
-    cursor: wait;
+    cursor: not-allowed;
 }
 
 .reports-action-card__file-input {
@@ -175,6 +175,30 @@
 
 .reports-pagination__button {
     min-width: 120px;
+}
+
+.reports-pagination__button:not(:disabled) {
+    cursor: pointer;
+}
+
+.reports-pagination__button:disabled {
+    cursor: not-allowed;
+}
+
+@media (max-width: 1280px) {
+    .reports-action-card__content {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .reports-action-card__actions {
+        width: 100%;
+    }
+
+    .reports-action-card__button {
+        width: 100%;
+        min-width: 0;
+    }
 }
 
 .reports-hero {

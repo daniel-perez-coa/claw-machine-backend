@@ -1,15 +1,8 @@
-.reports-page:has(.campaign-add-points-shell) {
-    height: calc(100vh - 160px);
-    min-height: 0;
-}
-
 .campaign-add-points-shell {
     display: flex;
     flex-direction: column;
     gap: 18px;
-    flex: 1;
-    min-height: 0;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .campaign-add-points-toolbar {
@@ -49,7 +42,7 @@
 }
 
 .campaign-add-points-summary {
-    min-height: 0;
+    min-height: auto;
 }
 
 .campaign-add-points-summary__card {
@@ -86,10 +79,7 @@
     display: flex;
     flex-direction: column;
     gap: 14px;
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-    padding-right: 6px;
+    overflow: visible;
 }
 
 .campaign-add-points-list::-webkit-scrollbar {
@@ -154,20 +144,7 @@
         min-width: 0;
     }
 
-    .campaign-add-points-shell {
-        flex: initial;
-        overflow: visible;
-    }
-
     .campaign-add-points-list {
-        flex: initial;
-        overflow-y: visible;
         padding-right: 0;
-    }
-}
-
-@media (max-width: 1100px) {
-    .reports-page:has(.campaign-add-points-shell) {
-        height: auto;
     }
 }

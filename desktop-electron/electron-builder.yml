@@ -1,5 +1,5 @@
 appId: com.rivercom.clawmachineadmin
-productName: Claw Machine Admin
+productName: Máquina de garra
 artifactName: ${productName}-${version}.${ext}
 directories:
   output: dist
@@ -20,12 +20,11 @@ win:
   target:
     - nsis
   icon: ../packaging/windows/claw-machine-admin.ico
-  signAndEditExecutable: false
 nsis:
   oneClick: false
   perMachine: false
   allowToChangeInstallationDirectory: true
   createDesktopShortcut: true
   createStartMenuShortcut: true
-  shortcutName: Claw Machine Admin
-  uninstallDisplayName: Claw Machine Admin
+  shortcutName: Máquina de garra
+  uninstallDisplayName: Máquina de garra

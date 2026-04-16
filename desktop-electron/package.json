@@ -3,12 +3,13 @@
   "version": "1.0.0",
   "private": true,
   "author": "Rivercom",
-  "description": "Shell de escritorio para Claw Machine Admin",
+  "description": "Shell de escritorio para Máquina de garra",
   "main": "main.js",
   "scripts": {
     "dev": "electron .",
     "build:backend": "..\\gradlew.bat -p .. prepareElectronDist",
-    "dist": "npm run build:backend && electron-builder --win nsis"
+    "dist": "npm run build:backend && electron-builder --config electron-builder.unsigned.yml --win nsis",
+    "dist:signed": "npm run build:backend && node scripts/require-signing-env.js && electron-builder --win nsis"
   },
   "devDependencies": {
     "electron": "^35.1.5",

@@ -12,8 +12,7 @@
 
 .prizes-list-shell {
     padding: 12px;
-    max-height: 640px;
-    overflow-y: auto;
+    overflow: visible;
 }
 
 .prizes-list {
@@ -101,10 +100,15 @@
     border-radius: 999px;
 }
 
+@media (max-width: 1280px) {
+    .prizes-list-shell {
+        padding: 16px;
+    }
+}
+
 @media (max-width: 992px) {
     .prizes-list-shell {
-        max-height: none;
-        overflow-y: visible;
+        padding: 16px;
     }
 
     .prizes-list {

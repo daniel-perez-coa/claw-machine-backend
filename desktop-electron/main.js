@@ -4,11 +4,13 @@ const fs = require('fs');
 const http = require('http');
 const path = require('path');
 
-const APP_NAME = 'Claw Machine Admin';
+const APP_NAME = 'Administración de máquina de garra';
 const BACKEND_PORT = process.env.APP_PORT || '18080';
 const BACKEND_URL = `http://127.0.0.1:${BACKEND_PORT}/`;
 const START_TIMEOUT_MS = 120000;
 const POLL_INTERVAL_MS = 1000;
+
+app.commandLine.appendSwitch('disable-http-cache');
 
 app.setName(APP_NAME);
 app.setPath('userData', path.join(app.getPath('appData'), 'claw-machine-admin'));
@@ -72,7 +74,7 @@ function openSplashWindow() {
   splashWindow.once('ready-to-show', () => splashWindow.show());
 }
 
-function openMainWindow() {
+async function openMainWindow() {
   mainWindow = new BrowserWindow({
     width: 1440,
     height: 960,
@@ -88,6 +90,7 @@ function openMainWindow() {
     }
   });
 
+  await mainWindow.webContents.session.clearCache();
   mainWindow.loadURL(BACKEND_URL);
   mainWindow.once('ready-to-show', () => {
     if (splashWindow && !splashWindow.isDestroyed()) {
@@ -196,7 +199,7 @@ async function bootstrap() {
   openSplashWindow();
   startBackend();
   await waitForBackend(BACKEND_URL, START_TIMEOUT_MS);
-  openMainWindow();
+  await openMainWindow();
 }
 
 function shutdownBackend() {
@@ -233,6 +236,6 @@ app.on('window-all-closed', () => {
 
 app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0 && !isQuitting) {
-    openMainWindow();
+    void openMainWindow();
   }
 });

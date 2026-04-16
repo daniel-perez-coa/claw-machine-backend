@@ -1,6 +1,6 @@
 # claw-machine-backend
 
-Backend Spring Boot para Claw Machine Admin y shell de escritorio basada en Electron.
+Backend Spring Boot para Máquina de garra admin y shell de escritorio basada en Electron.
 
 ## Desktop Windows
 
@@ -39,7 +39,35 @@ npm run dist
 
 Salida esperada:
 
-- `desktop-electron\dist\Claw Machine Admin-1.0.0.exe`
+- `desktop-electron\dist\Máquina de Garra Admin-1.0.0.exe`
+
+## Firma de codigo para Windows
+
+Para evitar bloqueos de SmartScreen / Smart App Control en equipos administrados, el instalador debe generarse firmado con un certificado de code signing confiable.
+
+`electron-builder` ya quedo preparado para firmar automaticamente si defines estas variables de entorno:
+
+- `CSC_LINK`
+  Puede apuntar a un archivo `.pfx` local o a una URL/secret compatible con `electron-builder`.
+- `CSC_KEY_PASSWORD`
+  Necesaria si tu `.pfx` tiene contrasena.
+
+Ejemplo con un certificado `.pfx` local:
+
+```powershell
+$env:CSC_LINK="C:\certs\claw-machine-admin.pfx"
+$env:CSC_KEY_PASSWORD="tu-password"
+
+cd .\desktop-electron
+npm run dist:signed
+```
+
+Notas:
+
+- Si ejecutas `npm run dist` sin variables de firma, el build intentara empaquetar sin certificado.
+- `npm run dist` usa una configuracion separada no firmada para evitar errores de empaquetado en Windows cuando no existe certificado.
+- Si necesitas distribucion para terceros, usa `npm run dist:signed`.
+- El archivo `desktop-electron\electron-builder.yml` ya no bloquea el firmado del ejecutable.
 
 ## Comportamiento
 

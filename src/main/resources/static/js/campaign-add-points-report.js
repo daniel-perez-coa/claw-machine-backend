@@ -50,8 +50,52 @@ document.addEventListener('DOMContentLoaded', () => {
         return campaign.status ?? '';
     }
 
+    function getSelectedScope() {
+        const selectedValue = campaignSelector?.value ?? 'ALL';
+        return {
+            selectedValue,
+            isAll: selectedValue === 'ALL',
+            isUnassigned: selectedValue === 'UNASSIGNED',
+            campaignId: selectedValue !== 'ALL' && selectedValue !== 'UNASSIGNED' ? selectedValue : ''
+        };
+    }
+
     function renderSummary(campaign, transactionCount) {
         if (!summaryElement) {
+            return;
+        }
+
+        const scope = getSelectedScope();
+
+        if (scope.isAll) {
+            summaryElement.innerHTML = `
+                <article class="campaign-add-points-summary__card">
+                    <div class="campaign-add-points-summary__item">
+                        <span class="campaign-add-points-summary__label">Vista</span>
+                        <strong class="campaign-add-points-summary__value">Todas las transacciones</strong>
+                    </div>
+                    <div class="campaign-add-points-summary__item">
+                        <span class="campaign-add-points-summary__label">Transacciones</span>
+                        <strong class="campaign-add-points-summary__value">${transactionCount}</strong>
+                    </div>
+                </article>
+            `;
+            return;
+        }
+
+        if (scope.isUnassigned) {
+            summaryElement.innerHTML = `
+                <article class="campaign-add-points-summary__card">
+                    <div class="campaign-add-points-summary__item">
+                        <span class="campaign-add-points-summary__label">Vista</span>
+                        <strong class="campaign-add-points-summary__value">Sin campaña</strong>
+                    </div>
+                    <div class="campaign-add-points-summary__item">
+                        <span class="campaign-add-points-summary__label">Transacciones</span>
+                        <strong class="campaign-add-points-summary__value">${transactionCount}</strong>
+                    </div>
+                </article>
+            `;
             return;
         }
 
@@ -156,7 +200,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (!transactions.length) {
-            listElement.innerHTML = '<div class="empty-state">No hay transacciones de agregar puntos para esta campaña.</div>';
+            const scope = getSelectedScope();
+            let emptyMessage = 'No hay transacciones de agregar puntos registradas.';
+
+            if (scope.isUnassigned) {
+                emptyMessage = 'No hay transacciones de agregar puntos sin campaña.';
+            } else if (!scope.isAll) {
+                emptyMessage = 'No hay transacciones de agregar puntos para esta campaña.';
+            }
+
+            listElement.innerHTML = `<div class="empty-state">${emptyMessage}</div>`;
             if (paginationElement) {
                 paginationElement.innerHTML = '';
             }
@@ -175,6 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="campaign-add-points-transaction__meta">
                         <span>Telefono: <strong>${escapeHtml(transaction.userPhone)}</strong></span>
                         <span>Fecha: <strong>${escapeHtml(transaction.createdAt)}</strong></span>
+                        <span>Campaña: <strong>${escapeHtml(transaction.campaignName ?? 'Sin campaña')}</strong></span>
                         <span>Puntos agregados: <strong>${escapeHtml(transaction.pointsAdded)}</strong></span>
                         <span>Saldo anterior: <strong>${escapeHtml(transaction.previousBalance)}</strong></span>
                         <span>Saldo nuevo: <strong>${escapeHtml(transaction.newBalance)}</strong></span>
@@ -219,35 +273,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const selectedCampaignId = getCampaignIdFromQuery();
         campaignSelector.innerHTML = `
-            <option value="">Seleccione una campaña</option>
+            <option value="ALL" ${!selectedCampaignId ? 'selected' : ''}>Todas las transacciones</option>
+            <option value="UNASSIGNED">Sin campaña</option>
             ${campaigns.map((campaign) => `
                 <option value="${campaign.id}" ${String(campaign.id) === selectedCampaignId ? 'selected' : ''}>
                     ${escapeHtml(campaign.name)} (${escapeHtml(getStatusLabel(campaign))})
                 </option>
             `).join('')}
         `;
-
-        if (!selectedCampaignId && campaigns.length) {
-            const openCampaign = campaigns.find((campaign) => campaign.status === 'OPEN');
-            if (openCampaign) {
-                campaignSelector.value = String(openCampaign.id);
-            }
-        }
     }
 
     async function loadTransactions() {
-        const campaignId = campaignSelector?.value ?? '';
-        if (!campaignId) {
-            currentPage = 1;
-            renderSummary(null, 0);
-            if (listElement) {
-                listElement.innerHTML = '<div class="empty-state">Seleccione una campaña para consultar transacciones.</div>';
-            }
-            if (paginationElement) {
-                paginationElement.innerHTML = '';
-            }
-            return;
-        }
+        const scope = getSelectedScope();
 
         reloadButton.disabled = true;
         setAlert('Cargando transacciones...');
@@ -256,13 +293,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
+            const query = new URLSearchParams();
+            if (scope.campaignId) {
+                query.set('campaignId', scope.campaignId);
+            }
+            if (scope.isUnassigned) {
+                query.set('unassignedOnly', 'true');
+            }
+
             const [campaignsResponse, transactionsResponse] = await Promise.all([
                 fetch('/api/campaigns'),
-                fetch(`/api/reports/campaigns/${campaignId}/add-points-transactions`)
+                fetch(`/api/reports/add-points-transactions?${query.toString()}`)
             ]);
 
             if (!campaignsResponse.ok) {
-                throw new Error('No fue posible cargar la campaña seleccionada.');
+                throw new Error('No fue posible cargar las campañas.');
             }
 
             if (!transactionsResponse.ok) {
@@ -271,7 +316,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const campaigns = await campaignsResponse.json();
             const transactions = await transactionsResponse.json();
-            const campaign = campaigns.find((item) => String(item.id) === String(campaignId));
+            const campaign = scope.campaignId
+                ? campaigns.find((item) => String(item.id) === String(scope.campaignId))
+                : null;
 
             renderTransactions(campaign, transactions);
             setAlert(`Se cargaron ${transactions.length} transacciones.`, 'success');
@@ -292,10 +339,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const campaigns = await fetchCampaigns();
             populateCampaignSelector(campaigns);
             setAlert('');
-
-            if (campaignSelector?.value) {
-                await loadTransactions();
-            }
+            await loadTransactions();
         } catch (error) {
             setAlert(error.message ?? 'No fue posible cargar las campañas.', 'error');
             if (listElement) {

@@ -1,15 +1,8 @@
-.reports-page:has(.campaign-redemptions-shell) {
-    height: calc(100vh - 160px);
-    min-height: 0;
-}
-
 .campaign-redemptions-shell {
     display: flex;
     flex-direction: column;
     gap: 18px;
-    flex: 1;
-    min-height: 0;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .campaign-redemptions-toolbar {
@@ -49,7 +42,7 @@
 }
 
 .campaign-redemptions-summary {
-    min-height: 0;
+    min-height: auto;
 }
 
 .campaign-redemptions-summary__card {
@@ -86,10 +79,7 @@
     display: flex;
     flex-direction: column;
     gap: 14px;
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-    padding-right: 6px;
+    overflow: visible;
 }
 
 .campaign-redemptions-list::-webkit-scrollbar {
@@ -154,20 +144,7 @@
         min-width: 0;
     }
 
-    .campaign-redemptions-shell {
-        flex: initial;
-        overflow: visible;
-    }
-
     .campaign-redemptions-list {
-        flex: initial;
-        overflow-y: visible;
         padding-right: 0;
-    }
-}
-
-@media (max-width: 1100px) {
-    .reports-page:has(.campaign-redemptions-shell) {
-        height: auto;
     }
 }

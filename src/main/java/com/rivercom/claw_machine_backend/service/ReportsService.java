@@ -1,15 +1,15 @@
 package com.rivercom.claw_machine_backend.service;
 
-import com.rivercom.claw_machine_backend.domain.entity.MachineExpenseRecords;
 import com.rivercom.claw_machine_backend.domain.entity.MachineCampaign;
+import com.rivercom.claw_machine_backend.domain.entity.MachineExpenseRecords;
 import com.rivercom.claw_machine_backend.domain.entity.PointTransaction;
 import com.rivercom.claw_machine_backend.domain.entity.Prize;
 import com.rivercom.claw_machine_backend.domain.entity.PrizeRedemption;
 import com.rivercom.claw_machine_backend.domain.enums.TransactionType;
 import com.rivercom.claw_machine_backend.dto.CampaignAddPointsTransactionDTO;
-import com.rivercom.claw_machine_backend.dto.CampaignQuickRedemptionItemDTO;
-import com.rivercom.claw_machine_backend.dto.CampaignQuickRedemptionDTO;
 import com.rivercom.claw_machine_backend.dto.CampaignPrizeRedemptionDTO;
+import com.rivercom.claw_machine_backend.dto.CampaignQuickRedemptionDTO;
+import com.rivercom.claw_machine_backend.dto.CampaignQuickRedemptionItemDTO;
 import com.rivercom.claw_machine_backend.repository.MachineCampaignRepository;
 import com.rivercom.claw_machine_backend.repository.MachineExpenseRecordsRepository;
 import com.rivercom.claw_machine_backend.repository.PointTransactionRepository;
@@ -239,33 +239,27 @@ public class ReportsService {
         );
     }
 
-    public List<CampaignAddPointsTransactionDTO> listCampaignAddPointsTransactions(Long campaignId) {
-        MachineCampaign campaign = machineCampaignRepository.findById(campaignId)
+    public List<CampaignAddPointsTransactionDTO> listAddPointsTransactions(Long campaignId, boolean unassignedOnly) {
+        if (unassignedOnly) {
+            return pointTransactionRepository.findByTransactionTypeAndCampaignIsNullOrderByCreatedAtDesc(TransactionType.EARN)
+                    .stream()
+                    .map(this::toCampaignAddPointsTransaction)
+                    .toList();
+        }
+
+        if (campaignId == null) {
+            return pointTransactionRepository.findByTransactionTypeOrderByCreatedAtDesc(TransactionType.EARN)
+                    .stream()
+                    .map(this::toCampaignAddPointsTransaction)
+                    .toList();
+        }
+
+        machineCampaignRepository.findById(campaignId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "La campaña no existe."));
 
-        LocalDateTime start = campaign.getOpenedAt();
-        LocalDateTime endExclusive = campaign.getClosedAt() != null
-                ? campaign.getClosedAt().plusSeconds(1)
-                : LocalDateTime.now().plusSeconds(1);
-
-        return pointTransactionRepository
-                .findByTransactionTypeAndCreatedAtGreaterThanEqualAndCreatedAtLessThanOrderByCreatedAtDesc(
-                        TransactionType.EARN,
-                        start,
-                        endExclusive
-                )
+        return pointTransactionRepository.findByTransactionTypeAndCampaignIdOrderByCreatedAtDesc(TransactionType.EARN, campaignId)
                 .stream()
-                .map(transaction -> new CampaignAddPointsTransactionDTO(
-                        transaction.getId(),
-                        campaign.getId(),
-                        campaign.getName(),
-                        transaction.getUser().getName(),
-                        transaction.getUser().getPhone(),
-                        transaction.getPointsDelta(),
-                        transaction.getPreviousBalance(),
-                        transaction.getNewBalance(),
-                        formatDateTime(transaction.getCreatedAt())
-                ))
+                .map(this::toCampaignAddPointsTransaction)
                 .toList();
     }
 
@@ -347,6 +341,21 @@ public class ReportsService {
                 formatDateTime(firstRecord.getRegisteredAt()),
                 records.stream().map(MachineExpenseRecords::getId).toList(),
                 items
+        );
+    }
+
+    private CampaignAddPointsTransactionDTO toCampaignAddPointsTransaction(PointTransaction transaction) {
+        MachineCampaign campaign = transaction.getCampaign();
+        return new CampaignAddPointsTransactionDTO(
+                transaction.getId(),
+                campaign != null ? campaign.getId() : null,
+                campaign != null ? campaign.getName() : null,
+                transaction.getUser().getName(),
+                transaction.getUser().getPhone(),
+                transaction.getPointsDelta(),
+                transaction.getPreviousBalance(),
+                transaction.getNewBalance(),
+                formatDateTime(transaction.getCreatedAt())
         );
     }
 
