@@ -1,0 +1,18 @@
+extends: ./electron-builder.yml
+artifactName: ${productName}-${version}-${arch}.${ext}
+linux:
+  target:
+    - AppImage
+    - deb
+  icon: ../packaging/windows/claw-machine-admin.png
+  category: Utility
+  synopsis: Administracion de maquina de garra
+  description: Administracion local de usuarios, puntos, premios, campanas y reportes para maquina de garra.
+deb:
+  depends:
+    - libgtk-3-0
+    - libnotify4
+    - libnss3
+    - libxss1
+    - libxtst6
+    - xdg-utils

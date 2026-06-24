@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: appHead('Reporte semanal')}">
+    <title>Reporte semanal</title>
+</head>
+<body>
+<div class="app">
+    <div th:replace="~{fragments/sidebar :: sidebar('reports')}"></div>
+
+    <main class="content">
+        <div th:replace="~{fragments/topbar :: topbar('Reporte semanal', 'Inicio / Reportes / Reporte semanal')}"></div>
+
+        <section class="page">
+            <div class="page-shell reports-page">
+
+                <section class="page-title-banner">
+                    <h3 class="page-title-banner__title">Reporte semanal</h3>
+                    <p class="page-title-banner__text">
+                        Genera el resumen semanal consolidado de lunes a domingo en formato PDF.
+                    </p>
+                </section>
+
+                <div class="reports-action-card__actions">
+                    <a href="/reports"
+                       class="reports-action-card__button reports-action-card__button--secondary">
+                        Volver a reportes
+                    </a>
+                </div>
+
+                <section class="app-card weekly-report-shell">
+                    <div id="weeklyReportStatus" class="reports-status" aria-live="polite"></div>
+
+                    <div class="weekly-report-shell__content">
+                        <div class="weekly-report-shell__block">
+                            <span class="weekly-report-shell__label">Semana actual</span>
+                            <strong class="weekly-report-shell__value"
+                                    th:text="${#temporals.format(weekStart, 'dd/MM/yyyy') + ' al ' + #temporals.format(weekEnd, 'dd/MM/yyyy')}">
+                                01/01/2026 al 07/01/2026
+                            </strong>
+                        </div>
+
+                        <div class="weekly-report-shell__block">
+                            <span class="weekly-report-shell__label">Lapso</span>
+                            <strong class="weekly-report-shell__value">Lunes a domingo</strong>
+                        </div>
+                    </div>
+
+                    <div class="reports-action-card__actions">
+                        <button type="button"
+                                id="generateWeeklySummaryBtn"
+                                class="reports-action-card__button reports-action-card__button--success">
+                            Generar reporte semanal
+                        </button>
+                    </div>
+                </section>
+
+            </div>
+        </section>
+    </main>
+</div>
+
+<script th:src="@{/js/report-print.js}"></script>
+<script th:src="@{/js/weekly-summary-report.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

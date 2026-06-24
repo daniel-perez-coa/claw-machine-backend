@@ -2,10 +2,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const downloadButton = document.getElementById('downloadDatabaseBackupBtn');
     const importFileInput = document.getElementById('importDatabaseBackupFile');
     const deleteDatabaseButton = document.getElementById('deleteDatabaseBtn');
-    const statusElement = document.getElementById('reportsStatus');
+    const resetUserPointsButton = document.getElementById('resetUserPointsBtn');
+    const databaseStatusElement = document.getElementById('reportsStatus');
+    const resetPointsStatusElement = document.getElementById('resetPointsStatus');
     const destructiveDeleteMessageHtml = 'BORRAR LA BASE DE DATOS <span class="app-confirm-modal__text-accent--danger">ELIMINAR&Aacute;</span> TODA LA INFORMACION HASTA EL MOMENTO, <span class="app-confirm-modal__text-accent--warning">SI NO ESTA SEGURO DE REALIZAR ESTA ACCION CANCELE O PREVIAMENTE PREPARE UNA COPIA DE SEGURIDAD.</span>';
+    const resetUserPointsMessageHtml = '<span class="app-confirm-modal__text-accent--danger"><strong>Esta acci&oacute;n es irreversible</strong></span>, al hacer esto <span class="app-confirm-modal__text-accent--danger"><strong>regresar&aacute; los puntos de los usuarios a 0</strong></span>, consulte previamente con su administrador antes de realizarlo.';
 
-    function setStatus(message, type = '') {
+    function setStatus(statusElement, message, type = '') {
         if (!statusElement) {
             return;
         }
@@ -38,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         downloadButton.disabled = true;
-        setStatus('Generando respaldo de la base de datos...');
+        setStatus(databaseStatusElement, 'Generando respaldo de la base de datos...');
 
         try {
             const response = await fetch('/api/reports/database-backup');
@@ -59,9 +62,9 @@ document.addEventListener('DOMContentLoaded', () => {
             anchor.remove();
             window.URL.revokeObjectURL(downloadUrl);
 
-            setStatus('Respaldo descargado correctamente.', 'success');
+            setStatus(databaseStatusElement, 'Respaldo descargado correctamente.', 'success');
         } catch (error) {
-            setStatus(error.message ?? 'No fue posible exportar la base de datos.', 'error');
+            setStatus(databaseStatusElement, error.message ?? 'No fue posible exportar la base de datos.', 'error');
         } finally {
             downloadButton.disabled = false;
         }
@@ -79,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (downloadButton) {
             downloadButton.disabled = true;
         }
-        setStatus('Importando base de datos...');
+        setStatus(databaseStatusElement, 'Importando base de datos...');
 
         try {
             const formData = new FormData();
@@ -95,10 +98,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(errorText || 'No fue posible importar la base de datos.');
             }
 
-            setStatus('Base de datos importada correctamente. Recargue la pantalla si es necesario.', 'success');
+            setStatus(databaseStatusElement, 'Base de datos importada correctamente. Recargue la pantalla si es necesario.', 'success');
             importFileInput.value = '';
         } catch (error) {
-            setStatus(error.message ?? 'No fue posible importar la base de datos.', 'error');
+            setStatus(databaseStatusElement, error.message ?? 'No fue posible importar la base de datos.', 'error');
             importFileInput.value = '';
         } finally {
             importFileInput.disabled = false;
@@ -141,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (downloadButton) {
                 downloadButton.disabled = true;
             }
-            setStatus('Eliminando base de datos...');
+            setStatus(databaseStatusElement, 'Eliminando base de datos...');
 
             const response = await fetch('/api/reports/database-backup', {
                 method: 'DELETE'
@@ -152,9 +155,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(errorText || 'No fue posible eliminar la base de datos.');
             }
 
-            setStatus('Base de datos reiniciada correctamente.', 'success');
+            setStatus(databaseStatusElement, 'Base de datos reiniciada correctamente.', 'success');
         } catch (error) {
-            setStatus(error.message ?? 'No fue posible eliminar la base de datos.', 'error');
+            setStatus(databaseStatusElement, error.message ?? 'No fue posible eliminar la base de datos.', 'error');
         } finally {
             deleteDatabaseButton.disabled = false;
             if (importFileInput) {
@@ -166,6 +169,49 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    async function resetUserPoints() {
+        if (!resetUserPointsButton) {
+            return;
+        }
+
+        try {
+            if (!window.showAppConfirmModal) {
+                throw new Error('No fue posible cargar el modal de confirmacion.');
+            }
+
+            const confirmed = await window.showAppConfirmModal({
+                title: 'Resetear puntos',
+                bodyHtml: resetUserPointsMessageHtml,
+                confirmText: 'Resetear',
+                cancelText: 'Cancelar',
+                cancelVariant: 'secondary',
+                confirmVariant: 'danger'
+            });
+
+            if (!confirmed) {
+                return;
+            }
+
+            resetUserPointsButton.disabled = true;
+            setStatus(resetPointsStatusElement, 'Reseteando puntos de usuarios...');
+
+            const response = await fetch('/api/reports/reset-user-points', {
+                method: 'POST'
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || 'No fue posible resetear los puntos de los usuarios.');
+            }
+
+            setStatus(resetPointsStatusElement, 'Los puntos de los usuarios se reiniciaron correctamente.', 'success');
+        } catch (error) {
+            setStatus(resetPointsStatusElement, error.message ?? 'No fue posible resetear los puntos de los usuarios.', 'error');
+        } finally {
+            resetUserPointsButton.disabled = false;
+        }
+    }
+
     downloadButton?.addEventListener('click', exportDatabaseBackup);
     importFileInput?.addEventListener('change', (event) => {
         const [selectedFile] = event.target.files ?? [];
@@ -173,6 +219,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     deleteDatabaseButton?.addEventListener('click', () => {
         void deleteDatabase();
+    });
+    resetUserPointsButton?.addEventListener('click', () => {
+        void resetUserPoints();
     });
 
     document.body.dataset.reportsReady = 'true';

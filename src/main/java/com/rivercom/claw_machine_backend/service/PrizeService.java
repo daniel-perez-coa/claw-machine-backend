@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
@@ -67,9 +68,9 @@ public class PrizeService {
         newPrize.setCategory(prizeCategory);
         newPrize.setName(normalizedName);
         newPrize.setDescription(normalizeText(prize.description()));
-        newPrize.setPointsCost(prize.pointsCost());
+        newPrize.setPointsCost(normalizePointsCost(prize.pointsCost()));
         newPrize.setIsActive(true);
-        newPrize.setCost(prize.cost());
+        newPrize.setCost(normalizePrizeCost(prize.cost()));
 
         Prize savedPrize = repository.save(newPrize);
         return mapper.toResponsePrize(savedPrize);
@@ -101,8 +102,8 @@ public class PrizeService {
         Prize updatedPrize = existingPrize.get();
         updatedPrize.setName(normalizedName);
         updatedPrize.setDescription(normalizeText(prize.description()));
-        updatedPrize.setPointsCost(prize.pointsCost());
-        updatedPrize.setCost(prize.cost());
+        updatedPrize.setPointsCost(normalizePointsCost(prize.pointsCost()));
+        updatedPrize.setCost(normalizePrizeCost(prize.cost()));
         updatedPrize.setCategory(prizeCategory);
 
         Prize savedPrize = repository.save(updatedPrize);
@@ -147,8 +148,8 @@ public class PrizeService {
             prize.setCategory(prizeCategory);
             prize.setName(normalizedName);
             prize.setDescription(normalizeText(prizeRequest.description()));
-            prize.setPointsCost(prizeRequest.pointsCost());
-            prize.setCost(prizeRequest.cost());
+            prize.setPointsCost(normalizePointsCost(prizeRequest.pointsCost()));
+            prize.setCost(normalizePrizeCost(prizeRequest.cost()));
         }
 
         prize.setIsActive(true);
@@ -169,5 +170,21 @@ public class PrizeService {
                 .map(String::trim)
                 .filter(text -> !text.isBlank())
                 .orElse(null);
+    }
+
+    private Integer normalizePointsCost(Integer pointsCost) {
+        if (pointsCost == null || pointsCost < 0) {
+            throw new ResponseStatusException(BAD_REQUEST, "El costo en puntos no es valido");
+        }
+
+        return pointsCost;
+    }
+
+    private BigDecimal normalizePrizeCost(BigDecimal cost) {
+        if (cost == null || cost.compareTo(BigDecimal.ZERO) < 0) {
+            throw new ResponseStatusException(BAD_REQUEST, "El costo real no es valido");
+        }
+
+        return cost.compareTo(BigDecimal.ZERO) == 0 ? null : cost;
     }
 }

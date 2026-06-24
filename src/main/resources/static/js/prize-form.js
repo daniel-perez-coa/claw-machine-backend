@@ -87,6 +87,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }).format(Number.isFinite(amount) ? amount : 0);
     }
 
+    function formatPointsCost(value) {
+        return value == null ? 'No canjeable' : String(value);
+    }
+
+    function formatPrizeCost(value) {
+        return value == null ? 'Sin costo' : `$${formatMoney(value)}`;
+    }
+
     function renderInactivePrizes(prizes) {
         if (!prizes || prizes.length === 0) {
             inactivePrizesList.innerHTML = '<div class="empty-state">No hay premios desactivados.</div>';
@@ -106,12 +114,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 <p class="prize-inactive-item__detail">
                     <strong>Puntos:</strong>
-                    <span>${prize.pointsCost ?? 0}</span>
+                    <span>${formatPointsCost(prize.pointsCost)}</span>
                 </p>
 
                 <p class="prize-inactive-item__detail">
                     <strong>Costo real:</strong>
-                    <span>$${formatMoney(prize.cost)}</span>
+                    <span>${formatPrizeCost(prize.cost)}</span>
                 </p>
 
                 <button type="button"
@@ -208,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const payload = buildPrizePayload();
         const { prizeCategory, name, pointsCost, cost } = payload;
 
-        if (!prizeCategory || !name || !Number.isFinite(pointsCost) || pointsCost <= 0 || !Number.isFinite(cost) || cost <= 0) {
+        if (!prizeCategory || !name || !Number.isFinite(pointsCost) || pointsCost < 0 || !Number.isFinite(cost) || cost < 0) {
             showAlert('Debes completar todos los campos obligatorios con valores validos.', 'error');
             return;
         }

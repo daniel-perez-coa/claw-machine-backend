@@ -1,12 +1,20 @@
 package com.rivercom.claw_machine_backend.service;
 
-import com.rivercom.claw_machine_backend.domain.entity.*;
+import com.rivercom.claw_machine_backend.domain.entity.MachineCampaign;
+import com.rivercom.claw_machine_backend.domain.entity.PointTransaction;
+import com.rivercom.claw_machine_backend.domain.entity.Prize;
+import com.rivercom.claw_machine_backend.domain.entity.PrizeRedemption;
+import com.rivercom.claw_machine_backend.domain.entity.User;
 import com.rivercom.claw_machine_backend.domain.enums.MachineCampaignStatus;
 import com.rivercom.claw_machine_backend.domain.enums.TransactionType;
 import com.rivercom.claw_machine_backend.dto.PrizeRedemptionResponseDTO;
 import com.rivercom.claw_machine_backend.dto.UserRedemptionRequestDTO;
 import com.rivercom.claw_machine_backend.mapper.PrizeRedemptionMapper;
-import com.rivercom.claw_machine_backend.repository.*;
+import com.rivercom.claw_machine_backend.repository.MachineCampaignRepository;
+import com.rivercom.claw_machine_backend.repository.PointTransactionRepository;
+import com.rivercom.claw_machine_backend.repository.PrizeRedemptionsRepository;
+import com.rivercom.claw_machine_backend.repository.PrizeRepository;
+import com.rivercom.claw_machine_backend.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,10 +42,14 @@ public class PrizeRedemptionService {
                 .orElseThrow(() -> new IllegalArgumentException("El premio no existe"));
 
         MachineCampaign campaign = machineCampaignRepository.findByStatus(MachineCampaignStatus.OPEN)
-                .orElseThrow(() -> new IllegalArgumentException("No hay campañas abiertas"));
+                .orElseThrow(() -> new IllegalArgumentException("No hay campanas abiertas"));
 
         if (!Boolean.TRUE.equals(prize.getIsActive())) {
-            throw new IllegalArgumentException("El premio no está activo");
+            throw new IllegalArgumentException("El premio no esta activo");
+        }
+
+        if (prize.getPointsCost() == null || prize.getPointsCost() <= 0) {
+            throw new IllegalArgumentException("El premio no es canjeable");
         }
 
         if (user.getCurrentPoints() < prize.getPointsCost()) {

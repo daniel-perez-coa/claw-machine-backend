@@ -4,6 +4,7 @@ import com.rivercom.claw_machine_backend.domain.entity.PrizeRedemption;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,4 +19,7 @@ public interface PrizeRedemptionsRepository extends JpaRepository<PrizeRedemptio
     @Override
     @EntityGraph(attributePaths = {"user", "prize", "prize.category", "pointTransaction", "campaign"})
     Optional<PrizeRedemption> findById(Long id);
+
+    @EntityGraph(attributePaths = {"user", "prize", "prize.category", "pointTransaction", "campaign"})
+    List<PrizeRedemption> findByRedeemedAtBetween(LocalDateTime start, LocalDateTime end);
 }

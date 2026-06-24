@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" name="weekly_summary_report" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="712" leftMargin="40" rightMargin="40" topMargin="32" bottomMargin="32" uuid="2ad1ffbe-53f6-4333-b7cb-f33098c1b52d">
+	<subDataset name="weeklySummaryDataset" uuid="3f1ac0df-cce9-495f-9228-aef8e891bda0">
+		<field name="concept" class="java.lang.String"/>
+		<field name="detail" class="java.lang.String"/>
+		<field name="value" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="earnedPointsByUserDataset" uuid="d1a5b8c4-609b-47e6-a5fc-1f5c774e4de0">
+		<field name="userName" class="java.lang.String"/>
+		<field name="pointsText" class="java.lang.String"/>
+	</subDataset>
+	<parameter name="REPORT_TITLE" class="java.lang.String"/>
+	<parameter name="REPORT_GENERATED_AT" class="java.util.Date"/>
+	<parameter name="TOTAL_EARNED_POINTS" class="java.lang.String"/>
+	<parameter name="EARNED_POINTS_BY_USER_DATA" class="net.sf.jasperreports.engine.JRDataSource"/>
+	<parameter name="WEEKLY_SUMMARY_DATA" class="net.sf.jasperreports.engine.JRDataSource"/>
+	<title>
+		<band height="260">
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="712" height="38" uuid="81e63473-f4ed-40eb-b509-6a1a7964df63"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="24" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{REPORT_TITLE}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy HH:mm:ss">
+				<reportElement x="0" y="46" width="712" height="22" uuid="4fa12e18-8c54-41ba-a537-5ef20b2de748"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{REPORT_GENERATED_AT}]]></textFieldExpression>
+			</textField>
+			<frame>
+				<reportElement x="0" y="82" width="712" height="34" uuid="1325d2ab-f47e-4b97-b13e-f27814e9280f"/>
+				<box>
+					<topPen lineWidth="0.9"/>
+					<leftPen lineWidth="0.9"/>
+					<bottomPen lineWidth="0.9"/>
+					<rightPen lineWidth="0.9"/>
+				</box>
+				<staticText>
+					<reportElement x="0" y="0" width="190" height="34" uuid="bc3d0ff8-4506-4323-8979-9662fd0a5e2d"/>
+					<box>
+						<rightPen lineWidth="0.9"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="14" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Concepto]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="190" y="0" width="352" height="34" uuid="6466fb62-2cb2-49d4-97f3-cbd0b9bf6f99"/>
+					<box>
+						<rightPen lineWidth="0.9"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="14" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Detalle]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="542" y="0" width="170" height="34" uuid="55edf3db-701c-444f-b81a-c87abf7cb843"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="14" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Valor]]></text>
+				</staticText>
+			</frame>
+			<frame>
+				<reportElement x="0" y="116" width="712" height="132" uuid="37937c25-533c-4a14-82c4-4b95aa4a0992"/>
+				<box>
+					<topPen lineWidth="0.7"/>
+					<leftPen lineWidth="0.7"/>
+					<bottomPen lineWidth="0.7"/>
+					<rightPen lineWidth="0.7"/>
+				</box>
+				<staticText>
+					<reportElement x="0" y="0" width="190" height="132" uuid="5817636f-0e03-4e1f-9d71-4f14f4ce7a10"/>
+					<box>
+						<rightPen lineWidth="0.7"/>
+					</box>
+					<textElement verticalAlignment="Middle">
+						<font size="13" isBold="true"/>
+						<paragraph leftIndent="12" rightIndent="12"/>
+					</textElement>
+					<text><![CDATA[Puntos acumulados]]></text>
+				</staticText>
+				<frame>
+					<reportElement x="190" y="0" width="352" height="132" uuid="3d1df67d-92cc-462a-bf5f-a1d0f2b905f9"/>
+					<box>
+						<rightPen lineWidth="0.7"/>
+					</box>
+					<frame>
+						<reportElement x="12" y="12" width="328" height="108" uuid="65af470e-a3c8-4f68-8b06-d7307d832d3a"/>
+						<box>
+							<topPen lineWidth="0.6" lineColor="#8393A7"/>
+							<leftPen lineWidth="0.6" lineColor="#8393A7"/>
+							<bottomPen lineWidth="0.6" lineColor="#8393A7"/>
+							<rightPen lineWidth="0.6" lineColor="#8393A7"/>
+						</box>
+						<frame>
+							<reportElement x="0" y="0" width="328" height="30" backcolor="#123F73" mode="Opaque" uuid="f3f54e11-12f8-43e8-a7b4-f62e370edfd9"/>
+							<staticText>
+								<reportElement x="0" y="0" width="220" height="30" forecolor="#FFFFFF" uuid="50ab1575-f4ce-4124-8326-479ee1c4a0ab"/>
+								<box>
+									<rightPen lineWidth="0.5" lineColor="#FFFFFF"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="11" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Usuario]]></text>
+							</staticText>
+							<staticText>
+								<reportElement x="220" y="0" width="108" height="30" forecolor="#FFFFFF" uuid="2038e6ad-ae53-4796-9758-3e22fd8a4d32"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="11" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Total]]></text>
+							</staticText>
+						</frame>
+						<componentElement>
+							<reportElement x="0" y="30" width="328" height="78" uuid="ecaf7355-286f-4402-b06c-578721f5732f"/>
+							<jr:list printOrder="Vertical">
+								<datasetRun subDataset="earnedPointsByUserDataset" uuid="14bf8ed2-7ff0-42b0-a98d-6a9e5199f3bf">
+									<dataSourceExpression><![CDATA[$P{EARNED_POINTS_BY_USER_DATA}]]></dataSourceExpression>
+								</datasetRun>
+								<jr:listContents height="26" width="328">
+									<frame>
+										<reportElement x="0" y="0" width="328" height="26" uuid="39c35f03-9d90-4fd1-8877-0c63f5781d7d"/>
+										<box>
+											<bottomPen lineWidth="0.3" lineColor="#C7D0DB"/>
+										</box>
+										<textField isBlankWhenNull="true">
+											<reportElement x="0" y="3" width="220" height="20" uuid="fa3cde9a-f7fb-42a1-b21a-c00aa7d918b1"/>
+											<box>
+												<rightPen lineWidth="0.3" lineColor="#C7D0DB"/>
+											</box>
+											<textElement verticalAlignment="Middle">
+												<font size="11"/>
+												<paragraph leftIndent="8" rightIndent="8"/>
+											</textElement>
+											<textFieldExpression><![CDATA[$F{userName}]]></textFieldExpression>
+										</textField>
+										<textField isBlankWhenNull="true">
+											<reportElement x="220" y="3" width="108" height="20" uuid="f8b5c2b3-c20d-41f8-b0cf-5e3f57a4eb31"/>
+											<textElement textAlignment="Right" verticalAlignment="Middle">
+												<font size="11" isBold="true"/>
+												<paragraph leftIndent="8" rightIndent="8"/>
+											</textElement>
+											<textFieldExpression><![CDATA[$F{pointsText}]]></textFieldExpression>
+										</textField>
+									</frame>
+								</jr:listContents>
+							</jr:list>
+						</componentElement>
+					</frame>
+				</frame>
+				<textField isBlankWhenNull="true">
+					<reportElement x="542" y="0" width="170" height="132" uuid="768cbb9a-f980-4242-a2b0-a6811ad80f02"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="16" isBold="true"/>
+						<paragraph leftIndent="10" rightIndent="10"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$P{TOTAL_EARNED_POINTS}]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</title>
+	<detail>
+		<band height="228">
+			<componentElement>
+				<reportElement x="0" y="0" width="712" height="228" uuid="54f6f37d-73be-4cdf-b3fb-6a66ca04c76d"/>
+				<jr:list printOrder="Vertical">
+					<datasetRun subDataset="weeklySummaryDataset" uuid="12613f94-40ba-4655-8c8c-f95f785dd052">
+						<dataSourceExpression><![CDATA[$P{WEEKLY_SUMMARY_DATA}]]></dataSourceExpression>
+					</datasetRun>
+					<jr:listContents height="76" width="712">
+						<frame>
+							<reportElement x="0" y="0" width="712" height="76" uuid="1730ba3a-ddc9-496a-b0c6-505d80fd2494"/>
+							<box>
+								<topPen lineWidth="0.7"/>
+								<leftPen lineWidth="0.7"/>
+								<bottomPen lineWidth="0.7"/>
+								<rightPen lineWidth="0.7"/>
+							</box>
+							<textField isBlankWhenNull="true" textAdjust="StretchHeight">
+								<reportElement x="0" y="0" width="190" height="76" uuid="6f2debd8-04b0-4bbf-a664-7751c198fd23"/>
+								<box>
+									<rightPen lineWidth="0.7"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font size="13" isBold="true"/>
+									<paragraph leftIndent="12" rightIndent="12"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{concept}]]></textFieldExpression>
+							</textField>
+							<textField isBlankWhenNull="true" textAdjust="StretchHeight">
+								<reportElement x="190" y="0" width="352" height="76" uuid="77c84df8-e729-4683-85ea-c679ef2eec2a"/>
+								<box>
+									<rightPen lineWidth="0.7"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font size="12"/>
+									<paragraph leftIndent="12" rightIndent="12" spacingBefore="2"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{detail}]]></textFieldExpression>
+							</textField>
+							<textField isBlankWhenNull="true" textAdjust="StretchHeight">
+								<reportElement x="542" y="0" width="170" height="76" uuid="e15fc5ee-2f33-47f4-8031-ac284c435577"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="13" isBold="true"/>
+									<paragraph leftIndent="10" rightIndent="10"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{value}]]></textFieldExpression>
+							</textField>
+						</frame>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+		</band>
+	</detail>
+</jasperReport>

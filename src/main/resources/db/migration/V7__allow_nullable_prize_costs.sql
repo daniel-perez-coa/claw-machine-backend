@@ -1,0 +1,5 @@
+ALTER TABLE app.prizes
+ALTER COLUMN points_cost DROP NOT NULL;
+
+ALTER TABLE app.prizes
+ALTER COLUMN cost DROP NOT NULL;

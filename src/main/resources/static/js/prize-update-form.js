@@ -82,8 +82,8 @@ document.addEventListener('DOMContentLoaded', () => {
         categorySelect.value = prize.prizeCode ?? '';
         nameInput.value = prize.name ?? '';
         descriptionInput.value = prize.description ?? '';
-        pointsCostInput.value = prize.pointsCost ?? '';
-        costInput.value = prize.cost ?? '';
+        pointsCostInput.value = prize.pointsCost ?? 0;
+        costInput.value = prize.cost ?? 0;
     }
 
     form.addEventListener('submit', async (event) => {
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const pointsCost = Number(pointsCostInput.value);
         const cost = Number(costInput.value);
 
-        if (!prizeCode || !name || !Number.isFinite(pointsCost) || pointsCost <= 0 || !Number.isFinite(cost) || cost <= 0) {
+        if (!prizeCode || !name || !Number.isFinite(pointsCost) || pointsCost < 0 || !Number.isFinite(cost) || cost < 0) {
             showAlert('Debes completar todos los campos obligatorios con valores validos.', 'error');
             return;
         }

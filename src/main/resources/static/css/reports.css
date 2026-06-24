@@ -185,6 +185,42 @@
     cursor: not-allowed;
 }
 
+.weekly-report-shell {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.weekly-report-shell__content {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.weekly-report-shell__block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 18px;
+    border-radius: 16px;
+    border: 1px solid rgba(113, 139, 196, 0.18);
+    background: rgba(7, 18, 37, 0.64);
+}
+
+.weekly-report-shell__label {
+    color: var(--text-soft);
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.weekly-report-shell__value {
+    color: var(--text);
+    font-size: 1.12rem;
+    font-weight: 800;
+}
+
 @media (max-width: 1280px) {
     .reports-action-card__content {
         flex-direction: column;
@@ -198,6 +234,10 @@
     .reports-action-card__button {
         width: 100%;
         min-width: 0;
+    }
+
+    .weekly-report-shell__content {
+        grid-template-columns: minmax(0, 1fr);
     }
 }
 
@@ -275,5 +315,9 @@
     .reports-action-card__button {
         width: 100%;
         min-width: 0;
+    }
+
+    .weekly-report-shell__content {
+        grid-template-columns: minmax(0, 1fr);
     }
 }

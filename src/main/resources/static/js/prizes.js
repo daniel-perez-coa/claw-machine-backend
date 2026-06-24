@@ -25,6 +25,14 @@ document.addEventListener('DOMContentLoaded', () => {
         return moneyFormatter.format(Number.isFinite(parsedValue) ? parsedValue : 0);
     }
 
+    function formatPointsCost(value) {
+        return value == null ? 'No canjeable' : String(value);
+    }
+
+    function formatPrizeCost(value) {
+        return value == null ? 'Sin costo' : `$${formatMoney(value)}`;
+    }
+
     function showAlert(message, type = 'success') {
         alertContainer.innerHTML = `
             <div class="alert alert-${type === 'error' ? 'danger' : 'success'}">
@@ -153,12 +161,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="prize-card__meta">
                         <div class="prize-card__target">
                             Costo en puntos:
-                            <strong>${prize.pointsCost ?? 0}</strong>
+                            <strong>${formatPointsCost(prize.pointsCost)}</strong>
                         </div>
 
                         <div class="prize-card__target">
                             Costo real:
-                            <strong>$${formatMoney(prize.cost)}</strong>
+                            <strong>${formatPrizeCost(prize.cost)}</strong>
                         </div>
                     </div>
                 </div>

@@ -77,6 +77,28 @@ Notas:
 - La base H2 se guarda en `%USERPROFILE%\.claw-machine-admin\data\`.
 - Los logs del backend se guardan en `%APPDATA%\claw-machine-admin\logs\`.
 
+## Desktop Linux
+
+El empaquetado Linux genera:
+
+- `AppImage` portable
+- paquete `.deb` instalable, con acceso desde el menu de aplicaciones del escritorio
+
+Importante: el runtime Java generado con `jlink` depende del sistema operativo. Para crear una app Linux funcional, ejecuta este flujo desde Linux, WSL con entorno compatible para empaquetado, una VM Linux o un runner Linux de CI.
+
+```bash
+cd desktop-electron
+npm install
+npm run dist:linux
+```
+
+Salida esperada:
+
+- `desktop-electron/dist/Maquina de garra-1.0.0-x86_64.AppImage`
+- `desktop-electron/dist/maquina-de-garra_1.0.0_amd64.deb`
+
+Para iniciar desde el escritorio Linux, instala el `.deb`; Electron Builder crea la entrada de aplicacion usando la configuracion de `desktop-electron/electron-builder.linux.yml`.
+
 ## Actualizaciones
 
 - El instalador puede reemplazarse por una version nueva sin perder la BD.

@@ -16,4 +16,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByNameIgnoreCaseAndIsActiveTrue(String name);
 
     List<User> findByIsActiveTrue();
+
+    List<User> findByCurrentPointsGreaterThan(Integer currentPoints);
 }

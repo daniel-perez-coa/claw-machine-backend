@@ -73,6 +73,24 @@
                                 </a>
                             </div>
                         </section>
+
+                        <section class="reports-action-card reports-action-card--grouped">
+                            <div class="reports-action-card__content">
+                                <div>
+                                    <h3 class="reports-action-card__title">Reporte semanal</h3>
+                                    <p class="reports-action-card__text">
+                                        Consulta la semana actual y genera un reporte consolidado en PDF.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="reports-action-card__actions">
+                                <a href="/reports/weekly-summary"
+                                   class="reports-action-card__button reports-action-card__button--success">
+                                    Ver reporte semanal
+                                </a>
+                            </div>
+                        </section>
                     </article>
 
                     <article class="app-card reports-action-card reports-action-card--database">
@@ -109,6 +127,27 @@
                         </div>
 
                         <div id="reportsStatus" class="reports-status" aria-live="polite"></div>
+                    </article>
+
+                    <article class="app-card reports-action-card reports-action-card--database">
+                        <div class="reports-action-card__content">
+                            <div>
+                                <h3 class="reports-action-card__title">Resetear puntos</h3>
+                                <p class="reports-action-card__text">
+                                    Restablece manualmente a cero los puntos acumulados de todos los usuarios registrados.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="reports-action-card__actions">
+                            <button type="button"
+                                    id="resetUserPointsBtn"
+                                    class="reports-action-card__button reports-action-card__button--danger">
+                                Resetear puntos
+                            </button>
+                        </div>
+
+                        <div id="resetPointsStatus" class="reports-status" aria-live="polite"></div>
                     </article>
                 </section>
 

@@ -5,16 +5,21 @@ import com.rivercom.claw_machine_backend.domain.entity.MachineExpenseRecords;
 import com.rivercom.claw_machine_backend.domain.entity.PointTransaction;
 import com.rivercom.claw_machine_backend.domain.entity.Prize;
 import com.rivercom.claw_machine_backend.domain.entity.PrizeRedemption;
+import com.rivercom.claw_machine_backend.domain.entity.IncomeRecords;
+import com.rivercom.claw_machine_backend.domain.entity.User;
 import com.rivercom.claw_machine_backend.domain.enums.TransactionType;
 import com.rivercom.claw_machine_backend.dto.CampaignAddPointsTransactionDTO;
 import com.rivercom.claw_machine_backend.dto.CampaignPrizeRedemptionDTO;
 import com.rivercom.claw_machine_backend.dto.CampaignQuickRedemptionDTO;
 import com.rivercom.claw_machine_backend.dto.CampaignQuickRedemptionItemDTO;
+import com.rivercom.claw_machine_backend.repository.IncomeRecordsRepository;
 import com.rivercom.claw_machine_backend.repository.MachineCampaignRepository;
 import com.rivercom.claw_machine_backend.repository.MachineExpenseRecordsRepository;
 import com.rivercom.claw_machine_backend.repository.PointTransactionRepository;
 import com.rivercom.claw_machine_backend.repository.PrizeRedemptionsRepository;
 import com.rivercom.claw_machine_backend.repository.PrizeRepository;
+import com.rivercom.claw_machine_backend.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jasperreports.engine.JRDataSource;
@@ -45,6 +50,8 @@ import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -68,10 +75,12 @@ public class ReportsService {
     private final DataSource dataSource;
     private final Flyway flyway;
     private final MachineCampaignRepository machineCampaignRepository;
+    private final IncomeRecordsRepository incomeRecordsRepository;
     private final PointTransactionRepository pointTransactionRepository;
     private final PrizeRepository prizeRepository;
     private final MachineExpenseRecordsRepository machineExpenseRecordsRepository;
     private final PrizeRedemptionsRepository prizeRedemptionsRepository;
+    private final UserRepository userRepository;
 
     public DatabaseBackupExport generateDatabaseBackup() {
         Path tempFile = null;
@@ -133,12 +142,156 @@ public class ReportsService {
         recreateEmptyDatabase();
     }
 
+    @Transactional
+    public void resetAllUserPoints() {
+        List<User> usersWithPoints = userRepository.findByCurrentPointsGreaterThan(0);
+
+        if (usersWithPoints.isEmpty()) {
+            return;
+        }
+
+        List<PointTransaction> resetTransactions = new ArrayList<>();
+
+        for (User user : usersWithPoints) {
+            int previousBalance = user.getCurrentPoints();
+            user.setCurrentPoints(0);
+
+            PointTransaction transaction = new PointTransaction();
+            transaction.setUser(user);
+            transaction.setTransactionType(TransactionType.ADJUSTMENT);
+            transaction.setPointsDelta(-previousBalance);
+            transaction.setPreviousBalance(previousBalance);
+            transaction.setNewBalance(0);
+            transaction.setNotes("Reinicio manual de puntos desde reportes");
+            resetTransactions.add(transaction);
+        }
+
+        userRepository.saveAll(usersWithPoints);
+        pointTransactionRepository.saveAll(resetTransactions);
+    }
+
+    public WeeklyReportPeriod getCurrentWeeklyReportPeriod() {
+        LocalDate today = LocalDate.now();
+        LocalDate weekStart = today.with(DayOfWeek.MONDAY);
+        LocalDate weekEnd = today.with(DayOfWeek.SUNDAY);
+        return new WeeklyReportPeriod(weekStart, weekEnd);
+    }
+
+    public PdfReportExport generateCurrentWeeklySummaryReport() {
+        WeeklyReportPeriod period = getCurrentWeeklyReportPeriod();
+        return generateWeeklySummaryReport(period.weekStart(), period.weekEnd());
+    }
+
+    public PdfReportExport generateWeeklySummaryReport(LocalDate weekStart, LocalDate weekEnd) {
+        LocalDateTime startDateTime = weekStart.atStartOfDay();
+        LocalDateTime endDateTime = weekEnd.plusDays(1).atStartOfDay().minusNanos(1);
+
+        List<PointTransaction> earnedTransactions = pointTransactionRepository.findByTransactionTypeAndCreatedAtBetween(
+                TransactionType.EARN,
+                startDateTime,
+                endDateTime
+        );
+        List<PrizeRedemption> registeredRedemptions = prizeRedemptionsRepository.findByRedeemedAtBetween(startDateTime, endDateTime);
+        List<MachineExpenseRecords> quickRedemptions = machineExpenseRecordsRepository.findByRegisteredAtBetween(startDateTime, endDateTime);
+        List<IncomeRecords> incomeRecords = incomeRecordsRepository.findByRegisteredAtBetween(startDateTime, endDateTime);
+
+        int earnedPointsTotal = earnedTransactions.stream()
+                .map(PointTransaction::getPointsDelta)
+                .filter(points -> points != null && points > 0)
+                .mapToInt(Integer::intValue)
+                .sum();
+
+        List<Map<String, Object>> earnedPointsByUserRows = earnedTransactions.stream()
+                .filter(transaction -> transaction.getPointsDelta() != null && transaction.getPointsDelta() > 0)
+                .collect(Collectors.groupingBy(
+                        transaction -> transaction.getUser().getName(),
+                        LinkedHashMap::new,
+                        Collectors.summingInt(PointTransaction::getPointsDelta)
+                ))
+                .entrySet()
+                .stream()
+                .sorted(Map.Entry.<String, Integer>comparingByValue(Comparator.reverseOrder())
+                        .thenComparing(Map.Entry.comparingByKey()))
+                .map(entry -> {
+                    Map<String, Object> row = new HashMap<>();
+                    row.put("userName", entry.getKey());
+                    row.put("pointsText", entry.getValue() + " pts");
+                    return row;
+                })
+                .toList();
+
+        int registeredSpentPointsTotal = registeredRedemptions.stream()
+                .map(PrizeRedemption::getPointsSpent)
+                .filter(points -> points != null && points > 0)
+                .mapToInt(Integer::intValue)
+                .sum();
+
+        BigDecimal incomeTotal = incomeRecords.stream()
+                .map(IncomeRecords::getAmount)
+                .filter(amount -> amount != null)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal registeredExpenseTotal = registeredRedemptions.stream()
+                .map(redemption -> redemption.getPrize().getCost())
+                .filter(cost -> cost != null)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal quickExpenseTotal = quickRedemptions.stream()
+                .map(MachineExpenseRecords::getTotalCost)
+                .filter(cost -> cost != null)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalExpense = registeredExpenseTotal.add(quickExpenseTotal);
+
+        List<Map<String, Object>> summaryRows = List.of(
+                createWeeklySummaryRow(
+                        "Lapso de fecha",
+                        "Semana actual de lunes a domingo",
+                        formatDateRange(weekStart, weekEnd)
+                ),
+                createWeeklySummaryRow(
+                        "Puntos canjeados",
+                        "Registrados: " + registeredSpentPointsTotal + " pts (" + registeredRedemptions.size()
+                                + " canjes) | Rapidos / no registrados: 0 pts (" + quickRedemptions.size() + " operaciones)",
+                        registeredSpentPointsTotal + " pts"
+                ),
+                createWeeklySummaryRow(
+                        "Dinero ganado",
+                        "Ingresos registrados: " + incomeRecords.size(),
+                        formatCurrency(incomeTotal)
+                ),
+                createWeeklySummaryRow(
+                        "Dinero salido",
+                        "Registrados: " + formatCurrency(registeredExpenseTotal)
+                                + " | Rapidos / no registrados: " + formatCurrency(quickExpenseTotal),
+                        formatCurrency(totalExpense)
+                )
+        );
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("REPORT_TITLE", "Reporte semanal");
+        parameters.put("REPORT_GENERATED_AT", toDate(LocalDateTime.now()));
+        parameters.put("TOTAL_EARNED_POINTS", earnedPointsTotal + " pts");
+        parameters.put("EARNED_POINTS_BY_USER_DATA", createDataSource(
+                earnedPointsByUserRows.isEmpty() ? List.of(Map.of("userName", "Sin acumulaciones", "pointsText", "0 pts")) : earnedPointsByUserRows
+        ));
+        parameters.put("WEEKLY_SUMMARY_DATA", createDataSource(summaryRows));
+
+        JasperPrint jasperPrint = fillSingleRecordReport("reports/weekly-summary-report.jrxml", parameters);
+        return createPdfExport(
+                "reporte-semanal-" + weekStart.format(DateTimeFormatter.BASIC_ISO_DATE) + ".pdf",
+                List.of(jasperPrint)
+        );
+    }
+
     public PdfReportExport generateAddPointsTicket(Long transactionId) {
         PointTransaction transaction = pointTransactionRepository.findById(transactionId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "La transaccion no existe."));
 
         List<Map<String, Object>> redeemablePrizes = prizeRepository.findByIsActive(true).stream()
-                .filter(prize -> prize.getPointsCost() != null && prize.getPointsCost() <= transaction.getNewBalance())
+                .filter(prize -> prize.getPointsCost() != null
+                        && prize.getPointsCost() > 0
+                        && prize.getPointsCost() <= transaction.getNewBalance())
                 .sorted(Comparator.comparing(Prize::getPointsCost).thenComparing(Prize::getName))
                 .map(prize -> {
                     Map<String, Object> row = new HashMap<>();
@@ -408,8 +561,26 @@ public class ReportsService {
         return Date.from(value.atZone(ZoneId.systemDefault()).toInstant());
     }
 
+    private Map<String, Object> createWeeklySummaryRow(String concept, String detail, String value) {
+        Map<String, Object> row = new HashMap<>();
+        row.put("concept", concept);
+        row.put("detail", detail);
+        row.put("value", value);
+        return row;
+    }
+
     private Integer toInteger(BigDecimal value) {
         return value == null ? 0 : value.intValue();
+    }
+
+    private String formatDateRange(LocalDate weekStart, LocalDate weekEnd) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        return weekStart.format(formatter) + " al " + weekEnd.format(formatter);
+    }
+
+    private String formatCurrency(BigDecimal amount) {
+        BigDecimal normalizedAmount = amount == null ? BigDecimal.ZERO : amount;
+        return "$" + normalizedAmount.setScale(2, java.math.RoundingMode.HALF_UP);
     }
 
     private String formatDateTime(LocalDateTime value) {
@@ -455,5 +626,8 @@ public class ReportsService {
     }
 
     public record PdfReportExport(String fileName, byte[] content) {
+    }
+
+    public record WeeklyReportPeriod(LocalDate weekStart, LocalDate weekEnd) {
     }
 }

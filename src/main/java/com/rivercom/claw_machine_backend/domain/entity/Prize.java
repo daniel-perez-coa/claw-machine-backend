@@ -32,14 +32,14 @@ public class Prize {
 
     private String description;
 
-    @Column(name = "points_cost", nullable = false)
+    @Column(name = "points_cost")
     private Integer pointsCost;
 
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
 
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal cost = BigDecimal.ZERO;
+    @Column(precision = 10, scale = 2)
+    private BigDecimal cost;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

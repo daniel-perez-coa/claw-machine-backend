@@ -4,6 +4,7 @@ import com.rivercom.claw_machine_backend.domain.entity.MachineExpenseRecords;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,4 +32,7 @@ public interface MachineExpenseRecordsRepository extends JpaRepository<MachineEx
 
     @EntityGraph(attributePaths = {"prize", "prize.category", "campaign", "campaign.majorPrize"})
     List<MachineExpenseRecords> findByIdIn(List<Long> ids);
+
+    @EntityGraph(attributePaths = {"prize", "prize.category", "campaign", "campaign.majorPrize"})
+    List<MachineExpenseRecords> findByRegisteredAtBetween(LocalDateTime start, LocalDateTime end);
 }

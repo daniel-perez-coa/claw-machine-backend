@@ -7,9 +7,12 @@
   "main": "main.js",
   "scripts": {
     "dev": "electron .",
-    "build:backend": "..\\gradlew.bat -p .. prepareElectronDist",
-    "dist": "npm run build:backend && electron-builder --config electron-builder.unsigned.yml --win nsis",
-    "dist:signed": "npm run build:backend && node scripts/require-signing-env.js && electron-builder --win nsis"
+    "build:backend": "npm run build:backend:win",
+    "build:backend:win": "..\\gradlew.bat -p .. prepareElectronDist",
+    "build:backend:linux": "../gradlew -p .. prepareElectronDist",
+    "dist": "npm run build:backend:win && electron-builder --config electron-builder.unsigned.yml --win nsis",
+    "dist:linux": "npm run build:backend:linux && electron-builder --config electron-builder.linux.yml --linux AppImage deb",
+    "dist:signed": "npm run build:backend:win && node scripts/require-signing-env.js && electron-builder --win nsis"
   },
   "devDependencies": {
     "electron": "^35.1.5",

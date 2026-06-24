@@ -5,6 +5,7 @@ import com.rivercom.claw_machine_backend.domain.enums.TransactionType;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,4 +26,11 @@ public interface PointTransactionRepository extends JpaRepository<PointTransacti
 
     @EntityGraph(attributePaths = {"user", "campaign"})
     List<PointTransaction> findByTransactionTypeAndCampaignIsNullOrderByCreatedAtDesc(TransactionType transactionType);
+
+    @EntityGraph(attributePaths = {"user", "campaign"})
+    List<PointTransaction> findByTransactionTypeAndCreatedAtBetween(
+            TransactionType transactionType,
+            LocalDateTime start,
+            LocalDateTime end
+    );
 }

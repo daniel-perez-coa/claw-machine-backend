@@ -16,7 +16,7 @@
                 <section class="prize-form-hero">
                     <h3 class="prize-form-hero__title">Crear premio</h3>
                     <p class="prize-form-hero__text">
-                        Registra un nuevo premio indicando categoria, nombre, costo en puntos y costo real.
+                        Registra un nuevo premio indicando categoria, nombre, costo en puntos y costo real. Si capturas 0, el sistema lo guardara como no canjeable o sin costo.
                     </p>
                 </section>
 
@@ -53,7 +53,7 @@
                                 <label for="prizePointsCost" class="prize-form__label">Costo en puntos</label>
                                 <input id="prizePointsCost"
                                        type="number"
-                                       min="1"
+                                       min="0"
                                        step="1"
                                        class="prize-form__input"
                                        placeholder="Ej. 300"
@@ -64,7 +64,7 @@
                                 <label for="prizeCost" class="prize-form__label">Costo real</label>
                                 <input id="prizeCost"
                                        type="number"
-                                       min="0.01"
+                                       min="0"
                                        step="0.01"
                                        class="prize-form__input"
                                        placeholder="Ej. 550.00"

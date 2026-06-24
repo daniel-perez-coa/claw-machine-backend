@@ -47,7 +47,7 @@ public class MachineExpenseRecordsService {
                 throw new IllegalArgumentException("El premio no esta activo");
             }
 
-            BigDecimal unitCost = prize.getCost();
+            BigDecimal unitCost = prize.getCost() == null ? BigDecimal.ZERO : prize.getCost();
             BigDecimal totalCost = unitCost.multiply(BigDecimal.valueOf(request.quantity()));
 
             MachineExpenseRecords expenseRecord = new MachineExpenseRecords();
@@ -80,7 +80,7 @@ public class MachineExpenseRecordsService {
             throw new IllegalArgumentException("El premio no esta activo");
         }
 
-        BigDecimal unitCost = prize.getCost();
+        BigDecimal unitCost = prize.getCost() == null ? BigDecimal.ZERO : prize.getCost();
         BigDecimal totalCost = unitCost.multiply(BigDecimal.valueOf(request.quantity()));
 
         existingRecord.setPrize(prize);

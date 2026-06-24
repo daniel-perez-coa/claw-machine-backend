@@ -213,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error('No se pudieron cargar los premios.');
             }
 
-            const prizes = await response.json();
+            const prizes = (await response.json()).filter((prize) => Number.isInteger(prize.pointsCost) && prize.pointsCost > 0);
 
             if (!prizes || prizes.length === 0) {
                 showContent();

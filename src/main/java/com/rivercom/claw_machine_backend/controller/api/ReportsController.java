@@ -46,6 +46,12 @@ public class ReportsController {
         return ResponseEntity.ok(Map.of("message", "Base de datos eliminada correctamente."));
     }
 
+    @PostMapping("/reset-user-points")
+    public ResponseEntity<Map<String, String>> resetUserPoints() {
+        reportsService.resetAllUserPoints();
+        return ResponseEntity.ok(Map.of("message", "Los puntos de los usuarios se reiniciaron correctamente."));
+    }
+
     @GetMapping("/tickets/add-points/{transactionId}")
     public ResponseEntity<byte[]> printAddPointsTicket(@PathVariable Long transactionId) {
         return buildPdfResponse(reportsService.generateAddPointsTicket(transactionId));
@@ -59,6 +65,11 @@ public class ReportsController {
     @GetMapping("/tickets/user-redemption/{redemptionId}")
     public ResponseEntity<byte[]> printUserRedemptionTicket(@PathVariable Long redemptionId) {
         return buildPdfResponse(reportsService.generateUserRedemptionTicket(redemptionId));
+    }
+
+    @GetMapping("/weekly-summary/current")
+    public ResponseEntity<byte[]> printCurrentWeeklySummary() {
+        return buildPdfResponse(reportsService.generateCurrentWeeklySummaryReport());
     }
 
     @GetMapping("/add-points-transactions")
