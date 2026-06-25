@@ -1,4 +1,4 @@
-const { app, BrowserWindow, dialog, shell } = require('electron');
+const { app, BrowserWindow, dialog, screen, shell } = require('electron');
 const { spawn } = require('child_process');
 const fs = require('fs');
 const http = require('http');
@@ -75,11 +75,17 @@ function openSplashWindow() {
 }
 
 async function openMainWindow() {
+  const { width: screenWidth, height: screenHeight } = screen.getPrimaryDisplay().workAreaSize;
+  const minWidth = Math.min(1000, Math.max(800, screenWidth - 80));
+  const minHeight = Math.min(720, Math.max(600, screenHeight - 80));
+  const width = Math.max(minWidth, Math.min(1440, screenWidth - 40));
+  const height = Math.max(minHeight, Math.min(960, screenHeight - 40));
+
   mainWindow = new BrowserWindow({
-    width: 1440,
-    height: 960,
-    minWidth: 1100,
-    minHeight: 760,
+    width,
+    height,
+    minWidth,
+    minHeight,
     show: false,
     backgroundColor: '#0f1720',
     icon: getAppIconPath(),
