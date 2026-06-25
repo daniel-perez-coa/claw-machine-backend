@@ -6,6 +6,7 @@ linux:
     - deb
   icon: ../packaging/windows/claw-machine-admin.png
   category: Utility
+  maintainer: Rivercom
   synopsis: Administracion de maquina de garra
   description: Administracion local de usuarios, puntos, premios, campanas y reportes para maquina de garra.
 deb:

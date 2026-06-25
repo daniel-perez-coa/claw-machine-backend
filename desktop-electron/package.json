@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "author": "Rivercom",
+  "homepage": "https://github.com/daniel-perez-coa/claw-machine-backend",
   "description": "Shell de escritorio para Máquina de garra",
   "main": "main.js",
   "scripts": {
