@@ -63,7 +63,7 @@ public class SystemUpdateService {
         );
 
         if (!repositoryWasCloned && !hasRemoteChanges()) {
-            return new UpdateResult("No hay nuevas versiones que descargar.", tail(logOutput.toString()));
+            return new UpdateResult("No hay nuevas versiones que descargar.", tail(logOutput.toString()), false);
         }
 
         if (!repositoryWasCloned) {
@@ -76,7 +76,7 @@ public class SystemUpdateService {
         Path debFile = findNewestDeb(electronPath.resolve("dist"));
         runStep("Instalando paquete", repositoryPath, List.of("pkexec", "apt", "install", "-y", debFile.toString()), logOutput);
 
-        return new UpdateResult("Actualizacion instalada correctamente.", tail(logOutput.toString()));
+        return new UpdateResult("Actualizacion instalada correctamente.", tail(logOutput.toString()), true);
     }
 
     private void verifyRepositoryReachable(StringBuilder logOutput) {
@@ -296,7 +296,7 @@ public class SystemUpdateService {
         return value.substring(value.length() - maxLength);
     }
 
-    public record UpdateResult(String message, String log) {
+    public record UpdateResult(String message, String log, boolean restartRequired) {
     }
 
     private static class UpdaterCleanupException extends RuntimeException {

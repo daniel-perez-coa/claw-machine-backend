@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { progress: 82, message: 'Aplicando los ultimos ajustes...' }
     ];
     let systemUpdateProgressTimer = null;
+    let systemRestartTimer = null;
 
     function setStatus(statusElement, message, type = '') {
         if (!statusElement) {
@@ -115,6 +116,66 @@ document.addEventListener('DOMContentLoaded', () => {
         systemUpdateProgressElement.setAttribute('aria-hidden', 'true');
         systemUpdateProgressBarElement.style.width = '0';
         systemUpdateProgressTextElement.textContent = '';
+    }
+
+    function restartDesktopApp() {
+        if (window.clawMachineDesktop?.restartApp) {
+            void window.clawMachineDesktop.restartApp();
+            return;
+        }
+
+        setStatus(systemUpdateStatusElement, 'Actualizacion lista. Cierre y abra la aplicacion para terminar.', 'success');
+    }
+
+    async function showRestartPrompt() {
+        if (!window.clawMachineDesktop?.restartApp) {
+            setStatus(systemUpdateStatusElement, 'Actualizacion lista. Cierre y abra la aplicacion para terminar.', 'success');
+            return;
+        }
+
+        if (!window.showAppConfirmModal) {
+            restartDesktopApp();
+            return;
+        }
+
+        let secondsRemaining = 5;
+        clearInterval(systemRestartTimer);
+
+        const updateCountdownMessage = () => (
+            `La actualizaci&oacute;n termin&oacute; correctamente. La aplicaci&oacute;n se reiniciar&aacute; en <strong>${secondsRemaining}</strong> segundos.`
+        );
+
+        const restartPromise = window.showAppConfirmModal({
+            title: 'Reiniciar aplicacion',
+            bodyHtml: updateCountdownMessage(),
+            confirmText: 'OK',
+            confirmVariant: 'success',
+            hideCancel: true,
+            preventDismiss: true
+        });
+
+        const modalTextElement = document.querySelector('#appConfirmModal .app-confirm-modal__text');
+        systemRestartTimer = setInterval(() => {
+            secondsRemaining -= 1;
+
+            if (modalTextElement) {
+                modalTextElement.innerHTML = updateCountdownMessage();
+            }
+
+            if (secondsRemaining <= 0) {
+                clearInterval(systemRestartTimer);
+                systemRestartTimer = null;
+                restartDesktopApp();
+            }
+        }, 1000);
+
+        const confirmed = await restartPromise;
+        clearInterval(systemRestartTimer);
+        systemRestartTimer = null;
+
+        if (confirmed) {
+            restartDesktopApp();
+        }
     }
 
     async function exportDatabaseBackup() {
@@ -332,6 +393,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
             finishSystemUpdateProgress('Proceso finalizado.');
             setStatus(systemUpdateStatusElement, result.message ?? 'Aplicacion actualizada correctamente.', 'success');
+
+            if (result.restartRequired) {
+                await showRestartPrompt();
+            }
         } catch (error) {
             resetSystemUpdateProgress();
             setStatus(systemUpdateStatusElement, error.message ?? 'No fue posible actualizar el sistema.', 'error');

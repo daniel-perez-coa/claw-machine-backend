@@ -1,4 +1,4 @@
-const { app, BrowserWindow, dialog, screen, shell } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain, screen, shell } = require('electron');
 const { spawn } = require('child_process');
 const fs = require('fs');
 const http = require('http');
@@ -220,6 +220,12 @@ function shutdownBackend() {
   }
 }
 
+function restartApplication() {
+  isQuitting = true;
+  app.relaunch();
+  app.quit();
+}
+
 app.whenReady().then(async () => {
   try {
     await bootstrap();
@@ -244,4 +250,8 @@ app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0 && !isQuitting) {
     void openMainWindow();
   }
+});
+
+ipcMain.handle('restart-app', () => {
+  restartApplication();
 });

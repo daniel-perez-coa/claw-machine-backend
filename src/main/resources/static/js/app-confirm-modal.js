@@ -40,6 +40,10 @@ window.showAppConfirmModal = (() => {
         const confirmButton = modalElement.querySelector('[data-app-confirm-action="confirm"]');
 
         cancelButton.addEventListener('click', () => {
+            if (modalElement._appConfirm.preventDismiss) {
+                return;
+            }
+
             resolver?.(false);
             resolver = null;
             modalInstance?.hide();
@@ -55,6 +59,12 @@ window.showAppConfirmModal = (() => {
             if (resolver) {
                 resolver(false);
                 resolver = null;
+            }
+        });
+
+        modalElement.addEventListener('hide.bs.modal', (event) => {
+            if (modalElement._appConfirm.preventDismiss && resolver) {
+                event.preventDefault();
             }
         });
 
@@ -78,10 +88,13 @@ window.showAppConfirmModal = (() => {
             confirmText = 'Confirmar',
             cancelText = 'Cancelar',
             cancelVariant = 'cancel',
-            confirmVariant = 'success'
+            confirmVariant = 'success',
+            hideCancel = false,
+            preventDismiss = false
         } = options;
 
         const { titleElement, textElement, cancelButton, confirmButton } = modalElement._appConfirm;
+        modalElement._appConfirm.preventDismiss = preventDismiss;
 
         titleElement.textContent = title;
         if (bodyHtml) {
@@ -91,6 +104,7 @@ window.showAppConfirmModal = (() => {
         }
         cancelButton.textContent = cancelText;
         cancelButton.className = `app-confirm-modal__button app-confirm-modal__button--${cancelVariant}`;
+        cancelButton.hidden = hideCancel;
         confirmButton.textContent = confirmText;
         confirmButton.className = `app-confirm-modal__button app-confirm-modal__button--confirm app-confirm-modal__button--${confirmVariant}`;
 
