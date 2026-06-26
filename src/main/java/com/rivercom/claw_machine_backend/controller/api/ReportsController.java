@@ -4,6 +4,7 @@ import com.rivercom.claw_machine_backend.dto.CampaignAddPointsTransactionDTO;
 import com.rivercom.claw_machine_backend.dto.CampaignPrizeRedemptionDTO;
 import com.rivercom.claw_machine_backend.dto.CampaignQuickRedemptionDTO;
 import com.rivercom.claw_machine_backend.service.ReportsService;
+import com.rivercom.claw_machine_backend.service.ThermalTicketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
@@ -28,6 +29,7 @@ import java.util.Map;
 public class ReportsController {
 
     private final ReportsService reportsService;
+    private final ThermalTicketService thermalTicketService;
 
     @GetMapping("/database-backup")
     public ResponseEntity<byte[]> exportDatabaseBackup() {
@@ -57,14 +59,32 @@ public class ReportsController {
         return buildPdfResponse(reportsService.generateAddPointsTicket(transactionId));
     }
 
+    @PostMapping("/tickets/add-points/{transactionId}/thermal-print")
+    public ResponseEntity<Map<String, String>> printAddPointsThermalTicket(@PathVariable Long transactionId) {
+        thermalTicketService.printAddPointsTicket(transactionId);
+        return ResponseEntity.ok(Map.of("message", "Ticket enviado a la impresora termica."));
+    }
+
     @GetMapping("/tickets/quick-redemption")
     public ResponseEntity<byte[]> printQuickRedemptionTicket(@RequestParam List<Long> expenseIds) {
         return buildPdfResponse(reportsService.generateQuickRedemptionTicket(expenseIds));
     }
 
+    @PostMapping("/tickets/quick-redemption/thermal-print")
+    public ResponseEntity<Map<String, String>> printQuickRedemptionThermalTicket(@RequestParam List<Long> expenseIds) {
+        thermalTicketService.printQuickRedemptionTicket(expenseIds);
+        return ResponseEntity.ok(Map.of("message", "Ticket enviado a la impresora termica."));
+    }
+
     @GetMapping("/tickets/user-redemption/{redemptionId}")
     public ResponseEntity<byte[]> printUserRedemptionTicket(@PathVariable Long redemptionId) {
         return buildPdfResponse(reportsService.generateUserRedemptionTicket(redemptionId));
+    }
+
+    @PostMapping("/tickets/user-redemption/{redemptionId}/thermal-print")
+    public ResponseEntity<Map<String, String>> printUserRedemptionThermalTicket(@PathVariable Long redemptionId) {
+        thermalTicketService.printUserRedemptionTicket(redemptionId);
+        return ResponseEntity.ok(Map.of("message", "Ticket enviado a la impresora termica."));
     }
 
     @GetMapping("/weekly-summary/current")

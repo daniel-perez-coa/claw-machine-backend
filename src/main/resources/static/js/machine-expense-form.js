@@ -142,14 +142,14 @@
         refreshRemoveButtons();
     }
 
-    async function printQuickRedemptionTickets(expenseIds, printWindow) {
+    async function printQuickRedemptionTickets(expenseIds) {
         if (!Array.isArray(expenseIds) || expenseIds.length === 0 || !window.appReportPrinter) {
             return;
         }
 
         const params = new URLSearchParams();
         expenseIds.forEach((expenseId) => params.append('expenseIds', String(expenseId)));
-        await window.appReportPrinter.printPdfFromUrl(`/api/reports/tickets/quick-redemption?${params.toString()}`, printWindow);
+        await window.appReportPrinter.printThermalTicketFromUrl(`/api/reports/tickets/quick-redemption/thermal-print?${params.toString()}`);
     }
 
     async function loadPrizes() {
@@ -238,8 +238,6 @@
         }
 
         submitButton.disabled = true;
-        const printWindow = window.appReportPrinter?.openPrintWindow('Preparando ticket de canje rapido...');
-
         try {
             const response = await fetch('/api/machine-expense-records', {
                 method: 'POST',
@@ -257,16 +255,14 @@
             showAlert('Canje registrado correctamente.', 'success');
 
             try {
-                await printQuickRedemptionTickets(result.expenseIds ?? [], printWindow);
+                await printQuickRedemptionTickets(result.expenseIds ?? []);
             } catch (printError) {
-                printWindow?.close();
-                showAlert('El canje se guardo, pero no fue posible abrir la impresion del ticket.', 'error');
+                showAlert('El canje se guardo, pero no fue posible imprimir el ticket termico.', 'error');
             }
 
             resetFormRows();
             redirectToDashboardWithDelay();
         } catch (error) {
-            printWindow?.close();
             showAlert('Ocurrio un error al registrar el canje.', 'error');
         } finally {
             submitButton.disabled = false;

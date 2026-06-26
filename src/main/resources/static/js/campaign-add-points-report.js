@@ -134,14 +134,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                const printWindow = window.appReportPrinter.openPrintWindow('Preparando ticket de puntos...');
-
                 try {
                     button.disabled = true;
-                    await window.appReportPrinter.printPdfFromUrl(`/api/reports/tickets/add-points/${transactionId}`, printWindow);
+                    await window.appReportPrinter.printThermalTicketFromUrl(`/api/reports/tickets/add-points/${transactionId}/thermal-print`);
                 } catch (error) {
-                    printWindow?.close();
-                    setAlert('No fue posible abrir la impresion del ticket.', 'error');
+                    setAlert('No fue posible imprimir el ticket termico.', 'error');
                 } finally {
                     button.disabled = false;
                 }

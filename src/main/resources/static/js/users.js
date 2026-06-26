@@ -236,8 +236,6 @@ document.addEventListener('DOMContentLoaded', () => {
             points
         };
 
-        const printWindow = window.appReportPrinter?.openPrintWindow('Preparando ticket de puntos...');
-
         try {
             const response = await fetch(`${apiBase}/add-points`, {
                 method: 'PUT',
@@ -265,16 +263,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 if (result.transactionId && window.appReportPrinter) {
-                    await window.appReportPrinter.printPdfFromUrl(`/api/reports/tickets/add-points/${result.transactionId}`, printWindow);
-                } else {
-                    printWindow?.close();
+                    await window.appReportPrinter.printThermalTicketFromUrl(`/api/reports/tickets/add-points/${result.transactionId}/thermal-print`);
                 }
             } catch (printError) {
-                printWindow?.close();
-                showAlert('Los puntos se agregaron, pero no fue posible abrir la impresion del ticket.', 'error');
+                showAlert('Los puntos se agregaron, pero no fue posible imprimir el ticket termico.', 'error');
             }
         } catch (error) {
-            printWindow?.close();
             showAlert('Ocurrio un error al agregar puntos.', 'error');
         }
     }

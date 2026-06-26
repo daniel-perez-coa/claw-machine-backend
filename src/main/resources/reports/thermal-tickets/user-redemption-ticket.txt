@@ -1,0 +1,21 @@
+COMPROBANTE DE CANJE
+--------------------------------
+Informacion del usuario
+Nombre: {{userName}}
+Telefono: {{userPhone}}
+
+Informacion del canje
+Premio: {{prizeName}}
+Puntos antes: {{previousBalance}}
+Puntos canjeados: {{pointsSpent}}
+Puntos restantes: {{newBalance}}
+
+El premio fue canjeado correctamente y
+los puntos del usuario fueron actualizados.
+{{date}} {{time}}
+--------------------------------
+Mensaje importante
+Siga acumulando puntos para obtener premios
+mas grandes en sus proximos canjes.
+--------------------------------
+Gracias por su visita.

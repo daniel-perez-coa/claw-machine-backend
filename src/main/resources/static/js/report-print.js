@@ -63,6 +63,18 @@ window.appReportPrinter = (() => {
         printPdfBlob(blob, existingWindow);
     }
 
+    async function printThermalTicketFromUrl(url) {
+        const response = await fetch(url, {
+            method: 'POST'
+        });
+
+        if (!response.ok) {
+            throw new Error('No fue posible imprimir el ticket termico.');
+        }
+
+        return response.json().catch(() => ({}));
+    }
+
     function printPdfBlob(blob, existingWindow = null) {
         const printWindow = existingWindow ?? openPrintWindow();
 
@@ -118,6 +130,7 @@ window.appReportPrinter = (() => {
     return {
         openPrintWindow,
         printPdfFromUrl,
-        printPdfBlob
+        printPdfBlob,
+        printThermalTicketFromUrl
     };
 })();

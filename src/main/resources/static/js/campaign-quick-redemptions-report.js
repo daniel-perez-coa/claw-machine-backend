@@ -104,14 +104,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     .filter((value) => value !== '')
                     .forEach((expenseId) => params.append('expenseIds', expenseId));
 
-                const printWindow = window.appReportPrinter.openPrintWindow('Preparando ticket de canje rapido...');
-
                 try {
                     button.disabled = true;
-                    await window.appReportPrinter.printPdfFromUrl(`/api/reports/tickets/quick-redemption?${params.toString()}`, printWindow);
+                    await window.appReportPrinter.printThermalTicketFromUrl(`/api/reports/tickets/quick-redemption/thermal-print?${params.toString()}`);
                 } catch (error) {
-                    printWindow?.close();
-                    setAlert('No fue posible abrir la impresion del ticket.', 'error');
+                    setAlert('No fue posible imprimir el ticket termico.', 'error');
                 } finally {
                     button.disabled = false;
                 }

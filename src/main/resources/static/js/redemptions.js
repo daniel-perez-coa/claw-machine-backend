@@ -317,13 +317,10 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const printWindow = window.appReportPrinter.openPrintWindow('Preparando ticket de canje...');
-
         try {
-            await window.appReportPrinter.printPdfFromUrl(`/api/reports/tickets/user-redemption/${lastRedemptionId}`, printWindow);
+            await window.appReportPrinter.printThermalTicketFromUrl(`/api/reports/tickets/user-redemption/${lastRedemptionId}/thermal-print`);
         } catch (error) {
-            printWindow?.close();
-            showAlert('No fue posible abrir la impresion del ticket.', 'error');
+            showAlert('No fue posible imprimir el ticket termico.', 'error');
         }
     }
 

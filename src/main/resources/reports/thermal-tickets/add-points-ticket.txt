@@ -1,0 +1,18 @@
+COMPROBANTE DE PUNTOS
+--------------------------------
+Informacion del usuario
+Nombre: {{userName}}
+Telefono: {{userPhone}}
+
+Operacion: agregar puntos
+Puntos previos: {{previousBalance}}
+Puntos agregados: {{pointsAdded}}
+Puntos actuales: {{newBalance}}
+{{date}} {{time}}
+--------------------------------
+Usted puede canjear los siguientes
+premios actualmente
+{{redeemablePrizes}}
+--------------------------------
+Tus puntos quedan registrados en sistema.
+Este comprobante es unicamente informativo.

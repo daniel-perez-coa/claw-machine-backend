@@ -1,0 +1,17 @@
+COMPROBANTE DE CANJE RAPIDO
+--------------------------------
+Informacion de la operacion
+{{operationItems}}
+
+Resumen
+Se realizo un canje rapido y el premio
+fue entregado en este momento.
+{{date}} {{time}}
+--------------------------------
+Mensaje importante
+Recuerde que si usted se registra puede
+acumular puntos para obtener premios mas
+grandes.
+--------------------------------
+Gracias por su visita.
+Conserve este comprobante.
