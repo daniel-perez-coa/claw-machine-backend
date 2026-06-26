@@ -136,6 +136,17 @@
     background: linear-gradient(180deg, rgba(104, 224, 160, 0.34) 0%, rgba(22, 120, 68, 0.96) 100%);
 }
 
+.reports-action-card__button--update {
+    border-color: rgba(96, 165, 250, 0.42);
+    background: linear-gradient(180deg, rgba(59, 130, 246, 0.34) 0%, rgba(29, 78, 216, 0.92) 100%);
+    color: #eff6ff;
+}
+
+.reports-action-card__button--update:hover:not(:disabled) {
+    border-color: rgba(147, 197, 253, 0.58);
+    background: linear-gradient(180deg, rgba(59, 130, 246, 0.46) 0%, rgba(37, 99, 235, 0.98) 100%);
+}
+
 .reports-action-card__button:disabled {
     opacity: 0.72;
     cursor: not-allowed;
