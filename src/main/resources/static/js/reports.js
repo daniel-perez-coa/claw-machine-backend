@@ -38,6 +38,18 @@ document.addEventListener('DOMContentLoaded', () => {
         return basicMatch?.[1] ?? 'claw-machine-backup.sql';
     }
 
+    async function getErrorMessage(response, fallbackMessage) {
+        const contentType = response.headers.get('content-type') ?? '';
+
+        if (contentType.includes('application/json')) {
+            const payload = await response.json().catch(() => null);
+            return payload?.message ?? payload?.error ?? fallbackMessage;
+        }
+
+        const errorText = await response.text();
+        return errorText || fallbackMessage;
+    }
+
     async function exportDatabaseBackup() {
         if (!downloadButton) {
             return;
@@ -97,8 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(errorText || 'No fue posible importar la base de datos.');
+                throw new Error(await getErrorMessage(response, 'No fue posible importar la base de datos.'));
             }
 
             setStatus(databaseStatusElement, 'Base de datos importada correctamente. Recargue la pantalla si es necesario.', 'success');
@@ -154,8 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(errorText || 'No fue posible eliminar la base de datos.');
+                throw new Error(await getErrorMessage(response, 'No fue posible eliminar la base de datos.'));
             }
 
             setStatus(databaseStatusElement, 'Base de datos reiniciada correctamente.', 'success');
@@ -203,8 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(errorText || 'No fue posible resetear los puntos de los usuarios.');
+                throw new Error(await getErrorMessage(response, 'No fue posible resetear los puntos de los usuarios.'));
             }
 
             setStatus(resetPointsStatusElement, 'Los puntos de los usuarios se reiniciaron correctamente.', 'success');
@@ -246,8 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(errorText || 'No fue posible actualizar el sistema.');
+                throw new Error(await getErrorMessage(response, 'No fue posible actualizar el sistema.'));
             }
 
             const result = await response.json();

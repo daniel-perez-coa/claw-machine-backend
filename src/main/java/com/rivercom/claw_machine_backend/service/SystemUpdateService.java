@@ -21,12 +21,15 @@ import java.util.stream.Stream;
 public class SystemUpdateService {
 
     private final Path repositoryPath;
+    private final String repositoryUrl;
     private final String branch;
 
     public SystemUpdateService(
-            @Value("${app.system-update.repository-path:.}") String repositoryPath,
+            @Value("${app.system-update.repository-url:https://github.com/daniel-perez-coa/claw-machine-backend.git}") String repositoryUrl,
+            @Value("${app.system-update.repository-path:${user.home}/.claw-machine-admin/updater/claw-machine-backend}") String repositoryPath,
             @Value("${app.system-update.branch:develop}") String branch) {
         this.repositoryPath = Path.of(repositoryPath).toAbsolutePath().normalize();
+        this.repositoryUrl = repositoryUrl;
         this.branch = branch;
     }
 
@@ -35,22 +38,24 @@ public class SystemUpdateService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La actualizacion automatica solo esta disponible en Linux.");
         }
 
+        StringBuilder logOutput = new StringBuilder();
+        boolean repositoryWasCloned = ensureRepository(logOutput);
         Path electronPath = repositoryPath.resolve("desktop-electron");
-        if (!Files.isDirectory(repositoryPath.resolve(".git")) || !Files.isDirectory(electronPath)) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "No se encontro un repositorio fuente valido para actualizar."
-            );
+
+        if (!Files.isDirectory(electronPath)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El repositorio no contiene la app de escritorio.");
         }
 
-        StringBuilder logOutput = new StringBuilder();
         runStep("Buscando nuevas versiones", repositoryPath, List.of("git", "fetch", "origin", branch), logOutput);
 
-        if (!hasRemoteChanges()) {
+        if (!repositoryWasCloned && !hasRemoteChanges()) {
             return new UpdateResult("No hay nuevas versiones que descargar.", tail(logOutput.toString()));
         }
 
-        runStep("Descargando cambios", repositoryPath, List.of("git", "pull", "origin", branch), logOutput);
+        if (!repositoryWasCloned) {
+            runStep("Descargando cambios", repositoryPath, List.of("git", "pull", "origin", branch), logOutput);
+        }
+
         runStep("Instalando dependencias", electronPath, List.of("npm", "install"), logOutput);
         runStep("Compilando paquete Linux", electronPath, List.of("npm", "run", "dist:linux"), logOutput);
 
@@ -58,6 +63,38 @@ public class SystemUpdateService {
         runStep("Instalando paquete", repositoryPath, List.of("pkexec", "apt", "install", "-y", debFile.toString()), logOutput);
 
         return new UpdateResult("Actualizacion instalada correctamente.", tail(logOutput.toString()));
+    }
+
+    private boolean ensureRepository(StringBuilder logOutput) {
+        if (Files.isDirectory(repositoryPath.resolve(".git"))) {
+            return false;
+        }
+
+        if (Files.exists(repositoryPath) && !isEmptyDirectory(repositoryPath)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "La carpeta de actualizacion existe, pero no es un repositorio Git valido: " + repositoryPath
+            );
+        }
+
+        Path parentPath = repositoryPath.getParent();
+        if (parentPath == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La ruta del repositorio de actualizacion no es valida.");
+        }
+
+        try {
+            Files.createDirectories(parentPath);
+        } catch (IOException exception) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No fue posible preparar la carpeta de actualizacion.");
+        }
+
+        runStep(
+                "Preparando repositorio de actualizacion",
+                parentPath,
+                List.of("git", "clone", "--branch", branch, repositoryUrl, repositoryPath.toString()),
+                logOutput
+        );
+        return true;
     }
 
     private void runStep(String label, Path workingDirectory, List<String> command, StringBuilder logOutput) {
@@ -123,6 +160,18 @@ public class SystemUpdateService {
                     ));
         } catch (IOException exception) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No fue posible localizar el paquete .deb.");
+        }
+    }
+
+    private boolean isEmptyDirectory(Path path) {
+        if (!Files.isDirectory(path)) {
+            return false;
+        }
+
+        try (Stream<Path> files = Files.list(path)) {
+            return files.findAny().isEmpty();
+        } catch (IOException exception) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No fue posible revisar la carpeta de actualizacion.");
         }
     }
 
