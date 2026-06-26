@@ -39,6 +39,7 @@ public class SystemUpdateService {
         }
 
         StringBuilder logOutput = new StringBuilder();
+        verifyRepositoryReachable(logOutput);
         boolean repositoryWasCloned = ensureRepository(logOutput);
         Path electronPath = repositoryPath.resolve("desktop-electron");
 
@@ -46,7 +47,12 @@ public class SystemUpdateService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El repositorio no contiene la app de escritorio.");
         }
 
-        runStep("Buscando nuevas versiones", repositoryPath, List.of("git", "fetch", "origin", branch), logOutput);
+        runStep(
+                "Buscando nuevas versiones",
+                repositoryPath,
+                List.of("git", "fetch", "origin", branch + ":refs/remotes/origin/" + branch),
+                logOutput
+        );
 
         if (!repositoryWasCloned && !hasRemoteChanges()) {
             return new UpdateResult("No hay nuevas versiones que descargar.", tail(logOutput.toString()));
@@ -63,6 +69,16 @@ public class SystemUpdateService {
         runStep("Instalando paquete", repositoryPath, List.of("pkexec", "apt", "install", "-y", debFile.toString()), logOutput);
 
         return new UpdateResult("Actualizacion instalada correctamente.", tail(logOutput.toString()));
+    }
+
+    private void verifyRepositoryReachable(StringBuilder logOutput) {
+        Path workingDirectory = Path.of(System.getProperty("user.home", ".")).toAbsolutePath().normalize();
+        runStep(
+                "Verificando conexion con repositorio",
+                workingDirectory,
+                List.of("git", "ls-remote", "--heads", repositoryUrl, branch),
+                logOutput
+        );
     }
 
     private boolean ensureRepository(StringBuilder logOutput) {
@@ -122,14 +138,18 @@ public class SystemUpdateService {
             logOutput.append(processOutput).append('\n');
 
             if (process.exitValue() != 0) {
+                String detail = summarizeProcessOutput(processOutput.toString());
                 throw new ResponseStatusException(
                         HttpStatus.INTERNAL_SERVER_ERROR,
-                        label + " fallo. Revise permisos, conexion o el repositorio local."
+                        label + " fallo. " + detail
                 );
             }
         } catch (IOException exception) {
             log.error("No fue posible ejecutar {}", label, exception);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No fue posible ejecutar: " + label);
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "No fue posible ejecutar " + label + ". Verifique que Git, Node/npm y las herramientas del sistema esten instaladas."
+            );
         } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "La actualizacion fue interrumpida.");
@@ -143,6 +163,21 @@ public class SystemUpdateService {
         } catch (IOException exception) {
             processOutput.append("No fue posible leer la salida del proceso.");
         }
+    }
+
+    private String summarizeProcessOutput(String output) {
+        String cleanOutput = output == null ? "" : output.trim();
+        if (cleanOutput.isBlank()) {
+            return "Revise permisos, conexion o el repositorio local.";
+        }
+
+        String singleLineOutput = cleanOutput.replaceAll("\\s+", " ");
+        int maxLength = 220;
+        if (singleLineOutput.length() > maxLength) {
+            return "Detalle: " + singleLineOutput.substring(0, maxLength) + "...";
+        }
+
+        return "Detalle: " + singleLineOutput;
     }
 
     private Path findNewestDeb(Path distPath) {
