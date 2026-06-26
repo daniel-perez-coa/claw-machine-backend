@@ -43,10 +43,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (contentType.includes('application/json')) {
             const payload = await response.json().catch(() => null);
-            return payload?.message ?? payload?.error ?? fallbackMessage;
+            return payload?.message ?? payload?.detail ?? fallbackMessage;
         }
 
         const errorText = await response.text();
+        try {
+            const payload = JSON.parse(errorText || '{}');
+            if (payload && typeof payload === 'object') {
+                return payload.message ?? payload.detail ?? fallbackMessage;
+            }
+        } catch (parseError) {
+            return errorText || fallbackMessage;
+        }
+
         return errorText || fallbackMessage;
     }
 
