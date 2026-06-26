@@ -160,6 +160,41 @@
     color: #ffb4b4;
 }
 
+.reports-progress {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.reports-progress--active {
+    display: flex;
+}
+
+.reports-progress__track {
+    width: 100%;
+    height: 10px;
+    overflow: hidden;
+    border-radius: 999px;
+    border: 1px solid rgba(104, 224, 160, 0.22);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.reports-progress__bar {
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #68e0a0 0%, #8bd7ff 100%);
+    box-shadow: 0 0 16px rgba(104, 224, 160, 0.34);
+    transition: width 0.5s ease;
+}
+
+.reports-progress__text {
+    min-height: 18px;
+    color: var(--text-soft);
+    font-size: 0.88rem;
+    font-weight: 700;
+}
+
 .reports-pagination {
     display: flex;
     align-items: center;

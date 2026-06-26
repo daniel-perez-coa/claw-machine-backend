@@ -7,9 +7,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const databaseStatusElement = document.getElementById('reportsStatus');
     const resetPointsStatusElement = document.getElementById('resetPointsStatus');
     const systemUpdateStatusElement = document.getElementById('systemUpdateStatus');
+    const systemUpdateProgressElement = document.getElementById('systemUpdateProgress');
+    const systemUpdateProgressBarElement = document.getElementById('systemUpdateProgressBar');
+    const systemUpdateProgressTextElement = document.getElementById('systemUpdateProgressText');
     const destructiveDeleteMessageHtml = 'BORRAR LA BASE DE DATOS <span class="app-confirm-modal__text-accent--danger">ELIMINAR&Aacute;</span> TODA LA INFORMACION HASTA EL MOMENTO, <span class="app-confirm-modal__text-accent--warning">SI NO ESTA SEGURO DE REALIZAR ESTA ACCION CANCELE O PREVIAMENTE PREPARE UNA COPIA DE SEGURIDAD.</span>';
     const resetUserPointsMessageHtml = '<span class="app-confirm-modal__text-accent--danger"><strong>Esta acci&oacute;n es irreversible</strong></span>, al hacer esto <span class="app-confirm-modal__text-accent--danger"><strong>regresar&aacute; los puntos de los usuarios a 0</strong></span>, consulte previamente con su administrador antes de realizarlo.';
-    const systemUpdateMessageHtml = 'La app descargara cambios de <strong>develop</strong>, compilara el paquete Linux e intentara instalar el nuevo <strong>.deb</strong>. Este proceso puede tardar varios minutos.';
+    const systemUpdateMessageHtml = 'Se comenzar&aacute; el proceso para buscar actualizaciones disponibles. Si existe una nueva versi&oacute;n, la aplicaci&oacute;n la preparar&aacute; e instalar&aacute; autom&aacute;ticamente.';
+    const systemUpdateProgressSteps = [
+        { progress: 12, message: 'Buscando actualizaciones disponibles...' },
+        { progress: 32, message: 'Preparando la actualizacion...' },
+        { progress: 58, message: 'Descargando e instalando componentes...' },
+        { progress: 82, message: 'Aplicando los ultimos ajustes...' }
+    ];
+    let systemUpdateProgressTimer = null;
 
     function setStatus(statusElement, message, type = '') {
         if (!statusElement) {
@@ -57,6 +67,54 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         return errorText || fallbackMessage;
+    }
+
+    function setSystemUpdateProgress(progress, message) {
+        if (!systemUpdateProgressElement || !systemUpdateProgressBarElement || !systemUpdateProgressTextElement) {
+            return;
+        }
+
+        systemUpdateProgressElement.classList.add('reports-progress--active');
+        systemUpdateProgressElement.setAttribute('aria-hidden', 'false');
+        systemUpdateProgressBarElement.style.width = `${Math.min(progress, 100)}%`;
+        systemUpdateProgressTextElement.textContent = message;
+    }
+
+    function startSystemUpdateProgress() {
+        let currentStepIndex = 0;
+        clearInterval(systemUpdateProgressTimer);
+        setSystemUpdateProgress(
+            systemUpdateProgressSteps[currentStepIndex].progress,
+            systemUpdateProgressSteps[currentStepIndex].message
+        );
+
+        systemUpdateProgressTimer = setInterval(() => {
+            currentStepIndex = Math.min(currentStepIndex + 1, systemUpdateProgressSteps.length - 1);
+            setSystemUpdateProgress(
+                systemUpdateProgressSteps[currentStepIndex].progress,
+                systemUpdateProgressSteps[currentStepIndex].message
+            );
+        }, 9000);
+    }
+
+    function finishSystemUpdateProgress(message) {
+        clearInterval(systemUpdateProgressTimer);
+        systemUpdateProgressTimer = null;
+        setSystemUpdateProgress(100, message);
+    }
+
+    function resetSystemUpdateProgress() {
+        clearInterval(systemUpdateProgressTimer);
+        systemUpdateProgressTimer = null;
+
+        if (!systemUpdateProgressElement || !systemUpdateProgressBarElement || !systemUpdateProgressTextElement) {
+            return;
+        }
+
+        systemUpdateProgressElement.classList.remove('reports-progress--active');
+        systemUpdateProgressElement.setAttribute('aria-hidden', 'true');
+        systemUpdateProgressBarElement.style.width = '0';
+        systemUpdateProgressTextElement.textContent = '';
     }
 
     async function exportDatabaseBackup() {
@@ -244,9 +302,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const confirmed = await window.showAppConfirmModal({
-                title: 'Actualizar sistema',
+                title: 'Actualizar la aplicacion',
                 bodyHtml: systemUpdateMessageHtml,
-                confirmText: 'Actualizar',
+                confirmText: 'Buscar actualizaciones',
                 cancelText: 'Cancelar',
                 cancelVariant: 'secondary',
                 confirmVariant: 'success'
@@ -257,7 +315,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             systemUpdateButton.disabled = true;
-            setStatus(systemUpdateStatusElement, 'Actualizando sistema... puede tardar varios minutos.');
+            setStatus(systemUpdateStatusElement, 'Buscando actualizaciones... puede tardar varios minutos.');
+            startSystemUpdateProgress();
 
             const response = await fetch('/api/reports/system-update', {
                 method: 'POST',
@@ -271,8 +330,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const result = await response.json();
-            setStatus(systemUpdateStatusElement, result.message ?? 'Sistema actualizado correctamente.', 'success');
+            finishSystemUpdateProgress('Proceso finalizado.');
+            setStatus(systemUpdateStatusElement, result.message ?? 'Aplicacion actualizada correctamente.', 'success');
         } catch (error) {
+            resetSystemUpdateProgress();
             setStatus(systemUpdateStatusElement, error.message ?? 'No fue posible actualizar el sistema.', 'error');
         } finally {
             systemUpdateButton.disabled = false;
