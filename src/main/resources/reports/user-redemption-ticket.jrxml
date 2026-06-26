@@ -82,7 +82,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
-				<text><![CDATA[El premio fue canjeado correctamente y los puntos del usuario fueron actualizados.]]></text>
+				<text><![CDATA[Gracias por jugar. Disfruta tu premio.]]></text>
 			</staticText>
 			<textField pattern="dd/MM/yyyy">
 				<reportElement x="0" y="194" width="68" height="11" uuid="84894a14-39a6-4627-96ef-8ac20d3900a9"/>

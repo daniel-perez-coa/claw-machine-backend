@@ -10,8 +10,7 @@ Puntos antes: {{previousBalance}}
 Puntos canjeados: {{pointsSpent}}
 Puntos restantes: {{newBalance}}
 
-El premio fue canjeado correctamente y
-los puntos del usuario fueron actualizados.
+Gracias por jugar. Disfruta tu premio.
 {{date}} {{time}}
 --------------------------------
 Mensaje importante

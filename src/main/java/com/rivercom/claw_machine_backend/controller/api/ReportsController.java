@@ -4,6 +4,7 @@ import com.rivercom.claw_machine_backend.dto.CampaignAddPointsTransactionDTO;
 import com.rivercom.claw_machine_backend.dto.CampaignPrizeRedemptionDTO;
 import com.rivercom.claw_machine_backend.dto.CampaignQuickRedemptionDTO;
 import com.rivercom.claw_machine_backend.service.ReportsService;
+import com.rivercom.claw_machine_backend.service.SystemUpdateService;
 import com.rivercom.claw_machine_backend.service.ThermalTicketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ContentDisposition;
@@ -30,6 +31,7 @@ public class ReportsController {
 
     private final ReportsService reportsService;
     private final ThermalTicketService thermalTicketService;
+    private final SystemUpdateService systemUpdateService;
 
     @GetMapping("/database-backup")
     public ResponseEntity<byte[]> exportDatabaseBackup() {
@@ -52,6 +54,11 @@ public class ReportsController {
     public ResponseEntity<Map<String, String>> resetUserPoints() {
         reportsService.resetAllUserPoints();
         return ResponseEntity.ok(Map.of("message", "Los puntos de los usuarios se reiniciaron correctamente."));
+    }
+
+    @PostMapping("/system-update")
+    public ResponseEntity<SystemUpdateService.UpdateResult> updateSystem() {
+        return ResponseEntity.ok(systemUpdateService.updateFromDevelop());
     }
 
     @GetMapping("/tickets/add-points/{transactionId}")

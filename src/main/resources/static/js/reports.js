@@ -3,10 +3,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const importFileInput = document.getElementById('importDatabaseBackupFile');
     const deleteDatabaseButton = document.getElementById('deleteDatabaseBtn');
     const resetUserPointsButton = document.getElementById('resetUserPointsBtn');
+    const systemUpdateButton = document.getElementById('systemUpdateBtn');
     const databaseStatusElement = document.getElementById('reportsStatus');
     const resetPointsStatusElement = document.getElementById('resetPointsStatus');
+    const systemUpdateStatusElement = document.getElementById('systemUpdateStatus');
     const destructiveDeleteMessageHtml = 'BORRAR LA BASE DE DATOS <span class="app-confirm-modal__text-accent--danger">ELIMINAR&Aacute;</span> TODA LA INFORMACION HASTA EL MOMENTO, <span class="app-confirm-modal__text-accent--warning">SI NO ESTA SEGURO DE REALIZAR ESTA ACCION CANCELE O PREVIAMENTE PREPARE UNA COPIA DE SEGURIDAD.</span>';
     const resetUserPointsMessageHtml = '<span class="app-confirm-modal__text-accent--danger"><strong>Esta acci&oacute;n es irreversible</strong></span>, al hacer esto <span class="app-confirm-modal__text-accent--danger"><strong>regresar&aacute; los puntos de los usuarios a 0</strong></span>, consulte previamente con su administrador antes de realizarlo.';
+    const systemUpdateMessageHtml = 'La app descargara cambios de <strong>develop</strong>, compilara el paquete Linux e intentara instalar el nuevo <strong>.deb</strong>. Este proceso puede tardar varios minutos.';
 
     function setStatus(statusElement, message, type = '') {
         if (!statusElement) {
@@ -212,6 +215,50 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    async function updateSystem() {
+        if (!systemUpdateButton) {
+            return;
+        }
+
+        try {
+            if (!window.showAppConfirmModal) {
+                throw new Error('No fue posible cargar el modal de confirmacion.');
+            }
+
+            const confirmed = await window.showAppConfirmModal({
+                title: 'Actualizar sistema',
+                bodyHtml: systemUpdateMessageHtml,
+                confirmText: 'Actualizar',
+                cancelText: 'Cancelar',
+                cancelVariant: 'secondary',
+                confirmVariant: 'success'
+            });
+
+            if (!confirmed) {
+                return;
+            }
+
+            systemUpdateButton.disabled = true;
+            setStatus(systemUpdateStatusElement, 'Actualizando sistema... puede tardar varios minutos.');
+
+            const response = await fetch('/api/reports/system-update', {
+                method: 'POST'
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || 'No fue posible actualizar el sistema.');
+            }
+
+            const result = await response.json();
+            setStatus(systemUpdateStatusElement, result.message ?? 'Sistema actualizado correctamente.', 'success');
+        } catch (error) {
+            setStatus(systemUpdateStatusElement, error.message ?? 'No fue posible actualizar el sistema.', 'error');
+        } finally {
+            systemUpdateButton.disabled = false;
+        }
+    }
+
     downloadButton?.addEventListener('click', exportDatabaseBackup);
     importFileInput?.addEventListener('change', (event) => {
         const [selectedFile] = event.target.files ?? [];
@@ -222,6 +269,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     resetUserPointsButton?.addEventListener('click', () => {
         void resetUserPoints();
+    });
+    systemUpdateButton?.addEventListener('click', () => {
+        void updateSystem();
     });
 
     document.body.dataset.reportsReady = 'true';

@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.ByteArrayOutputStream;
-import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
 import java.time.LocalDateTime;
@@ -106,14 +105,8 @@ public class ThermalTicketService {
                 .filter(value -> value != null)
                 .mapToInt(Integer::intValue)
                 .sum();
-        int totalCost = orderedRecords.stream()
-                .map(MachineExpenseRecords::getTotalCost)
-                .filter(value -> value != null)
-                .mapToInt(BigDecimal::intValue)
-                .sum();
-
         EscPosTicket ticket = newTicket();
-        ticket.centerBold("COMPROBANTE DE CANJE RAPIDO");
+        ticket.centerBold("COMPROBANTE DE CANJE");
         ticket.separator();
         ticket.boldLine("Informacion de la operacion");
         for (int index = 0; index < orderedRecords.size(); index++) {
@@ -122,18 +115,17 @@ public class ThermalTicketService {
                 ticket.blank();
             }
             ticket.keyValue("Premio", record.getPrize().getName());
-            ticket.keyValue("Categoria", record.getPrize().getCategory().getName());
             ticket.keyValue("Cantidad", record.getQuantity());
         }
         ticket.blank();
         ticket.boldLine("Resumen");
         ticket.keyValue("Cantidad total", totalQuantity);
-        ticket.keyValue("Costo total", "$" + totalCost);
-        ticket.center("Se realizo un canje rapido y el premio fue entregado en este momento.");
+        ticket.center("Gracias por jugar. Disfruta tu premio.");
         ticket.dateTime(firstRecord.getRegisteredAt());
         ticket.separator();
         ticket.centerBold("Mensaje importante");
         ticket.center("Recuerde que si usted se registra puede acumular puntos para obtener premios mas grandes.");
+        ticket.center("Realiza tu registro en caja.");
         ticket.separator();
         ticket.center("Gracias por su visita.");
         ticket.center("Conserve este comprobante.");
@@ -158,7 +150,7 @@ public class ThermalTicketService {
         ticket.keyValue("Puntos canjeados", redemption.getPointsSpent());
         ticket.keyValue("Puntos restantes", redemption.getPointTransaction().getNewBalance(), true);
         ticket.blank();
-        ticket.center("El premio fue canjeado correctamente y los puntos del usuario fueron actualizados.");
+        ticket.center("Gracias por jugar. Disfruta tu premio.");
         ticket.dateTime(redemption.getRedeemedAt());
         ticket.separator();
         ticket.centerBold("Mensaje importante");

@@ -350,9 +350,8 @@ public class ReportsService {
 
         String operationItemsText = orderedRecords.stream()
                 .map(record -> String.format(
-                        "Premio: %s%nCategoria: %s%nCantidad: %d",
+                        "Premio: %s%nCantidad: %d",
                         record.getPrize().getName(),
-                        record.getPrize().getCategory().getName(),
                         record.getQuantity()
                 ))
                 .collect(Collectors.joining(System.lineSeparator() + System.lineSeparator()));
