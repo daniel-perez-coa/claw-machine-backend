@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -59,16 +58,7 @@ public class ReportsController {
 
     @PostMapping("/system-update")
     public ResponseEntity<SystemUpdateService.UpdateResult> updateSystem() {
-        try {
-            return ResponseEntity.ok(systemUpdateService.updateFromDevelop());
-        } catch (ResponseStatusException exception) {
-            String message = exception.getReason() == null || exception.getReason().isBlank()
-                    ? "No fue posible actualizar el sistema."
-                    : exception.getReason();
-            return ResponseEntity
-                    .status(exception.getStatusCode())
-                    .body(new SystemUpdateService.UpdateResult(message, ""));
-        }
+        return ResponseEntity.ok(systemUpdateService.updateFromDevelop());
     }
 
     @GetMapping("/tickets/add-points/{transactionId}")

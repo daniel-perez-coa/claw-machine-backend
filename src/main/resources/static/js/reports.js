@@ -260,7 +260,10 @@ document.addEventListener('DOMContentLoaded', () => {
             setStatus(systemUpdateStatusElement, 'Actualizando sistema... puede tardar varios minutos.');
 
             const response = await fetch('/api/reports/system-update', {
-                method: 'POST'
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json'
+                }
             });
 
             if (!response.ok) {
