@@ -21,6 +21,7 @@ import java.util.stream.Stream;
 public class SystemUpdateService {
 
     private final Path repositoryPath;
+    private final Path updaterRootPath;
     private final String repositoryUrl;
     private final String branch;
 
@@ -29,6 +30,7 @@ public class SystemUpdateService {
             @Value("${app.system-update.repository-path:${user.home}/.claw-machine-admin/updater/claw-machine-backend}") String repositoryPath,
             @Value("${app.system-update.branch:develop}") String branch) {
         this.repositoryPath = Path.of(repositoryPath).toAbsolutePath().normalize();
+        this.updaterRootPath = this.repositoryPath.getParent();
         this.repositoryUrl = repositoryUrl;
         this.branch = branch;
     }
@@ -44,7 +46,13 @@ public class SystemUpdateService {
         Path electronPath = repositoryPath.resolve("desktop-electron");
 
         if (!Files.isDirectory(electronPath)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El repositorio no contiene la app de escritorio.");
+            logOutput.append("El repositorio local no contiene la app de escritorio; se descargara de nuevo.\n");
+            cleanUpdaterRepository();
+            repositoryWasCloned = cloneRepository(logOutput);
+            electronPath = repositoryPath.resolve("desktop-electron");
+            if (!Files.isDirectory(electronPath)) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "El repositorio no contiene la app de escritorio.");
+            }
         }
 
         runStep(
@@ -87,10 +95,8 @@ public class SystemUpdateService {
         }
 
         if (Files.exists(repositoryPath) && !isEmptyDirectory(repositoryPath)) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "La carpeta de actualizacion existe, pero no es un repositorio Git valido: " + repositoryPath
-            );
+            logOutput.append("La carpeta de actualizacion existe, pero no es un repositorio Git valido; se limpiara y descargara de nuevo.\n");
+            cleanUpdaterRepository();
         }
 
         Path parentPath = repositoryPath.getParent();
@@ -104,6 +110,15 @@ public class SystemUpdateService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No fue posible preparar la carpeta de actualizacion.");
         }
 
+        return cloneRepository(logOutput);
+    }
+
+    private boolean cloneRepository(StringBuilder logOutput) {
+        Path parentPath = repositoryPath.getParent();
+        if (parentPath == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La ruta del repositorio de actualizacion no es valida.");
+        }
+
         runStep(
                 "Preparando repositorio de actualizacion",
                 parentPath,
@@ -111,6 +126,35 @@ public class SystemUpdateService {
                 logOutput
         );
         return true;
+    }
+
+    private void cleanUpdaterRepository() {
+        assertRepositoryPathIsSafeToDelete();
+
+        if (!Files.exists(repositoryPath)) {
+            return;
+        }
+
+        try (Stream<Path> paths = Files.walk(repositoryPath)) {
+            paths.sorted(Comparator.reverseOrder())
+                    .forEach(path -> {
+                        try {
+                            Files.deleteIfExists(path);
+                        } catch (IOException exception) {
+                            throw new UpdaterCleanupException(exception);
+                        }
+                    });
+        } catch (UpdaterCleanupException exception) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No fue posible limpiar la carpeta de actualizacion.");
+        } catch (IOException exception) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No fue posible revisar la carpeta de actualizacion.");
+        }
+    }
+
+    private void assertRepositoryPathIsSafeToDelete() {
+        if (updaterRootPath == null || !repositoryPath.startsWith(updaterRootPath) || repositoryPath.equals(updaterRootPath)) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "La ruta del repositorio de actualizacion no es segura.");
+        }
     }
 
     private void runStep(String label, Path workingDirectory, List<String> command, StringBuilder logOutput) {
@@ -253,5 +297,11 @@ public class SystemUpdateService {
     }
 
     public record UpdateResult(String message, String log) {
+    }
+
+    private static class UpdaterCleanupException extends RuntimeException {
+        private UpdaterCleanupException(Throwable cause) {
+            super(cause);
+        }
     }
 }
