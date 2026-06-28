@@ -74,7 +74,12 @@ public class SystemUpdateService {
         runStep("Compilando paquete Linux", electronPath, List.of("npm", "run", "dist:linux"), logOutput);
 
         Path debFile = findNewestDeb(electronPath.resolve("dist"));
-        runStep("Instalando paquete", repositoryPath, List.of("pkexec", "apt", "install", "-y", debFile.toString()), logOutput);
+        runStep(
+                "Instalando paquete",
+                repositoryPath,
+                List.of("pkexec", "apt", "install", "--reinstall", "-y", debFile.toString()),
+                logOutput
+        );
 
         return new UpdateResult("Actualizacion instalada correctamente.", tail(logOutput.toString()), true);
     }
