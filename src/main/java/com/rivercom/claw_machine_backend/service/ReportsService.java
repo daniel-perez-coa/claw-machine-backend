@@ -279,7 +279,7 @@ public class ReportsService {
 
         JasperPrint jasperPrint = fillSingleRecordReport("reports/weekly-summary-report.jrxml", parameters);
         return createPdfExport(
-                "reporte-semanal-" + weekStart.format(DateTimeFormatter.BASIC_ISO_DATE) + ".pdf",
+                formatWeeklyReportFileName(weekStart, weekEnd),
                 List.of(jasperPrint)
         );
     }
@@ -575,6 +575,11 @@ public class ReportsService {
     private String formatDateRange(LocalDate weekStart, LocalDate weekEnd) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         return weekStart.format(formatter) + " al " + weekEnd.format(formatter);
+    }
+
+    private String formatWeeklyReportFileName(LocalDate weekStart, LocalDate weekEnd) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        return "REP-" + weekStart.format(formatter) + "-a-" + weekEnd.format(formatter) + ".pdf";
     }
 
     private String formatCurrency(BigDecimal amount) {
