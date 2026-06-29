@@ -1,0 +1,51 @@
+name: Release Linux desktop package
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: desktop-electron/package-lock.json
+
+      - name: Install Electron dependencies
+        working-directory: desktop-electron
+        run: npm ci
+
+      - name: Set package version from tag
+        working-directory: desktop-electron
+        run: npm version "${GITHUB_REF_NAME#v}" --no-git-tag-version
+
+      - name: Build Linux package
+        working-directory: desktop-electron
+        run: npm run dist:linux
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            desktop-electron/dist/*.deb
+            desktop-electron/dist/*.AppImage
+          fail_on_unmatched_files: true
+          generate_release_notes: true
