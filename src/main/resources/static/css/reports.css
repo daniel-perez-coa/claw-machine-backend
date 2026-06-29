@@ -206,6 +206,78 @@
     font-weight: 700;
 }
 
+#systemUpdateModal .modal-dialog {
+    max-width: 620px;
+}
+
+.reports-update-modal {
+    background: linear-gradient(180deg, rgba(8, 21, 45, 0.98) 0%, rgba(5, 16, 34, 1) 100%) !important;
+    border: 1px solid rgba(113, 139, 196, 0.2) !important;
+    border-radius: 22px !important;
+    color: var(--text) !important;
+    box-shadow: var(--shadow-panel);
+    overflow: hidden;
+}
+
+.reports-update-modal__body {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 26px;
+    background:
+        radial-gradient(circle at top right, rgba(59, 130, 246, 0.16), transparent 32%),
+        linear-gradient(180deg, rgba(8, 21, 45, 0.98) 0%, rgba(5, 16, 34, 1) 100%);
+}
+
+.reports-update-modal__title {
+    margin: 0;
+    font-size: 24px;
+    line-height: 1.35;
+    font-weight: 900;
+    color: #ffffff;
+    text-align: center;
+}
+
+.reports-update-modal__message {
+    min-height: 28px;
+    margin: 0;
+    color: var(--text);
+    font-size: 17px;
+    font-weight: 800;
+    text-align: center;
+}
+
+.reports-update-modal__message--success {
+    color: #9ff0c3;
+}
+
+.reports-update-modal__message--error {
+    color: #ffb4b4;
+}
+
+.reports-update-modal__actions {
+    display: flex;
+    justify-content: center;
+}
+
+.reports-update-modal__button {
+    min-width: 150px;
+    min-height: 48px;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(180deg, #22c55e 0%, #15803d 100%);
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 800;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
+    transition: transform 0.18s ease, filter 0.18s ease;
+}
+
+.reports-update-modal__button:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+}
+
 .reports-pagination {
     display: flex;
     align-items: center;

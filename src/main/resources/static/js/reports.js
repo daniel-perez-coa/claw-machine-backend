@@ -6,10 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const systemUpdateButton = document.getElementById('systemUpdateBtn');
     const databaseStatusElement = document.getElementById('reportsStatus');
     const resetPointsStatusElement = document.getElementById('resetPointsStatus');
-    const systemUpdateStatusElement = document.getElementById('systemUpdateStatus');
-    const systemUpdateProgressElement = document.getElementById('systemUpdateProgress');
-    const systemUpdateProgressBarElement = document.getElementById('systemUpdateProgressBar');
-    const systemUpdateProgressTextElement = document.getElementById('systemUpdateProgressText');
     const destructiveDeleteMessageHtml = 'BORRAR LA BASE DE DATOS <span class="app-confirm-modal__text-accent--danger">ELIMINAR&Aacute;</span> TODA LA INFORMACION HASTA EL MOMENTO, <span class="app-confirm-modal__text-accent--warning">SI NO ESTA SEGURO DE REALIZAR ESTA ACCION CANCELE O PREVIAMENTE PREPARE UNA COPIA DE SEGURIDAD.</span>';
     const resetUserPointsMessageHtml = '<span class="app-confirm-modal__text-accent--danger"><strong>Esta acci&oacute;n es irreversible</strong></span>, al hacer esto <span class="app-confirm-modal__text-accent--danger"><strong>regresar&aacute; los puntos de los usuarios a 0</strong></span>, consulte previamente con su administrador antes de realizarlo.';
     const systemUpdateMessageHtml = 'Se comenzar&aacute; el proceso para buscar actualizaciones disponibles. Si existe una nueva versi&oacute;n, la aplicaci&oacute;n la preparar&aacute; e instalar&aacute; autom&aacute;ticamente.';
@@ -20,6 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
         { progress: 82, message: 'Aplicando los ultimos ajustes...' }
     ];
     let systemUpdateProgressTimer = null;
+    let systemUpdateModalElement = null;
+    let systemUpdateModalInstance = null;
     let systemRestartTimer = null;
 
     function setStatus(statusElement, message, type = '') {
@@ -70,20 +68,66 @@ document.addEventListener('DOMContentLoaded', () => {
         return errorText || fallbackMessage;
     }
 
-    function setSystemUpdateProgress(progress, message) {
-        if (!systemUpdateProgressElement || !systemUpdateProgressBarElement || !systemUpdateProgressTextElement) {
+    function ensureSystemUpdateModal() {
+        if (systemUpdateModalElement) {
             return;
         }
 
-        systemUpdateProgressElement.classList.add('reports-progress--active');
-        systemUpdateProgressElement.setAttribute('aria-hidden', 'false');
-        systemUpdateProgressBarElement.style.width = `${Math.min(progress, 100)}%`;
-        systemUpdateProgressTextElement.textContent = message;
+        systemUpdateModalElement = document.createElement('div');
+        systemUpdateModalElement.className = 'modal fade';
+        systemUpdateModalElement.id = 'systemUpdateModal';
+        systemUpdateModalElement.tabIndex = -1;
+        systemUpdateModalElement.setAttribute('aria-hidden', 'true');
+        systemUpdateModalElement.innerHTML = `
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content reports-update-modal">
+                    <div class="modal-body reports-update-modal__body">
+                        <h2 class="reports-update-modal__title">Actualizando aplicacion</h2>
+                        <p class="reports-update-modal__message" data-system-update-message></p>
+                        <div class="reports-progress reports-progress--active" aria-hidden="false">
+                            <div class="reports-progress__track">
+                                <div class="reports-progress__bar" data-system-update-progress-bar></div>
+                            </div>
+                            <div class="reports-progress__text" data-system-update-progress-text></div>
+                        </div>
+                        <div class="reports-update-modal__actions">
+                            <button type="button" class="reports-update-modal__button" data-system-update-close hidden>Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(systemUpdateModalElement);
+
+        const closeButton = systemUpdateModalElement.querySelector('[data-system-update-close]');
+        closeButton.addEventListener('click', () => {
+            systemUpdateModalInstance?.hide();
+        });
+
+        systemUpdateModalInstance = new window.bootstrap.Modal(systemUpdateModalElement, {
+            backdrop: 'static',
+            keyboard: false
+        });
+    }
+
+    function setSystemUpdateProgress(progress, message) {
+        ensureSystemUpdateModal();
+
+        const progressBarElement = systemUpdateModalElement.querySelector('[data-system-update-progress-bar]');
+        const progressTextElement = systemUpdateModalElement.querySelector('[data-system-update-progress-text]');
+        const messageElement = systemUpdateModalElement.querySelector('[data-system-update-message]');
+
+        progressBarElement.style.width = `${Math.min(progress, 100)}%`;
+        progressTextElement.textContent = message;
+        messageElement.textContent = 'No cierre la aplicacion mientras se completa el proceso.';
+        messageElement.classList.remove('reports-update-modal__message--success', 'reports-update-modal__message--error');
     }
 
     function startSystemUpdateProgress() {
         let currentStepIndex = 0;
         clearInterval(systemUpdateProgressTimer);
+        showSystemUpdateModal(false);
         setSystemUpdateProgress(
             systemUpdateProgressSteps[currentStepIndex].progress,
             systemUpdateProgressSteps[currentStepIndex].message
@@ -104,18 +148,30 @@ document.addEventListener('DOMContentLoaded', () => {
         setSystemUpdateProgress(100, message);
     }
 
-    function resetSystemUpdateProgress() {
+    function showSystemUpdateModal(canClose) {
+        ensureSystemUpdateModal();
+        const closeButton = systemUpdateModalElement.querySelector('[data-system-update-close]');
+        closeButton.hidden = !canClose;
+        systemUpdateModalInstance.show();
+    }
+
+    function showSystemUpdateResult(message, type = 'success') {
+        ensureSystemUpdateModal();
         clearInterval(systemUpdateProgressTimer);
         systemUpdateProgressTimer = null;
 
-        if (!systemUpdateProgressElement || !systemUpdateProgressBarElement || !systemUpdateProgressTextElement) {
-            return;
-        }
+        const messageElement = systemUpdateModalElement.querySelector('[data-system-update-message]');
+        const progressTextElement = systemUpdateModalElement.querySelector('[data-system-update-progress-text]');
+        const progressBarElement = systemUpdateModalElement.querySelector('[data-system-update-progress-bar]');
+        const closeButton = systemUpdateModalElement.querySelector('[data-system-update-close]');
 
-        systemUpdateProgressElement.classList.remove('reports-progress--active');
-        systemUpdateProgressElement.setAttribute('aria-hidden', 'true');
-        systemUpdateProgressBarElement.style.width = '0';
-        systemUpdateProgressTextElement.textContent = '';
+        progressBarElement.style.width = '100%';
+        progressTextElement.textContent = 'Proceso finalizado.';
+        messageElement.textContent = message;
+        messageElement.classList.remove('reports-update-modal__message--success', 'reports-update-modal__message--error');
+        messageElement.classList.add(`reports-update-modal__message--${type}`);
+        closeButton.hidden = false;
+        systemUpdateModalInstance.show();
     }
 
     function restartDesktopApp() {
@@ -124,12 +180,12 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        setStatus(systemUpdateStatusElement, 'Actualizacion lista. Cierre y abra la aplicacion para terminar.', 'success');
+        showSystemUpdateResult('Actualizacion lista. Cierre y abra la aplicacion para terminar.', 'success');
     }
 
     async function showRestartPrompt() {
         if (!window.clawMachineDesktop?.restartApp) {
-            setStatus(systemUpdateStatusElement, 'Actualizacion lista. Cierre y abra la aplicacion para terminar.', 'success');
+            showSystemUpdateResult('Actualizacion lista. Cierre y abra la aplicacion para terminar.', 'success');
             return;
         }
 
@@ -376,7 +432,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             systemUpdateButton.disabled = true;
-            setStatus(systemUpdateStatusElement, 'Buscando actualizaciones... puede tardar varios minutos.');
             startSystemUpdateProgress();
 
             const response = await fetch('/api/reports/system-update', {
@@ -392,14 +447,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const result = await response.json();
             finishSystemUpdateProgress('Proceso finalizado.');
-            setStatus(systemUpdateStatusElement, result.message ?? 'Aplicacion actualizada correctamente.', 'success');
+            showSystemUpdateResult(result.message ?? 'Aplicacion actualizada correctamente.', 'success');
 
             if (result.restartRequired) {
+                systemUpdateModalInstance?.hide();
                 await showRestartPrompt();
             }
         } catch (error) {
-            resetSystemUpdateProgress();
-            setStatus(systemUpdateStatusElement, error.message ?? 'No fue posible actualizar el sistema.', 'error');
+            showSystemUpdateResult(error.message ?? 'No fue posible actualizar el sistema.', 'error');
         } finally {
             systemUpdateButton.disabled = false;
         }
