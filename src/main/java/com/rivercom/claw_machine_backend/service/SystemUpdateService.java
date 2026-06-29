@@ -1,5 +1,7 @@
 package com.rivercom.claw_machine_backend.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -7,9 +9,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.time.Duration;
 import java.util.Comparator;
 import java.util.List;
@@ -22,18 +29,34 @@ import java.util.stream.Stream;
 public class SystemUpdateService {
 
     private final Path repositoryPath;
+    private final Path releaseDownloadPath;
     private final Path updaterRootPath;
     private final String repositoryUrl;
     private final String branch;
+    private final String releaseApiUrl;
+    private final String packageName;
+    private final HttpClient httpClient;
+    private final ObjectMapper objectMapper;
 
     public SystemUpdateService(
             @Value("${app.system-update.repository-url:https://github.com/daniel-perez-coa/claw-machine-backend.git}") String repositoryUrl,
             @Value("${app.system-update.repository-path:${user.home}/.claw-machine-admin/updater/claw-machine-backend}") String repositoryPath,
-            @Value("${app.system-update.branch:develop}") String branch) {
+            @Value("${app.system-update.branch:develop}") String branch,
+            @Value("${app.system-update.release-api-url:https://api.github.com/repos/daniel-perez-coa/claw-machine-backend/releases/latest}") String releaseApiUrl,
+            @Value("${app.system-update.release-download-path:${user.home}/.claw-machine-admin/updater/releases}") String releaseDownloadPath,
+            @Value("${app.system-update.package-name:maquina-de-garra}") String packageName) {
         this.repositoryPath = Path.of(repositoryPath).toAbsolutePath().normalize();
+        this.releaseDownloadPath = Path.of(releaseDownloadPath).toAbsolutePath().normalize();
         this.updaterRootPath = this.repositoryPath.getParent();
         this.repositoryUrl = repositoryUrl;
         this.branch = branch;
+        this.releaseApiUrl = releaseApiUrl;
+        this.packageName = packageName;
+        this.objectMapper = new ObjectMapper();
+        this.httpClient = HttpClient.newBuilder()
+                .followRedirects(HttpClient.Redirect.NORMAL)
+                .connectTimeout(Duration.ofSeconds(30))
+                .build();
     }
 
     public UpdateResult updateFromDevelop() {
@@ -42,50 +65,171 @@ public class SystemUpdateService {
         }
 
         StringBuilder logOutput = new StringBuilder();
-        verifyRepositoryReachable(logOutput);
-        boolean repositoryWasCloned = ensureRepository(logOutput);
-        Path electronPath = repositoryPath.resolve("desktop-electron");
+        ensureReleaseDownloadPath();
 
-        if (!Files.isDirectory(electronPath)) {
-            logOutput.append("El repositorio local no contiene la app de escritorio; se descargara de nuevo.\n");
-            cleanUpdaterRepository();
-            repositoryWasCloned = cloneRepository(logOutput);
-            electronPath = repositoryPath.resolve("desktop-electron");
-            if (!Files.isDirectory(electronPath)) {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "El repositorio no contiene la app de escritorio.");
-            }
+        if (installPendingDownloadedPackage(releaseDownloadPath, logOutput)) {
+            return new UpdateResult("Actualizacion instalada correctamente.", tail(logOutput.toString()), true);
         }
 
-        runStep(
-                "Buscando nuevas versiones",
-                repositoryPath,
-                List.of("git", "fetch", "origin", branch + ":refs/remotes/origin/" + branch),
-                logOutput
-        );
+        GitHubRelease release = fetchLatestRelease(logOutput);
+        String releaseVersion = normalizeReleaseVersion(release.tagName());
+        String installedVersion = readInstalledPackageVersion(packageName, logOutput);
 
-        if (!repositoryWasCloned && !hasRemoteChanges()) {
-            if (installPendingDownloadedPackage(electronPath, logOutput)) {
-                return new UpdateResult("Actualizacion instalada correctamente.", tail(logOutput.toString()), true);
-            }
-
+        if (installedVersion != null && !isDebVersionNewer(releaseVersion, installedVersion, logOutput)) {
             return new UpdateResult("No hay nuevas versiones que descargar.", tail(logOutput.toString()), false);
         }
 
-        if (!repositoryWasCloned) {
-            runStep("Descargando cambios", repositoryPath, List.of("git", "pull", "origin", branch), logOutput);
+        Path debFile = downloadReleaseAsset(release, logOutput);
+        DebPackageInfo packageInfo = readDebPackageInfo(debFile);
+        String currentInstalledVersion = readInstalledPackageVersion(packageInfo.packageName(), logOutput);
+
+        if (currentInstalledVersion != null && !isDebVersionNewer(packageInfo.version(), currentInstalledVersion, logOutput)) {
+            return new UpdateResult("No hay nuevas versiones que descargar.", tail(logOutput.toString()), false);
         }
 
-        runStep("Instalando dependencias", electronPath, List.of("npm", "install"), logOutput);
-        runStep("Compilando paquete Linux", electronPath, List.of("npm", "run", "dist:linux"), logOutput);
-
-        Path debFile = findNewestDeb(electronPath.resolve("dist"));
         installDebPackage(debFile, logOutput);
-
         return new UpdateResult("Actualizacion instalada correctamente.", tail(logOutput.toString()), true);
     }
 
-    private boolean installPendingDownloadedPackage(Path electronPath, StringBuilder logOutput) {
-        Path distPath = electronPath.resolve("dist");
+    private void ensureReleaseDownloadPath() {
+        try {
+            Files.createDirectories(releaseDownloadPath);
+        } catch (IOException exception) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No fue posible preparar la carpeta de descargas de actualizacion.");
+        }
+    }
+
+    private GitHubRelease fetchLatestRelease(StringBuilder logOutput) {
+        logOutput.append("\n== Buscando ultima version publicada ==\n");
+
+        HttpRequest request = HttpRequest.newBuilder(URI.create(releaseApiUrl))
+                .timeout(Duration.ofSeconds(30))
+                .header("Accept", "application/vnd.github+json")
+                .header("User-Agent", "claw-machine-admin-updater")
+                .GET()
+                .build();
+
+        try {
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+            if (response.statusCode() < 200 || response.statusCode() >= 300) {
+                throw new ResponseStatusException(
+                        HttpStatus.INTERNAL_SERVER_ERROR,
+                        "No fue posible consultar la ultima version publicada. Detalle: HTTP " + response.statusCode()
+                );
+            }
+
+            JsonNode releaseNode = objectMapper.readTree(response.body());
+            String tagName = releaseNode.path("tag_name").asText("");
+            JsonNode assetsNode = releaseNode.path("assets");
+
+            if (tagName.isBlank() || !assetsNode.isArray()) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "La respuesta de releases no contiene una version valida.");
+            }
+
+            GitHubReleaseAsset debAsset = findDebAsset(assetsNode)
+                    .orElseThrow(() -> new ResponseStatusException(
+                            HttpStatus.INTERNAL_SERVER_ERROR,
+                            "La ultima version publicada no contiene un paquete .deb."
+                    ));
+
+            logOutput.append("Ultima version publicada: ").append(tagName).append(".\n");
+            logOutput.append("Paquete disponible: ").append(debAsset.name()).append(".\n");
+            return new GitHubRelease(tagName, debAsset);
+        } catch (IOException exception) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No fue posible leer la informacion de actualizacion.");
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "La consulta de actualizaciones fue interrumpida.");
+        }
+    }
+
+    private Optional<GitHubReleaseAsset> findDebAsset(JsonNode assetsNode) {
+        GitHubReleaseAsset firstDebAsset = null;
+
+        for (JsonNode assetNode : assetsNode) {
+            String name = assetNode.path("name").asText("");
+            String downloadUrl = assetNode.path("browser_download_url").asText("");
+
+            if (!name.endsWith(".deb") || downloadUrl.isBlank()) {
+                continue;
+            }
+
+            GitHubReleaseAsset asset = new GitHubReleaseAsset(name, downloadUrl);
+            if (name.contains("amd64")) {
+                return Optional.of(asset);
+            }
+
+            if (firstDebAsset == null) {
+                firstDebAsset = asset;
+            }
+        }
+
+        return Optional.ofNullable(firstDebAsset);
+    }
+
+    private Path downloadReleaseAsset(GitHubRelease release, StringBuilder logOutput) {
+        GitHubReleaseAsset asset = release.asset();
+        Path targetPath = releaseDownloadPath.resolve(asset.name()).normalize();
+
+        if (!targetPath.startsWith(releaseDownloadPath)) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "El nombre del paquete de actualizacion no es seguro.");
+        }
+
+        if (Files.exists(targetPath)) {
+            logOutput.append("El paquete ya estaba descargado: ").append(targetPath).append(".\n");
+            return targetPath;
+        }
+
+        logOutput.append("\n== Descargando paquete publicado ==\n");
+        logOutput.append(asset.downloadUrl()).append('\n');
+
+        HttpRequest request = HttpRequest.newBuilder(URI.create(asset.downloadUrl()))
+                .timeout(Duration.ofMinutes(10))
+                .header("User-Agent", "claw-machine-admin-updater")
+                .GET()
+                .build();
+
+        try {
+            HttpResponse<Path> response = httpClient.send(
+                    request,
+                    HttpResponse.BodyHandlers.ofFile(
+                            targetPath,
+                            StandardOpenOption.CREATE,
+                            StandardOpenOption.TRUNCATE_EXISTING,
+                            StandardOpenOption.WRITE
+                    )
+            );
+
+            if (response.statusCode() < 200 || response.statusCode() >= 300) {
+                throw new ResponseStatusException(
+                        HttpStatus.INTERNAL_SERVER_ERROR,
+                        "No fue posible descargar el paquete de actualizacion. Detalle: HTTP " + response.statusCode()
+                );
+            }
+
+            return targetPath;
+        } catch (IOException exception) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No fue posible guardar el paquete de actualizacion.");
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "La descarga de actualizacion fue interrumpida.");
+        }
+    }
+
+    private String normalizeReleaseVersion(String tagName) {
+        String normalizedVersion = tagName == null ? "" : tagName.trim();
+        if (normalizedVersion.startsWith("v") || normalizedVersion.startsWith("V")) {
+            normalizedVersion = normalizedVersion.substring(1);
+        }
+
+        if (normalizedVersion.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "La version publicada no es valida.");
+        }
+
+        return normalizedVersion;
+    }
+
+    private boolean installPendingDownloadedPackage(Path distPath, StringBuilder logOutput) {
         if (!Files.isDirectory(distPath)) {
             logOutput.append("No hay paquete local pendiente para instalar.\n");
             return false;
@@ -124,12 +268,12 @@ public class SystemUpdateService {
     private DebPackageInfo readDebPackageInfo(Path debFile) {
         String packageName = runCommandForOutput(
                 "Leyendo nombre del paquete local",
-                repositoryPath,
+                debFile.getParent(),
                 List.of("dpkg-deb", "-f", debFile.toString(), "Package")
         );
         String version = runCommandForOutput(
                 "Leyendo version del paquete local",
-                repositoryPath,
+                debFile.getParent(),
                 List.of("dpkg-deb", "-f", debFile.toString(), "Version")
         );
 
@@ -143,7 +287,7 @@ public class SystemUpdateService {
     private String readInstalledPackageVersion(String packageName, StringBuilder logOutput) {
         ProcessResult result = runCommand(
                 "Leyendo version instalada",
-                repositoryPath,
+                releaseDownloadPath,
                 List.of("dpkg-query", "-W", "-f=${Version}", packageName),
                 Duration.ofSeconds(30)
         );
@@ -167,7 +311,7 @@ public class SystemUpdateService {
     private boolean isDebVersionNewer(String candidateVersion, String installedVersion, StringBuilder logOutput) {
         ProcessResult result = runCommand(
                 "Comparando versiones",
-                repositoryPath,
+                releaseDownloadPath,
                 List.of("dpkg", "--compare-versions", candidateVersion, "gt", installedVersion),
                 Duration.ofSeconds(30)
         );
@@ -187,7 +331,7 @@ public class SystemUpdateService {
     private void installDebPackage(Path debFile, StringBuilder logOutput) {
         runStep(
                 "Instalando paquete",
-                repositoryPath,
+                debFile.getParent(),
                 List.of("/usr/bin/pkexec", "/usr/bin/apt", "install", "--reinstall", "-y", debFile.toString()),
                 logOutput
         );
@@ -464,6 +608,12 @@ public class SystemUpdateService {
     }
 
     private record ProcessResult(int exitCode, String output) {
+    }
+
+    private record GitHubRelease(String tagName, GitHubReleaseAsset asset) {
+    }
+
+    private record GitHubReleaseAsset(String name, String downloadUrl) {
     }
 
     private static class UpdaterCleanupException extends RuntimeException {
