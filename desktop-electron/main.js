@@ -54,16 +54,40 @@ function ensureDownloadsDir() {
   return downloadsDir;
 }
 
+function sanitizePathSegment(segment, fallback = 'Archivo') {
+  const sanitized = String(segment || '')
+    .replace(/[<>:"/\\|?*\x00-\x1F]/g, '-')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  return sanitized || fallback;
+}
+
+function getReportsDir(monthName) {
+  const reportsDir = path.join(
+    app.getPath('documents'),
+    'Sepia',
+    'Reportes',
+    sanitizePathSegment(monthName, 'Reportes')
+  );
+  fs.mkdirSync(reportsDir, { recursive: true });
+  return reportsDir;
+}
+
 function getAvailableDownloadPath(fileName) {
   const downloadsDir = ensureDownloadsDir();
-  const parsedPath = path.parse(fileName || 'descarga');
+  return getAvailableFilePath(downloadsDir, fileName);
+}
+
+function getAvailableFilePath(directoryPath, fileName) {
+  const parsedPath = path.parse(sanitizePathSegment(fileName, 'descarga'));
   const baseName = parsedPath.name || 'descarga';
   const extension = parsedPath.ext || '';
-  let candidatePath = path.join(downloadsDir, `${baseName}${extension}`);
+  let candidatePath = path.join(directoryPath, `${baseName}${extension}`);
   let suffix = 1;
 
   while (fs.existsSync(candidatePath)) {
-    candidatePath = path.join(downloadsDir, `${baseName} (${suffix})${extension}`);
+    candidatePath = path.join(directoryPath, `${baseName} (${suffix})${extension}`);
     suffix += 1;
   }
 
@@ -283,4 +307,13 @@ app.on('activate', () => {
 
 ipcMain.handle('restart-app', () => {
   restartApplication();
+});
+
+ipcMain.handle('save-weekly-report', async (_event, { fileName, monthName, content }) => {
+  const reportsDir = getReportsDir(monthName);
+  const targetPath = getAvailableFilePath(reportsDir, fileName);
+  const bytes = Buffer.from(content);
+
+  await fs.promises.writeFile(targetPath, bytes);
+  return { path: targetPath };
 });
