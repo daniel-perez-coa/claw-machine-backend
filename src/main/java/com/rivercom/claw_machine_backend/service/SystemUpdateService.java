@@ -188,7 +188,7 @@ public class SystemUpdateService {
         runStep(
                 "Instalando paquete",
                 repositoryPath,
-                List.of("pkexec", "/usr/bin/apt", "install", "--reinstall", "-y", debFile.toString()),
+                List.of("/usr/bin/pkexec", "/usr/bin/apt", "install", "--reinstall", "-y", debFile.toString()),
                 logOutput
         );
     }
