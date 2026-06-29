@@ -48,6 +48,34 @@ function ensureLogsDir() {
   fs.mkdirSync(getLogsDir(), { recursive: true });
 }
 
+function ensureDownloadsDir() {
+  const downloadsDir = app.getPath('downloads');
+  fs.mkdirSync(downloadsDir, { recursive: true });
+  return downloadsDir;
+}
+
+function getAvailableDownloadPath(fileName) {
+  const downloadsDir = ensureDownloadsDir();
+  const parsedPath = path.parse(fileName || 'descarga');
+  const baseName = parsedPath.name || 'descarga';
+  const extension = parsedPath.ext || '';
+  let candidatePath = path.join(downloadsDir, `${baseName}${extension}`);
+  let suffix = 1;
+
+  while (fs.existsSync(candidatePath)) {
+    candidatePath = path.join(downloadsDir, `${baseName} (${suffix})${extension}`);
+    suffix += 1;
+  }
+
+  return candidatePath;
+}
+
+function configureAutomaticDownloads(webContents) {
+  webContents.session.on('will-download', (_event, item) => {
+    item.setSavePath(getAvailableDownloadPath(item.getFilename()));
+  });
+}
+
 function writeLaunchUrl() {
   const appHome = path.join(app.getPath('home'), '.claw-machine-admin');
   fs.mkdirSync(appHome, { recursive: true });
@@ -96,6 +124,7 @@ async function openMainWindow() {
     }
   });
 
+  configureAutomaticDownloads(mainWindow.webContents);
   await mainWindow.webContents.session.clearCache();
   mainWindow.loadURL(BACKEND_URL);
   mainWindow.once('ready-to-show', () => {
