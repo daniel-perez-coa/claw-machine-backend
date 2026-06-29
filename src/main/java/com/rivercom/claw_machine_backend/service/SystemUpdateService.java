@@ -14,6 +14,7 @@ import java.time.Duration;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Service
@@ -63,6 +64,10 @@ public class SystemUpdateService {
         );
 
         if (!repositoryWasCloned && !hasRemoteChanges()) {
+            if (installPendingDownloadedPackage(electronPath, logOutput)) {
+                return new UpdateResult("Actualizacion instalada correctamente.", tail(logOutput.toString()), true);
+            }
+
             return new UpdateResult("No hay nuevas versiones que descargar.", tail(logOutput.toString()), false);
         }
 
@@ -74,14 +79,118 @@ public class SystemUpdateService {
         runStep("Compilando paquete Linux", electronPath, List.of("npm", "run", "dist:linux"), logOutput);
 
         Path debFile = findNewestDeb(electronPath.resolve("dist"));
+        installDebPackage(debFile, logOutput);
+
+        return new UpdateResult("Actualizacion instalada correctamente.", tail(logOutput.toString()), true);
+    }
+
+    private boolean installPendingDownloadedPackage(Path electronPath, StringBuilder logOutput) {
+        Path distPath = electronPath.resolve("dist");
+        if (!Files.isDirectory(distPath)) {
+            logOutput.append("No hay paquete local pendiente para instalar.\n");
+            return false;
+        }
+
+        Optional<Path> pendingDebFile = findNewestDebOptional(distPath);
+        if (pendingDebFile.isEmpty()) {
+            logOutput.append("No hay paquete local pendiente para instalar.\n");
+            return false;
+        }
+
+        Path debFile = pendingDebFile.get();
+        DebPackageInfo packageInfo = readDebPackageInfo(debFile);
+        String installedVersion = readInstalledPackageVersion(packageInfo.packageName(), logOutput);
+
+        if (installedVersion != null && !isDebVersionNewer(packageInfo.version(), installedVersion, logOutput)) {
+            logOutput.append("El paquete local ")
+                    .append(packageInfo.packageName())
+                    .append(" version ")
+                    .append(packageInfo.version())
+                    .append(" no es mas nuevo que la version instalada ")
+                    .append(installedVersion)
+                    .append(".\n");
+            return false;
+        }
+
+        logOutput.append("Se encontro un paquete local pendiente: ")
+                .append(packageInfo.packageName())
+                .append(" ")
+                .append(packageInfo.version())
+                .append(". Se instalara sin descargar nuevamente.\n");
+        installDebPackage(debFile, logOutput);
+        return true;
+    }
+
+    private DebPackageInfo readDebPackageInfo(Path debFile) {
+        String packageName = runCommandForOutput(
+                "Leyendo nombre del paquete local",
+                repositoryPath,
+                List.of("dpkg-deb", "-f", debFile.toString(), "Package")
+        );
+        String version = runCommandForOutput(
+                "Leyendo version del paquete local",
+                repositoryPath,
+                List.of("dpkg-deb", "-f", debFile.toString(), "Version")
+        );
+
+        if (packageName.isBlank() || version.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No fue posible leer la version del paquete local.");
+        }
+
+        return new DebPackageInfo(packageName, version);
+    }
+
+    private String readInstalledPackageVersion(String packageName, StringBuilder logOutput) {
+        ProcessResult result = runCommand(
+                "Leyendo version instalada",
+                repositoryPath,
+                List.of("dpkg-query", "-W", "-f=${Version}", packageName),
+                Duration.ofSeconds(30)
+        );
+
+        if (result.exitCode() == 0) {
+            String version = result.output().trim();
+            logOutput.append("Version instalada de ")
+                    .append(packageName)
+                    .append(": ")
+                    .append(version)
+                    .append(".\n");
+            return version;
+        }
+
+        logOutput.append("El paquete ")
+                .append(packageName)
+                .append(" no esta instalado o no se pudo consultar; se intentara instalar el paquete local.\n");
+        return null;
+    }
+
+    private boolean isDebVersionNewer(String candidateVersion, String installedVersion, StringBuilder logOutput) {
+        ProcessResult result = runCommand(
+                "Comparando versiones",
+                repositoryPath,
+                List.of("dpkg", "--compare-versions", candidateVersion, "gt", installedVersion),
+                Duration.ofSeconds(30)
+        );
+
+        if (result.exitCode() == 0) {
+            return true;
+        }
+
+        if (result.exitCode() == 1) {
+            return false;
+        }
+
+        logOutput.append(result.output()).append('\n');
+        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No fue posible comparar la version del paquete local.");
+    }
+
+    private void installDebPackage(Path debFile, StringBuilder logOutput) {
         runStep(
                 "Instalando paquete",
                 repositoryPath,
                 List.of("pkexec", "/usr/bin/apt", "install", "--reinstall", "-y", debFile.toString()),
                 logOutput
         );
-
-        return new UpdateResult("Actualizacion instalada correctamente.", tail(logOutput.toString()), true);
     }
 
     private void verifyRepositoryReachable(StringBuilder logOutput) {
@@ -205,6 +314,49 @@ public class SystemUpdateService {
         }
     }
 
+    private String runCommandForOutput(String label, Path workingDirectory, List<String> command) {
+        ProcessResult result = runCommand(label, workingDirectory, command, Duration.ofSeconds(30));
+
+        if (result.exitCode() != 0) {
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    label + " fallo. " + summarizeProcessOutput(result.output())
+            );
+        }
+
+        return result.output().trim();
+    }
+
+    private ProcessResult runCommand(String label, Path workingDirectory, List<String> command, Duration timeout) {
+        log.info("Ejecutando actualizacion: {} command={}", label, command);
+
+        ProcessBuilder processBuilder = new ProcessBuilder(command);
+        processBuilder.directory(workingDirectory.toFile());
+        processBuilder.redirectErrorStream(true);
+
+        try {
+            Process process = processBuilder.start();
+            boolean finished = process.waitFor(timeout.toMillis(), java.util.concurrent.TimeUnit.MILLISECONDS);
+
+            if (!finished) {
+                process.destroyForcibly();
+                throw new ResponseStatusException(HttpStatus.GATEWAY_TIMEOUT, label + " tardo demasiado tiempo.");
+            }
+
+            String output = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+            return new ProcessResult(process.exitValue(), output);
+        } catch (IOException exception) {
+            log.error("No fue posible ejecutar {}", label, exception);
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "No fue posible ejecutar " + label + ". Verifique que Git, Node/npm y las herramientas del sistema esten instaladas."
+            );
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "La actualizacion fue interrumpida.");
+        }
+    }
+
     private void readProcessOutput(Process process, StringBuilder processOutput) {
         try {
             byte[] bytes = process.getInputStream().readAllBytes();
@@ -230,6 +382,14 @@ public class SystemUpdateService {
     }
 
     private Path findNewestDeb(Path distPath) {
+        return findNewestDebOptional(distPath)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.INTERNAL_SERVER_ERROR,
+                        "No se encontro el paquete .deb generado."
+                ));
+    }
+
+    private Optional<Path> findNewestDebOptional(Path distPath) {
         if (!Files.isDirectory(distPath)) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No se encontro la carpeta dist del paquete Linux.");
         }
@@ -237,11 +397,7 @@ public class SystemUpdateService {
         try (Stream<Path> files = Files.list(distPath)) {
             return files
                     .filter(path -> path.getFileName().toString().endsWith(".deb"))
-                    .max(Comparator.comparing(path -> path.toFile().lastModified()))
-                    .orElseThrow(() -> new ResponseStatusException(
-                            HttpStatus.INTERNAL_SERVER_ERROR,
-                            "No se encontro el paquete .deb generado."
-                    ));
+                    .max(Comparator.comparing(path -> path.toFile().lastModified()));
         } catch (IOException exception) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No fue posible localizar el paquete .deb.");
         }
@@ -302,6 +458,12 @@ public class SystemUpdateService {
     }
 
     public record UpdateResult(String message, String log, boolean restartRequired) {
+    }
+
+    private record DebPackageInfo(String packageName, String version) {
+    }
+
+    private record ProcessResult(int exitCode, String output) {
     }
 
     private static class UpdaterCleanupException extends RuntimeException {
