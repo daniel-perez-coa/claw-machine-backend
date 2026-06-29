@@ -96,7 +96,7 @@ public class ReportsController {
 
     @GetMapping("/weekly-summary/current")
     public ResponseEntity<byte[]> printCurrentWeeklySummary() {
-        return buildPdfResponse(reportsService.generateCurrentWeeklySummaryReport());
+        return buildPdfDownloadResponse(reportsService.generateCurrentWeeklySummaryReport());
     }
 
     @GetMapping("/add-points-transactions")
@@ -137,6 +137,20 @@ public class ReportsController {
                 .header(
                         HttpHeaders.CONTENT_DISPOSITION,
                         ContentDisposition.inline()
+                                .filename(reportExport.fileName(), StandardCharsets.UTF_8)
+                                .build()
+                                .toString()
+                )
+                .contentType(MediaType.APPLICATION_PDF)
+                .contentLength(reportExport.content().length)
+                .body(reportExport.content());
+    }
+
+    private ResponseEntity<byte[]> buildPdfDownloadResponse(ReportsService.PdfReportExport reportExport) {
+        return ResponseEntity.ok()
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        ContentDisposition.attachment()
                                 .filename(reportExport.fileName(), StandardCharsets.UTF_8)
                                 .build()
                                 .toString()

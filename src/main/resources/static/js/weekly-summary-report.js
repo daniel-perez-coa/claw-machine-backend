@@ -15,21 +15,52 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function generateWeeklyReport() {
-        if (!generateButton || !window.appReportPrinter) {
-            return;
+    function getFileNameFromHeader(dispositionHeader) {
+        if (!dispositionHeader) {
+            return 'reporte-semanal.pdf';
         }
 
-        const printWindow = window.appReportPrinter.openPrintWindow('Preparando reporte semanal...');
+        const utf8Match = dispositionHeader.match(/filename\*=UTF-8''([^;]+)/i);
+        if (utf8Match?.[1]) {
+            return decodeURIComponent(utf8Match[1]);
+        }
+
+        const basicMatch = dispositionHeader.match(/filename="?([^"]+)"?/i);
+        return basicMatch?.[1] ?? 'reporte-semanal.pdf';
+    }
+
+    async function downloadPdfFromUrl(url) {
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error('No fue posible descargar el reporte semanal.');
+        }
+
+        const fileName = getFileNameFromHeader(response.headers.get('content-disposition'));
+        const fileBlob = await response.blob();
+        const downloadUrl = window.URL.createObjectURL(fileBlob);
+        const anchor = document.createElement('a');
+
+        anchor.href = downloadUrl;
+        anchor.download = fileName;
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+        window.URL.revokeObjectURL(downloadUrl);
+    }
+
+    async function generateWeeklyReport() {
+        if (!generateButton) {
+            return;
+        }
 
         try {
             generateButton.disabled = true;
             setStatus('Generando reporte semanal...');
-            await window.appReportPrinter.printPdfFromUrl('/api/reports/weekly-summary/current', printWindow);
-            setStatus('Reporte semanal generado correctamente.', 'success');
+            await downloadPdfFromUrl('/api/reports/weekly-summary/current');
+            setStatus('Reporte semanal descargado correctamente.', 'success');
         } catch (error) {
-            printWindow?.close();
-            setStatus('No fue posible generar el reporte semanal.', 'error');
+            setStatus(error.message ?? 'No fue posible descargar el reporte semanal.', 'error');
         } finally {
             generateButton.disabled = false;
         }
